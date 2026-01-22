@@ -1,0 +1,63 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+
+body{
+    margin: 0px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(32, 32, 251);
+}
+
+.LoginContainer{
+    background-color: rgb(246, 246, 246);
+    border-radius: 20px;
+    box-shadow: 3px 3px 30px black;
+    width: 400px;
+    height: 400px;
+    transition: ease 0.5s;
+}
+
+.LoginContents{
+    margin: 50px;
+    transition: ease 0.5s;
+}
+
+.InputBox input{
+    border: 2px rgb(194, 194, 194) solid;
+    padding: 10px;
+    box-shadow: 1px 1px 20px rgb(146, 146, 146);
+    border-radius: 7px;
+    width: 100%;
+    margin-bottom: 15px;
+
+}
+
+#Forgot a{
+    color: blue;
+}
+
+.SubmitBtn button{
+    background-color: rgb(14, 14, 14);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    width: 100%;
+    
+}
+
+.SubmitBtn button:hover{
+    transition: ease 0.5s;
+    cursor: pointer;
+    transform:translateY(-3px);
+}
+
+span h3{
+    margin-bottom: 5px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}

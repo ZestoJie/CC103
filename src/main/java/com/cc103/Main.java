@@ -4,28 +4,37 @@ import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+/*
+
+import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
+
+*/
 
 public class Main extends Application {
+    public static void main(String[] args) {
+        launch(args);
+    }
     @Override
     public void start(Stage stage) throws IOException {
         //SCENES
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/primary.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/primary.fxml"));
             Scene scene = new Scene(root, 600, 600, Color.SKYBLUE);
-            scene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
@@ -103,9 +112,4 @@ public class Main extends Application {
         stage.show();
         */
     }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
 }

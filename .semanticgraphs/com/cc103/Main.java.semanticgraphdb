@@ -1,0 +1,234 @@
+
+!src\main\java\com\cc103\Main.javaè
+com.cc103.MainCLASS+
+!src\main\java\com\cc103\Main.java ("
+package	com.cc103"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"”
+declarationString<mark class="modifier">public </mark><mark class="modifier">class </mark>Main<mark class="modifier"> extends </mark>Application"
+accesspublic*Main2d
+(com.cc103.Main.start(javafx.stage.Stage)DECLARATION+
+!src\main\java\com\cc103\Main.java (2c
+'com.cc103.Main.main(java.lang.String[])DECLARATION+
+!src\main\java\com\cc103\Main.javaZ Z(2U
+javafx.application.ApplicationEXTEND+
+!src\main\java\com\cc103\Main.java (%³4
+(com.cc103.Main.start(javafx.stage.Stage)METHOD+
+!src\main\java\com\cc103\Main.java ("
+isFinalfalse"‰
+declarationStringó<mark class="annotation">@Override</mark> <br><mark class="modifier">public </mark><mark class="modifier">void</mark> <mark class="method">start</mark>(Stage stage)<mark class="modifier"> <mark class="modifier">throws</mark> </mark>IOException"
+isStaticfalse"
+accesspublic"
+
+isAbstractfalse"
+typevoid*start2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.java  ($2n
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17CALL+
+!src\main\java\com\cc103\Main.java (2n
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17CALL+
+!src\main\java\com\cc103\Main.java (2n
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17CALL+
+!src\main\java\com\cc103\Main.java (2n
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17CALL+
+!src\main\java\com\cc103\Main.java (2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java# #(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java$ $(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java% %(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java& &(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java' '(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java( ((2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.java) )(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java- -(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java. .(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java/ /(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java0 0(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java1 1(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java2 2(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.java3 3(2r
+=com.cc103.Main.start(javafx.stage.Stage)?triangle@54.16:54.24CALL+
+!src\main\java\com\cc103\Main.java7 7(2r
+=com.cc103.Main.start(javafx.stage.Stage)?triangle@54.16:54.24CALL+
+!src\main\java\com\cc103\Main.java< <(2n
+9com.cc103.Main.start(javafx.stage.Stage)?lmao@63.14:63.18CALL+
+!src\main\java\com\cc103\Main.java@' @(+2n
+9com.cc103.Main.start(javafx.stage.Stage)?imgv@64.18:64.22CALL+
+!src\main\java\com\cc103\Main.javaA A(2n
+9com.cc103.Main.start(javafx.stage.Stage)?imgv@64.18:64.22CALL+
+!src\main\java\com\cc103\Main.javaB B(2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.javaE E(2n
+9com.cc103.Main.start(javafx.stage.Stage)?imgv@64.18:64.22CALL+
+!src\main\java\com\cc103\Main.javaE E(#2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.javaF F(2r
+=com.cc103.Main.start(javafx.stage.Stage)?triangle@54.16:54.24CALL+
+!src\main\java\com\cc103\Main.javaF F('2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.javaG G(2s
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27CALL+
+!src\main\java\com\cc103\Main.javaG G((2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.javaH H(2n
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17CALL+
+!src\main\java\com\cc103\Main.javaH H(#2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.javaI I(2n
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17CALL+
+!src\main\java\com\cc103\Main.javaI I(#2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaL L(2n
+9com.cc103.Main.start(javafx.stage.Stage)?icon@24.14:24.18CALL+
+!src\main\java\com\cc103\Main.javaL L(!2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaM M(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaN N(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaO O(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaP P(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaQ Q(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaR R(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaS S(2o
+:com.cc103.Main.start(javafx.stage.Stage)?scene@23.14:23.19CALL+
+!src\main\java\com\cc103\Main.javaS S(2c
+.com.cc103.Main.start(javafx.stage.Stage)!stageCALL+
+!src\main\java\com\cc103\Main.javaT T(2h
+.com.cc103.Main.start(javafx.stage.Stage)!stage	PARAMETER+
+!src\main\java\com\cc103\Main.java (!2u
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18DECLARATION+
+!src\main\java\com\cc103\Main.java (2v
+:com.cc103.Main.start(javafx.stage.Stage)?scene@23.14:23.19DECLARATION+
+!src\main\java\com\cc103\Main.java (2u
+9com.cc103.Main.start(javafx.stage.Stage)?icon@24.14:24.18DECLARATION+
+!src\main\java\com\cc103\Main.java (2u
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17DECLARATION+
+!src\main\java\com\cc103\Main.java (2u
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17DECLARATION+
+!src\main\java\com\cc103\Main.java" "(2z
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27DECLARATION+
+!src\main\java\com\cc103\Main.java, ,(2y
+=com.cc103.Main.start(javafx.stage.Stage)?triangle@54.16:54.24DECLARATION+
+!src\main\java\com\cc103\Main.java6 6(2u
+9com.cc103.Main.start(javafx.stage.Stage)?lmao@63.14:63.18DECLARATION+
+!src\main\java\com\cc103\Main.java? ?(2u
+9com.cc103.Main.start(javafx.stage.Stage)?imgv@64.18:64.22DECLARATION+
+!src\main\java\com\cc103\Main.java@ @(2@
+voidRETURN_TYPE+
+!src\main\java\com\cc103\Main.java (Ñ
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18VARIABLE+
+!src\main\java\com\cc103\Main.java ("
+typeGroup"
+isFinalfalse"m
+declarationStringX<mark class="modifier"> </mark>Group <mark class="class-field">root</mark> = new Group()*root2G
+javafx.scene.GroupTYPE+
+!src\main\java\com\cc103\Main.java (â
+:com.cc103.Main.start(javafx.stage.Stage)?scene@23.14:23.19VARIABLE+
+!src\main\java\com\cc103\Main.java ("
+typeScene"
+isFinalfalse"‹
+declarationStringv<mark class="modifier"> </mark>Scene <mark class="class-field">scene</mark> = new Scene(root, 600, 600, Color.SKYBLUE)*scene2G
+javafx.scene.SceneTYPE+
+!src\main\java\com\cc103\Main.java (2n
+9com.cc103.Main.start(javafx.stage.Stage)?root@22.14:22.18CALL+
+!src\main\java\com\cc103\Main.java  ($ã
+9com.cc103.Main.start(javafx.stage.Stage)?icon@24.14:24.18VARIABLE+
+!src\main\java\com\cc103\Main.java ("
+typeImage"
+isFinalfalse"y
+declarationStringd<mark class="modifier"> </mark>Image <mark class="class-field">icon</mark> = new Image("Hotdog.png")*icon2M
+javafx.scene.image.ImageTYPE+
+!src\main\java\com\cc103\Main.java (Ò
+9com.cc103.Main.start(javafx.stage.Stage)?text@27.13:27.17VARIABLE+
+!src\main\java\com\cc103\Main.java ("
+typeText"
+isFinalfalse"k
+declarationStringV<mark class="modifier"> </mark>Text <mark class="class-field">text</mark> = new Text()*text2K
+javafx.scene.text.TextTYPE+
+!src\main\java\com\cc103\Main.java (Ó
+9com.cc103.Main.start(javafx.stage.Stage)?line@34.13:34.17VARIABLE+
+!src\main\java\com\cc103\Main.java" "("
+typeLine"
+isFinalfalse"k
+declarationStringV<mark class="modifier"> </mark>Line <mark class="class-field">line</mark> = new Line()*line2L
+javafx.scene.shape.LineTYPE+
+!src\main\java\com\cc103\Main.java" "(ö
+>com.cc103.Main.start(javafx.stage.Stage)?rectangle@44.18:44.27VARIABLE+
+!src\main\java\com\cc103\Main.java, ,("
+type	Rectangle"
+isFinalfalse"z
+declarationStringe<mark class="modifier"> </mark>Rectangle <mark class="class-field">rectangle</mark> = new Rectangle()*	rectangle2Q
+javafx.scene.shape.RectangleTYPE+
+!src\main\java\com\cc103\Main.java, ,(ë
+=com.cc103.Main.start(javafx.stage.Stage)?triangle@54.16:54.24VARIABLE+
+!src\main\java\com\cc103\Main.java6 6("
+typePolygon"
+isFinalfalse"u
+declarationString`<mark class="modifier"> </mark>Polygon <mark class="class-field">triangle</mark> = new Polygon()*triangle2O
+javafx.scene.shape.PolygonTYPE+
+!src\main\java\com\cc103\Main.java6 6(à
+9com.cc103.Main.start(javafx.stage.Stage)?lmao@63.14:63.18VARIABLE+
+!src\main\java\com\cc103\Main.java? ?("
+typeImage"
+isFinalfalse"v
+declarationStringa<mark class="modifier"> </mark>Image <mark class="class-field">lmao</mark> = new Image("wow.jpg")*lmao2M
+javafx.scene.image.ImageTYPE+
+!src\main\java\com\cc103\Main.java? ?(Û
+9com.cc103.Main.start(javafx.stage.Stage)?imgv@64.18:64.22VARIABLE+
+!src\main\java\com\cc103\Main.java@ @("
+type	ImageView"
+isFinalfalse"y
+declarationStringd<mark class="modifier"> </mark>ImageView <mark class="class-field">imgv</mark> = new ImageView(lmao)*imgv2Q
+javafx.scene.image.ImageViewTYPE+
+!src\main\java\com\cc103\Main.java@ @(2n
+9com.cc103.Main.start(javafx.stage.Stage)?lmao@63.14:63.18CALL+
+!src\main\java\com\cc103\Main.java@' @(+û
+.com.cc103.Main.start(javafx.stage.Stage)!stage	PARAMETER+
+!src\main\java\com\cc103\Main.java (!"
+typeStage"
+isFinalfalse" 
+declarationStringStage stage*stage2G
+javafx.stage.StageTYPE+
+!src\main\java\com\cc103\Main.java (ÿ
+'com.cc103.Main.main(java.lang.String[])METHOD+
+!src\main\java\com\cc103\Main.javaZ Z("
+isFinalfalse"²
+declarationStringœ<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">main</mark>(String[] args)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*main2a
+,com.cc103.Main.main(java.lang.String[])!argsCALL+
+!src\main\java\com\cc103\Main.java[ [(2f
+,com.cc103.Main.main(java.lang.String[])!args	PARAMETER+
+!src\main\java\com\cc103\Main.javaZ% Z()2@
+voidRETURN_TYPE+
+!src\main\java\com\cc103\Main.javaZ Z(ý
+,com.cc103.Main.main(java.lang.String[])!args	PARAMETER+
+!src\main\java\com\cc103\Main.javaZ% Z()"
+typeString[]"
+isFinalfalse""
+declarationStringString[] args*args2G
+java.lang.String[]TYPE+
+!src\main\java\com\cc103\Main.javaZ Z($

@@ -4,12 +4,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Arc?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button layoutX="227.0" layoutY="148.0" mnemonicParsing="false" text="Button" />
-      <Button layoutX="319.0" layoutY="148.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="429.0" layoutY="187.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="403.0" layoutY="98.0" mnemonicParsing="false" text="Button" />
       <Button layoutX="267.0" layoutY="187.0" mnemonicParsing="false" text="Button" />
-      <Arc fill="DODGERBLUE" layoutX="136.0" layoutY="187.0" length="270.0" radiusX="100.0" radiusY="100.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+      <Arc fill="DODGERBLUE" layoutX="248.0" layoutY="200.0" length="270.0" radiusX="100.0" radiusY="100.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+      <Arc fill="DODGERBLUE" layoutX="379.0" layoutY="111.0" length="270.0" radiusX="79.0" radiusY="65.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
    </children>
 </AnchorPane>

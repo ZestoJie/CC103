@@ -1,0 +1,30 @@
+# Build artifacts
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.classpath
+.project
+.settings/
+.vscode/launch.json
+.vscode/tasks.json
+*.swp
+*.swo
+*~
+
+# Maven
+.m2/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.maven.metadata.xml
+
+# OS
+.DS_Store
+Thumbs.db

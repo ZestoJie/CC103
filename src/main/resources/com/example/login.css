@@ -1,0 +1,111 @@
+/* Main Background */
+.root {
+    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Login Container */
+#loginContainer {
+    -fx-background-color: white;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 40;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 0, 5);
+    -fx-max-width: 400;
+}
+
+/* Title */
+.title {
+    -fx-font-size: 32;
+    -fx-font-weight: bold;
+    -fx-text-fill: #667eea;
+    -fx-alignment: center;
+}
+
+/* Subtitle */
+.subtitle {
+    -fx-font-size: 16;
+    -fx-text-fill: #666666;
+    -fx-alignment: center;
+}
+
+/* Labels */
+.label {
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Text Field */
+.text-field {
+    -fx-padding: 10;
+    -fx-font-size: 14;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-color: #f5f5f5;
+}
+
+.text-field:focused {
+    -fx-border-color: #667eea;
+    -fx-background-color: white;
+    -fx-border-width: 2;
+}
+
+/* Password Field */
+.password-field {
+    -fx-padding: 10;
+    -fx-font-size: 14;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-color: #f5f5f5;
+}
+
+.password-field:focused {
+    -fx-border-color: #667eea;
+    -fx-background-color: white;
+    -fx-border-width: 2;
+}
+
+/* Error Label */
+.error-label {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
+/* Login Button */
+.login-button {
+    -fx-padding: 12 30;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    -fx-background-color: linear-gradient(to right, #764ba2, #667eea);
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.5), 8, 0.5, 0, 3);
+}
+
+.login-button:pressed {
+    -fx-background-color: #667eea;
+    -fx-padding: 13 29;
+}
+
+/* Hyperlink */
+.hyperlink {
+    -fx-text-fill: #667eea;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+    -fx-underline: false;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #764ba2;
+    -fx-underline: true;
+}

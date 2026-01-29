@@ -1,0 +1,717 @@
+================================================================================
+                    FULL STACK JAVAFX + SPRING BOOT APP
+                          STEP-BY-STEP SETUP GUIDE
+================================================================================
+
+Created: 2026-01-29
+Version: 1.0
+
+
+================================================================================
+OVERVIEW
+================================================================================
+
+This guide shows how to build a complete full-stack application with:
+- JavaFX Desktop GUI (Frontend)
+- Spring Boot REST API (Backend)
+- H2 In-Memory Database (No external DB needed)
+- HTTP Client Communication (JSON-based)
+
+
+================================================================================
+PREREQUISITES (Install These First)
+================================================================================
+
+1. Java 21 JDK
+   URL: https://www.oracle.com/java/technologies/downloads/
+   Verify: Open Command Prompt, type: java -version
+
+2. Maven 3.9.12+
+   URL: https://maven.apache.org/download.cgi
+   Verify: Open Command Prompt, type: mvn -version
+
+3. VS Code (Optional, but recommended)
+   URL: https://code.visualstudio.com/
+
+
+================================================================================
+STEP 1: CREATE PROJECT STRUCTURE
+================================================================================
+
+Command Prompt:
+  mkdir cc103-app
+  cd cc103-app
+
+Then create these folders:
+  src\main\java\com\example\
+  src\main\java\com\example\controller\
+  src\main\java\com\example\entity\
+  src\main\java\com\example\repository\
+  src\main\java\com\example\service\
+  src\main\resources\com\example\
+
+
+================================================================================
+STEP 2: CREATE pom.xml (Maven Configuration)
+================================================================================
+
+File: pom.xml
+
+Content:
+--------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>cc103</artifactId>
+    <version>1.0.0</version>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>23</version>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+
+        <!-- Database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <!-- Jakarta -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+        <!-- HTTP Client (Client-side only) -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.example.App</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+================================================================================
+STEP 3: CREATE DATABASE ENTITY
+================================================================================
+
+File: src\main\java\com\example\entity\User.java
+
+Content:
+--------
+package com.example.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true)
+    private String username;
+    private String password;
+    private String email;
+
+    public User() {}
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
+
+
+================================================================================
+STEP 4: CREATE REPOSITORY (Data Access)
+================================================================================
+
+File: src\main\java\com\example\repository\UserRepository.java
+
+Content:
+--------
+package com.example.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.entity.User;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    User findByUsername(String username);
+    boolean existsByUsername(String username);
+}
+
+
+================================================================================
+STEP 5: CREATE SERVICE (Business Logic)
+================================================================================
+
+File: src\main\java\com\example\service\UserService.java
+
+Content:
+--------
+package com.example.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.example.entity.User;
+import com.example.repository.UserRepository;
+
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    
+    public User authenticate(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
+    }
+}
+
+
+================================================================================
+STEP 6: CREATE REST CONTROLLER (API Endpoints)
+================================================================================
+
+File: src\main\java\com\example\controller\AuthController.java
+
+Content:
+--------
+package com.example.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.example.service.UserService;
+import com.example.entity.User;
+import com.google.gson.JsonObject;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    @Autowired
+    private UserService userService;
+    
+    @PostMapping("/login")
+    public String login(@RequestBody String body) {
+        // Parse JSON
+        com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+        JsonObject json = parser.parse(body).getAsJsonObject();
+        String username = json.get("username").getAsString();
+        String password = json.get("password").getAsString();
+        
+        User user = userService.authenticate(username, password);
+        
+        JsonObject response = new JsonObject();
+        if (user != null) {
+            response.addProperty("success", true);
+            response.addProperty("userId", user.getId());
+            response.addProperty("email", user.getEmail());
+        } else {
+            response.addProperty("success", false);
+            response.addProperty("message", "Invalid credentials");
+        }
+        return response.toString();
+    }
+}
+
+
+================================================================================
+STEP 7: CREATE DATA INITIALIZER (Auto-Create Test Users)
+================================================================================
+
+File: src\main\java\com\example\DataInitializer.java
+
+Content:
+--------
+package com.example;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import com.example.entity.User;
+import com.example.repository.UserRepository;
+
+@Component
+public class DataInitializer implements CommandLineRunner {
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Override
+    public void run(String... args) throws Exception {
+        if (!userRepository.existsByUsername("testuser")) {
+            userRepository.save(new User("testuser", "password123", "test@example.com"));
+            userRepository.save(new User("admin", "password123", "admin@example.com"));
+        }
+        System.out.println("✅ Test users ready!");
+    }
+}
+
+
+================================================================================
+STEP 8: CREATE SPRING BOOT ENTRY POINT
+================================================================================
+
+File: src\main\java\com\example\ServerApplication.java
+
+Content:
+--------
+package com.example;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ServerApplication.class, args);
+    }
+}
+
+
+================================================================================
+STEP 9: CREATE APPLICATION PROPERTIES (Configuration)
+================================================================================
+
+File: src\main\resources\application.properties
+
+Content:
+--------
+server.port=8080
+
+# H2 In-Memory Database
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+# JPA/Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=false
+
+# Disable HTTP client autoconfiguration
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.http.client.HttpClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration
+
+
+================================================================================
+STEP 10: CREATE JAVAFX FXML (UI Layout)
+================================================================================
+
+File: src\main\resources\com\example\login.fxml
+
+Content:
+--------
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.example.controller.LoginController"
+      alignment="CENTER" spacing="20" style="-fx-padding: 50;">
+    
+    <Label text="CC103 Login" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+    
+    <TextField fx:id="usernameField" promptText="Username" prefWidth="250"/>
+    <PasswordField fx:id="passwordField" promptText="Password" prefWidth="250"/>
+    
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;"/>
+    
+    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" prefWidth="250"/>
+</VBox>
+
+
+================================================================================
+STEP 11: CREATE JAVAFX CONTROLLER (UI Logic)
+================================================================================
+
+File: src\main\java\com\example\controller\LoginController.java
+
+Content:
+--------
+package com.example.controller;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+public class LoginController {
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField;
+    @FXML private Label errorLabel;
+    @FXML private Button loginButton;
+    
+    private static final String API_URL = "http://localhost:8080/api/auth/login";
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final Gson gson = new Gson();
+    
+    @FXML
+    private void handleLogin() {
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText();
+        
+        if (username.isEmpty() || password.isEmpty()) {
+            errorLabel.setText("Please fill in all fields");
+            return;
+        }
+        
+        loginButton.setDisable(true);
+        loginButton.setText("Logging in...");
+        
+        new Thread(() -> {
+            try {
+                JsonObject loginRequest = new JsonObject();
+                loginRequest.addProperty("username", username);
+                loginRequest.addProperty("password", password);
+                
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(loginRequest.toString()))
+                    .build();
+                
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                
+                if (response.statusCode() == 200) {
+                    JsonObject responseBody = gson.fromJson(response.body(), JsonObject.class);
+                    if (responseBody.get("success").getAsBoolean()) {
+                        javafx.application.Platform.runLater(() -> {
+                            errorLabel.setText("✅ Login successful!");
+                            errorLabel.setStyle("-fx-text-fill: green;");
+                        });
+                    } else {
+                        showError("Invalid credentials");
+                    }
+                } else {
+                    showError("Server error");
+                }
+            } catch (Exception e) {
+                showError("Connection error: " + e.getMessage());
+            } finally {
+                javafx.application.Platform.runLater(() -> {
+                    loginButton.setDisable(false);
+                    loginButton.setText("Login");
+                });
+            }
+        }).start();
+    }
+    
+    private void showError(String message) {
+        javafx.application.Platform.runLater(() -> {
+            errorLabel.setText(message);
+            errorLabel.setStyle("-fx-text-fill: red;");
+        });
+    }
+}
+
+
+================================================================================
+STEP 12: CREATE JAVAFX APP (Entry Point)
+================================================================================
+
+File: src\main\java\com\example\App.java
+
+Content:
+--------
+package com.example;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class App extends Application {
+    @Override
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("login.fxml"));
+        Scene scene = new Scene(loader.load(), 600, 400);
+        stage.setTitle("CC103 Login");
+        stage.setScene(scene);
+        stage.show();
+    }
+    
+    public static void main(String[] args) {
+        launch();
+    }
+}
+
+
+================================================================================
+STEP 13: CREATE STARTUP SCRIPTS
+================================================================================
+
+File: START.bat
+
+Content:
+--------
+@echo off
+cd /d "%~dp0"
+start "CC103 Server" cmd /k "mvn spring-boot:run"
+timeout /t 20 /nobreak
+mvn javafx:run
+
+
+File: run-server.bat
+
+Content:
+--------
+@echo off
+cd /d "%~dp0"
+mvn spring-boot:run
+
+File: run-app.bat
+
+Content:
+--------
+@echo off
+cd /d "%~dp0"
+mvn javafx:run
+
+
+================================================================================
+STEP 14: BUILD AND RUN
+================================================================================
+
+In Command Prompt:
+
+1. Build:
+   mvn clean package
+
+2. Run Everything:
+   Double-click: START.bat
+
+OR
+
+3. Run Server Only:
+   Double-click: run-server.bat
+   Then in another terminal: run-app.bat
+
+4. Run App Only (Server must be running):
+   Double-click: run-app.bat
+
+
+================================================================================
+TEST THE APPLICATION
+================================================================================
+
+When the login window appears:
+
+Username: testuser
+Password: password123
+
+OR
+
+Username: admin
+Password: password123
+
+If you see "✅ Login successful!" - it works!
+
+
+================================================================================
+PROJECT STRUCTURE (FINAL)
+================================================================================
+
+cc103/
+├── src/
+│   └── main/
+│       ├── java/com/example/
+│       │   ├── App.java
+│       │   ├── ServerApplication.java
+│       │   ├── DataInitializer.java
+│       │   ├── controller/
+│       │   │   ├── AuthController.java
+│       │   │   └── LoginController.java
+│       │   ├── entity/
+│       │   │   └── User.java
+│       │   ├── repository/
+│       │   │   └── UserRepository.java
+│       │   └── service/
+│       │       └── UserService.java
+│       └── resources/
+│           ├── application.properties
+│           └── com/example/
+│               └── login.fxml
+├── pom.xml
+├── START.bat
+├── run-server.bat
+└── run-app.bat
+
+
+================================================================================
+KEY CONCEPTS EXPLAINED
+================================================================================
+
+1. ENTITY (User.java)
+   - Database table definition
+   - @Entity = JPA class
+   - @Table = Database table name
+
+2. REPOSITORY (UserRepository.java)
+   - Data access layer
+   - Extends JpaRepository for CRUD operations
+   - Custom query methods
+
+3. SERVICE (UserService.java)
+   - Business logic layer
+   - Authentication logic
+   - Called by controller
+
+4. CONTROLLER (AuthController.java)
+   - REST API endpoints
+   - Receives HTTP requests
+   - Returns JSON responses
+
+5. JAVAFX GUI (LoginController.java + login.fxml)
+   - Desktop user interface
+   - Sends HTTP requests to server
+   - Displays responses
+
+6. FLOW:
+   JavaFX App → HTTP Request → Spring Boot → Database → HTTP Response → JavaFX App
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "Port 8080 already in use"
+FIX: Change port in application.properties or close other apps using 8080
+
+ERROR: "Connection error: null"
+FIX: Make sure run-server.bat started successfully first
+
+ERROR: "Maven command not found"
+FIX: Add Maven to system PATH environment variable
+
+ERROR: "Java version mismatch"
+FIX: Ensure Java 21 is installed: java -version
+
+ERROR: "FXML not found"
+FIX: Make sure login.fxml is in src/main/resources/com/example/
+
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. ✅ Build this application locally
+2. ✅ Test login with provided credentials
+3. ✅ Modify UI by editing login.fxml
+4. ✅ Add new endpoints in AuthController.java
+5. ✅ Create new entities in entity/ folder
+6. ✅ Add more test users in DataInitializer.java
+7. ✅ Deploy to cloud (Azure, Railway, Render)
+
+
+================================================================================
+END OF GUIDE
+================================================================================
+
+Questions? Check the official documentation:
+- JavaFX: https://gluonhq.com/products/javafx/
+- Spring Boot: https://spring.io/projects/spring-boot
+- Maven: https://maven.apache.org/
+
+Good luck! 🚀

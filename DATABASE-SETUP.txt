@@ -1,0 +1,298 @@
+================================================================================
+                         POSTGRESQL DATABASE SETUP
+                    For CC103 Full-Stack Application
+================================================================================
+
+STEP 1: DOWNLOAD & INSTALL POSTGRESQL
+================================================================================
+
+1. Download PostgreSQL 15 or later
+   URL: https://www.postgresql.org/download/
+   
+2. During installation, remember the password for "postgres" user
+   Example: postgres_password_123
+   
+3. Installation directory (default):
+   Windows: C:\Program Files\PostgreSQL\15\
+
+
+STEP 2: CREATE DATABASE & USER
+================================================================================
+
+After PostgreSQL is installed:
+
+1. Open pgAdmin (comes with PostgreSQL)
+   or use Windows Start Menu → pgAdmin 4
+
+2. Login with:
+   Username: postgres
+   Password: [password you set during installation]
+
+3. Right-click "Databases" → Create → Database
+   Name: cc103_db
+   Owner: postgres
+   
+4. Click Create
+
+
+ALTERNATIVE: Using Command Line
+================================================================================
+
+1. Open Command Prompt or PowerShell
+
+2. Connect to PostgreSQL:
+   psql -U postgres
+
+3. Enter your password when prompted
+
+4. Create database:
+   CREATE DATABASE cc103_db;
+
+5. List databases:
+   \l
+
+6. Exit:
+   \q
+
+
+STEP 3: UPDATE PROJECT CONFIGURATION
+================================================================================
+
+Update pom.xml:
+
+Change from H2 to PostgreSQL driver.
+
+Replace this section:
+------
+<!-- Database -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>2.3.232</version>
+    <scope>runtime</scope>
+</dependency>
+------
+
+With this:
+------
+<!-- PostgreSQL Database -->
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.3</version>
+</dependency>
+------
+
+
+STEP 4: UPDATE APPLICATION PROPERTIES
+================================================================================
+
+File: src/main/resources/application.properties
+
+Replace the entire database section:
+
+OLD:
+----
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=false
+
+
+NEW:
+----
+# PostgreSQL Database Configuration
+server.port=8080
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/cc103_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_POSTGRES_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL10Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
+
+# Disable HTTP client autoconfiguration
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.http.client.HttpClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration
+
+
+Replace "YOUR_POSTGRES_PASSWORD" with the password you set during PostgreSQL installation!
+
+
+STEP 5: TEST THE CONNECTION
+================================================================================
+
+1. Open Command Prompt in project folder
+
+2. Run:
+   mvn clean package
+
+3. Start server:
+   mvn spring-boot:run
+
+4. Check console for:
+   "Tomcat initialized with port 8080"
+   "Initialized JPA EntityManagerFactory"
+
+If you see these, database connection is successful!
+
+
+STEP 6: VERIFY DATABASE WAS CREATED
+================================================================================
+
+1. Open pgAdmin
+
+2. Expand "Databases" → "cc103_db"
+
+3. Expand "Schemas" → "public" → "Tables"
+
+4. You should see "users" table with columns:
+   - id (bigint)
+   - username (varchar)
+   - password (varchar)
+   - email (varchar)
+
+If you see the table, everything works!
+
+
+STEP 7: TEST LOGIN
+================================================================================
+
+1. Run: mvn javafx:run
+
+2. Login with:
+   Username: testuser
+   Password: password123
+
+3. If login succeeds, database is working correctly!
+
+
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "Connection to localhost:5432 refused"
+FIX: 
+- Make sure PostgreSQL service is running
+- Windows: Check Services (services.msc) → "postgresql-x64-15"
+- Restart PostgreSQL if needed
+
+ERROR: "FATAL: role 'postgres' does not exist"
+FIX: During installation, you skipped creating postgres user
+- Reinstall PostgreSQL
+
+ERROR: "database 'cc103_db' does not exist"
+FIX: Create the database using pgAdmin or psql command shown above
+
+ERROR: "password authentication failed"
+FIX: Check application.properties - password must match what you set during install
+
+ERROR: "Driver not found"
+FIX: Run: mvn clean install
+Then: mvn spring-boot:run
+
+
+VERIFY CONNECTION STRING
+================================================================================
+
+Format: jdbc:postgresql://HOST:PORT/DATABASE
+
+Your connection string should be:
+jdbc:postgresql://localhost:5432/cc103_db
+
+Where:
+- localhost = PostgreSQL server address (your computer)
+- 5432 = Default PostgreSQL port (don't change unless you did during install)
+- cc103_db = Database name you created
+
+
+DATA PERSISTENCE
+================================================================================
+
+Unlike H2 in-memory:
+
+✅ Data persists after server restarts
+✅ Data stored in PostgreSQL files on disk
+✅ Data shared across multiple app instances
+✅ Production-ready
+✅ Scalable
+
+Location of data:
+Windows: C:\Program Files\PostgreSQL\15\data\
+
+
+RESTART POSTGRESQL
+================================================================================
+
+Windows Command Line:
+  net stop postgresql-x64-15
+  net start postgresql-x64-15
+
+Or use Services (services.msc):
+  Services → postgresql-x64-15 → Restart
+
+
+UNINSTALL H2 REFERENCES
+================================================================================
+
+Remove from pom.xml if still there:
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>2.3.232</version>
+    <scope>runtime</scope>
+</dependency>
+
+And this line from application.properties:
+spring.h2.console.enabled=true
+
+
+FULL UPDATED APPLICATION.PROPERTIES
+================================================================================
+
+server.port=8080
+
+# PostgreSQL Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/cc103_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_POSTGRES_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA/Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL10Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
+
+# Spring Boot
+spring.application.name=CC103 Application
+
+# Disable HTTP client autoconfiguration
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.http.client.HttpClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration,org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration
+
+
+QUICK CHECKLIST
+================================================================================
+
+[ ] Download PostgreSQL 15+
+[ ] Install PostgreSQL (remember password!)
+[ ] Create database "cc103_db" in pgAdmin
+[ ] Update pom.xml - remove H2, add PostgreSQL
+[ ] Update application.properties - add PostgreSQL config
+[ ] Update password in application.properties
+[ ] Run: mvn clean package
+[ ] Run: mvn spring-boot:run
+[ ] Check console for success messages
+[ ] Run: mvn javafx:run
+[ ] Test login
+
+
+NEXT: Back to your project and run!
+
+================================================================================

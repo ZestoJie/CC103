@@ -1,4 +1,8 @@
 com\cc103sys\cc103\Controllers\LoginController.class
 com\cc103sys\cc103\DB\DBUtil.class
-com\cc103sys\cc103\Controllers\DashboardController.class
 com\cc103sys\cc103\App.class
+com\cc103sys\cc103\Utils\ResourceLoader.class
+com\cc103sys\cc103\Controllers\DashboardController.class
+com\cc103sys\cc103\Utils\Session.class
+com\cc103sys\cc103\Controllers\RegisterController.class
+com\cc103sys\cc103\Utils\Navigator.class

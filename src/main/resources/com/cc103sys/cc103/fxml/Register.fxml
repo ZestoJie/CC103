@@ -6,15 +6,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="421.0" prefWidth="360.0" spacing="15" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LoginController">
+<VBox alignment="CENTER" prefHeight="281.0" prefWidth="206.0" spacing="15" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.RegisterController">
 
-    <Label styleClass="title" text="LOGIN" />
+    <Label styleClass="title" text="REGISTER" />
 
     <TextField fx:id="usernameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Username" />
     <PasswordField fx:id="passwordField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Password" />
 
-    <Button onAction="#handleLogin" text="Login" />
-    <Button onAction="#goRegister" text="Register" />
+    <Button onAction="#handleRegister" text="Register" />
+    <Button onAction="#goLogin" text="Back to Login" />
 
     <Label fx:id="messageLabel" />
 

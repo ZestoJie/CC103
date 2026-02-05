@@ -1,0 +1,28 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: linear-gradient(to bottom right, #1e1e2f, #2c2c54);
+}
+
+.label {
+    -fx-text-fill: white;
+}
+
+.title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.text-field, .password-field {
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+}
+
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}

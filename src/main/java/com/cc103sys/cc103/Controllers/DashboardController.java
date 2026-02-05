@@ -1,16 +1,22 @@
 package com.cc103sys.cc103.Controllers;
 
-import com.cc103sys.cc103.App;
+import com.cc103sys.cc103.Utils.Navigator;
+import com.cc103sys.cc103.Utils.Session;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 public class DashboardController {
 
+    @FXML private Label welcomeLabel;
+
     @FXML
-    private void handleLogout() {
-        try {
-            App.setRoot("Login"); // return to Login.fxml
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void initialize(){
+        welcomeLabel.setText("Welcome, " + Session.getUsername());
+    }
+
+    @FXML
+    private void handleLogout(){
+        Session.clear();
+        Navigator.switchScene("Login");
     }
 }

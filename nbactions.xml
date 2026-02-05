@@ -32,7 +32,6 @@
             <displayName>jlink</displayName>
             <goals>
                 <goal>clean</goal>
-                <!-- compile not needed with javafx-maven-plugin v0.0.5 -->
                 <goal>compile</goal>
                 <goal>javafx:jlink</goal>
             </goals>

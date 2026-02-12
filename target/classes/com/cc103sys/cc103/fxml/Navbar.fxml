@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox spacing="15" styleClass="card"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
+
+    <Button text="Dashboard" onAction="#goDashboard"/>
+    <Button text="Tasks" onAction="#goTasks"/>
+    <Button text="Leaderboard" onAction="#goLeaderboard"/>
+    <Button text="Classes" onAction="#goClasses"/>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <Button text="Logout" onAction="#logout"/>
+</HBox>
+

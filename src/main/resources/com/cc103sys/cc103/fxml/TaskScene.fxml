@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox spacing="15"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+
+    <fx:include source="Navbar.fxml"/>
+
+    <Label text="Task Manager" styleClass="title"/>
+
+    <VBox spacing="10" styleClass="card">
+
+        <HBox spacing="10">
+            <TextField fx:id="taskField" promptText="Enter Task"/>
+            <DatePicker fx:id="taskDate"/>
+            <Button text="Add Task" onAction="#handleAddTask"/>
+        </HBox>
+
+        <ListView fx:id="taskList" prefHeight="400"/>
+
+        <HBox spacing="10">
+            <Button text="Mark Done" onAction="#handleMarkDone"/>
+            <Button text="Delete Task" onAction="#handleDeleteTask"/>
+        </HBox>
+
+    </VBox>
+
+</VBox>

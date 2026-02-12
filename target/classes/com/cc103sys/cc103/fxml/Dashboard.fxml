@@ -1,14 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.control.*?>
+<?import javafx.collections.FXCollections?>
 
-<VBox alignment="CENTER" spacing="20"
+<VBox spacing="15"
       xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
-
+    <fx:include source="navbar.fxml"/>
     <Label fx:id="welcomeLabel" styleClass="title"/>
-    <Button text="Logout" onAction="#handleLogout"/>
+    <HBox spacing="20" alignment="CENTER">
+        <VBox spacing="15" styleClass="card">
+            <HBox spacing="10">
+                <TextField fx:id="taskField" promptText="Enter Task"/>
+                <DatePicker fx:id="taskDate"/>
+                <Button text="Add Task" onAction="#handleAddTask"/>
+            </HBox>
 
+            <ListView fx:id="taskList" prefWidth="400" prefHeight="350"/>
+
+            <HBox spacing="10">
+                <Button text="Mark Done" onAction="#handleMarkDone"/>
+                <Button text="Delete Task" onAction="#handleDeleteTask"/>
+            </HBox>
+
+        </VBox>
+        <VBox spacing="20">
+
+        <VBox spacing="10" styleClass="card">
+
+            <Label text="Game Timer" styleClass="title"/>
+
+            <ComboBox fx:id="timerPreset"/>
+
+            <Label fx:id="timerLabel" text="00:00"/>
+
+            <Button text="Start Timer" onAction="#handleStartTimer"/>
+        </VBox>
+
+            <VBox spacing="10" styleClass="card">
+                <Label text="Leaderboard Preview" styleClass="title"/>
+                <ListView fx:id="leaderboardPreview" prefWidth="250" prefHeight="200"/>
+                <Button text="Open Full Leaderboard"
+                        onAction="#openLeaderboardScene"/>
+            </VBox>
+        </VBox>
+    </HBox>
 </VBox>

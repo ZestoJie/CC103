@@ -11,11 +11,11 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Scene scene = new Scene(ResourceLoader.loadFXML("Login"), 500, 400);
+        Scene scene = new Scene(ResourceLoader.loadFXML("Login"), 1440, 720);
 
         Navigator.setScene(scene);
 
-        stage.setTitle("CC103 Login System");
+        stage.setTitle("CC103 Task Manager");
         stage.setScene(scene);
         stage.show();
     }

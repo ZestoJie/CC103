@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15"
+      alignment="CENTER"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1">
+
+    <fx:include source="Navbar.fxml"/>
+
+    <Label text="Classes" styleClass="title"/>
+
+    <Label text="This section is coming soon 🚧"/>
+</VBox>

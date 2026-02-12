@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="10" styleClass="card"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.TimerController">
+    <Label text="Focus Timer" styleClass="title"/>
+    <ComboBox fx:id="timeSelect"/>
+    <Label fx:id="timerLabel" text="00:00"/>
+    <Button text="Start Timer" onAction="#startTimer"/>
+</VBox>

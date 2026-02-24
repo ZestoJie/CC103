@@ -9,17 +9,26 @@
       fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController"
       styleClass="card">
 
-    <Label text="Class Leaderboard" styleClass="title"/>
+    <Label text="Choose a Class Leaderboard" styleClass="title"/>
 
-    <TableView fx:id="table" prefWidth="500">
+    <!-- Class Picker -->
+    <ComboBox fx:id="classComboBox" promptText="Select Class" />
 
-        <columns>
-            <TableColumn fx:id="usernameCol" text="Username" prefWidth="250"/>
-            <TableColumn fx:id="pointsCol" text="Points" prefWidth="250"/>
-        </columns>
+    <Button text="View Leaderboard" onAction="#loadLeaderboard"/>
 
-    </TableView>
+    <!-- Scrollable TableView -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="400">
+        <content>
+            <TableView fx:id="table" prefWidth="500" visible="false">
+
+                <columns>
+                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="250"/>
+                    <TableColumn fx:id="pointsCol" text="Points" prefWidth="250"/>
+                </columns>
+
+            </TableView>
+        </content>
+    </ScrollPane>
 
     <Button text="Back to Dashboard" onAction="#goBack"/>
-
 </VBox>

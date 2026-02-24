@@ -6,11 +6,21 @@
 <VBox spacing="15"
       alignment="CENTER"
       xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.ClassesController">
 
     <fx:include source="Navbar.fxml"/>
 
     <Label text="Classes" styleClass="title"/>
 
-    <Label text="This section is coming soon 🚧"/>
+    <!-- Public classes -->
+    <ListView fx:id="classList" prefWidth="400" prefHeight="250"/>
+
+    <!-- Join private class -->
+    <VBox spacing="10" styleClass="card">
+        <Label text="Join Private Class"/>
+        <TextField fx:id="codeField" promptText="Enter class code"/>
+        <Button text="Join Class" onAction="#joinPrivateClass"/>
+    </VBox>
+
 </VBox>

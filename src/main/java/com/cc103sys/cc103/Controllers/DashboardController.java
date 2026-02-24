@@ -11,6 +11,7 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Models.Classes;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -28,7 +29,8 @@ import javafx.scene.control.TextField;
 import javafx.util.Duration;
 
 public class DashboardController {
-
+    
+    @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
@@ -66,6 +68,8 @@ public class DashboardController {
         );
     
         loadTasks();
+        loadUserClassesForLeaderboard();
+        classSelector.setOnAction(e -> loadLeaderboardPreviewForClass());
 
         if (timerPreset != null) {
             timerPreset.getItems().addAll("1 Minute", "5 Minutes", "10 Minutes", "1 Hour");
@@ -73,8 +77,44 @@ public class DashboardController {
         } else {
             System.err.println("timerPreset is null! FXML not injected properly.");
         }
+        
+        loadLeaderboardPreviewForClass();
     }
+    private void loadUserClassesForLeaderboard() {
+        ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
+        String sql = """
+            SELECT c.id, c.class_name
+            FROM classes c
+            JOIN users u ON c.id = u.class_id
+            WHERE u.username = ?
+        """;
+
+        try (Connection conn = DBUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, Session.getUsername());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("class_name");
+                System.out.println("Found class: " + id + " - " + name);
+                userClasses.add(new Classes(id, name));
+            }
+
+            System.out.println("Total classes loaded: " + userClasses.size());
+            classSelector.setItems(userClasses);
+
+            if (!userClasses.isEmpty()) {
+                classSelector.setValue(userClasses.get(0));
+                loadLeaderboardPreviewForClass();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private void loadTasks(){
 
         tasks.clear();
@@ -182,7 +222,35 @@ public class DashboardController {
             e.printStackTrace();
           }
     }
+    
+    @FXML
+    private void handleMarkUndone(){
 
+        Task selected = taskList.getSelectionModel().getSelectedItem();
+        if(selected == null) return;
+
+        String sql = "UPDATE tasks SET status='Pending' WHERE id=?";
+        String updatePoints = "UPDATE users SET points = points - 10 WHERE username=?";
+
+        try(Connection conn = DBUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, selected.getId());
+            stmt.executeUpdate();
+
+            loadTasks();
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try(Connection conn = DBUtil.getConnection();
+            PreparedStatement pts = conn.prepareStatement(updatePoints)){
+            pts.setString(1, Session.getUsername());
+            pts.executeUpdate();
+        } catch (Exception e){
+            e.printStackTrace();
+          }
+    }
     private void playAnimation(){
 
         FadeTransition fade = new FadeTransition(Duration.seconds(1), taskList);
@@ -204,7 +272,11 @@ public class DashboardController {
     }
     @FXML
     private void openLeaderboardScene() {
-    Navigator.switchScene("Leaderboard");
+        Classes selectedClass = classSelector.getValue();
+        if (selectedClass == null) return;
+
+        Session.setSelectedClassId(selectedClass.getId()); // save selected class in session
+        Navigator.switchScene("Leaderboard");
     }
 
     @FXML
@@ -242,36 +314,46 @@ public class DashboardController {
         if (value.contains("5")) return 300;
         return 60;
     }
+    
+    private void loadLeaderboardPreviewForClass() {
+        Classes selectedClass = classSelector.getValue();
+        if (selectedClass == null) return;
 
-    private void loadLeaderboardPreview() {
         ObservableList<UserRank> data = FXCollections.observableArrayList();
-        String sql = "SELECT username, points FROM users ORDER BY points DESC LIMIT 5";
-        try (Connection conn = DBUtil.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)
-        ) 
-        {
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            data.add(
-                    new UserRank(
-                    rs.getString("username"),
-                    rs.getInt("points")
-                )
-            );
-        }
 
-        leaderboardPreview.setItems(data);
-        leaderboardPreview.setCellFactory(param -> new ListCell<>() {
+        // Use users.class_id instead of class_members
+        String sql = """
+            SELECT username, points
+            FROM users
+            WHERE class_id = ?
+            ORDER BY points DESC
+            LIMIT 5
+        """;
+
+        try (Connection conn = DBUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, selectedClass.getId());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String username = rs.getString("username");
+                int points = rs.getInt("points");
+                data.add(new UserRank(username, points));
+            }
+
+            leaderboardPreview.setItems(data);
+            leaderboardPreview.setCellFactory(param -> new ListCell<>() {
                 @Override
                 protected void updateItem(UserRank item, boolean empty) {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? null :
                             item.getUsername() + " - " + item.getPoints() + " pts");
                 }
-            }
-        );
-    } catch (Exception e) {
-        e.printStackTrace();
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
 }

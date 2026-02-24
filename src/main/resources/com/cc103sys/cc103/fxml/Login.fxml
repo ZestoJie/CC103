@@ -10,8 +10,8 @@
 
     <Label styleClass="title" text="LOGIN" />
 
-    <TextField fx:id="usernameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Username" />
-    <PasswordField fx:id="passwordField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Password" />
+    <TextField fx:id="usernameField" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Username" />
+    <PasswordField fx:id="passwordField" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Password" />
 
     <Button onAction="#handleLogin" text="Login" />
     <Button onAction="#goRegister" text="Register" />

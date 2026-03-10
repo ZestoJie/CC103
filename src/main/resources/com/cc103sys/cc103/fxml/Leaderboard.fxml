@@ -11,12 +11,10 @@
 
     <Label text="Choose a Class Leaderboard" styleClass="title"/>
 
-    <!-- Class Picker -->
     <ComboBox fx:id="classComboBox" promptText="Select Class" />
 
     <Button text="View Leaderboard" onAction="#loadLeaderboard"/>
 
-    <!-- Scrollable TableView -->
     <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="400">
         <content>
             <TableView fx:id="table" prefWidth="500" visible="false">

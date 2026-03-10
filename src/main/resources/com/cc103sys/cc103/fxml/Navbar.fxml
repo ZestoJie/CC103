@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
-<HBox spacing="15" styleClass="card"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="274.0" prefWidth="428.0" spacing="15" styleClass="card" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goTasks" text="Tasks" translateX="20.0" />
 
-    <Button text="Dashboard" onAction="#goDashboard"/>
-    <Button text="Tasks" onAction="#goTasks"/>
-    <Button text="Leaderboard" onAction="#goLeaderboard"/>
-    <Button text="Classes" onAction="#goClasses"/>
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goDashboard" text="Dashboard" translateX="-80.0" translateY="40.0" />
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goClasses" text="Classes" translateX="-180.0" translateY="80.0" />
 
-    <Region HBox.hgrow="ALWAYS"/>
+    <Region maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
 
-    <Button text="Logout" onAction="#logout"/>
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#logout" text="Logout" translateX="-315.0" translateY="160.0" />
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goLeaderboard" text="Leaderboard" translateX="-385.0" translateY="120.0" />
 </HBox>
-

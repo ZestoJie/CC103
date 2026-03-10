@@ -7,11 +7,11 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 
 import com.cc103sys.cc103.DB.DBUtil;
+import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Models.Classes;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;

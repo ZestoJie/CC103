@@ -1,8 +1,13 @@
 package com.cc103sys.cc103.Controllers;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Utils.Session;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,10 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 public class ClassesController {
 
@@ -31,8 +32,8 @@ public class ClassesController {
         String sql = """
             SELECT * 
             FROM classes 
-            WHERE is_public = 1 
-              AND id NOT IN (SELECT class_id FROM users WHERE username = ?)
+            WHERE is_public = 1
+                AND id NOT IN (SELECT class_id FROM users WHERE username = ?)
         """;
 
         try (Connection conn = DBUtil.getConnection();

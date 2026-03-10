@@ -1,3 +1,5 @@
+package com.cc103sys.cc103.Models;
+
 public class ClassItem {
     private int classId;
     private String className;

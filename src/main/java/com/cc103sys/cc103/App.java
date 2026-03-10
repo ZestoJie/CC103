@@ -2,6 +2,7 @@ package com.cc103sys.cc103;
 
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.ResourceLoader;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

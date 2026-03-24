@@ -5,6 +5,7 @@ import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.Navigator;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,11 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Logger;
 
-/**
- * Controller for Leaderboard scene.
- * Displays class rankings and user points.
- */
 public class LeaderboardController {
+
     private static final Logger LOGGER = Logger.getLogger(LeaderboardController.class.getName());
 
     @FXML private ComboBox<Classes> classComboBox;
@@ -30,26 +28,22 @@ public class LeaderboardController {
     @FXML private TableColumn<UserRank, String> usernameCol;
     @FXML private TableColumn<UserRank, Integer> pointsCol;
 
-    /**
-     * Initialize leaderboard controller.
-     */
     @FXML
     public void initialize() {
         try {
             setupTableColumns();
             loadUserClasses();
+
             if (classComboBox != null) {
                 classComboBox.setOnAction(e -> loadLeaderboard());
             }
-            LOGGER.info("Leaderboard controller initialized");
+
+            LOGGER.info("Leaderboard initialized");
         } catch (Exception e) {
-            LOGGER.severe("Leaderboard initialization error: " + e.getMessage());
+            LOGGER.severe("Initialization error: " + e.getMessage());
         }
     }
 
-    /**
-     * Setup table columns with property value factories.
-     */
     private void setupTableColumns() {
         if (usernameCol != null) {
             usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -59,58 +53,72 @@ public class LeaderboardController {
         }
     }
 
-    /**
-     * Load user classes for selection.
-     */
     private void loadUserClasses() {
         ObservableList<Classes> userClasses = FXCollections.observableArrayList();
-        String sql = "SELECT DISTINCT c.id, c.class_name FROM classes c WHERE c.id IN (SELECT class_id FROM users WHERE username = ?)";
+
+        String sql = "SELECT c.id, c.class_name FROM classes c "
+                   + "JOIN user_classes uc ON c.id = uc.class_id "
+                   + "JOIN users u ON uc.user_id = u.id "
+                   + "WHERE u.username = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, Session.getUsername());
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    userClasses.add(new Classes(rs.getInt("id"), rs.getString("class_name")));
+                    userClasses.add(new Classes(
+                            rs.getInt("id"),
+                            rs.getString("class_name")
+                    ));
                 }
             }
 
             if (classComboBox != null) {
                 classComboBox.setItems(userClasses);
+
                 if (!userClasses.isEmpty()) {
                     classComboBox.getSelectionModel().selectFirst();
                     loadLeaderboard();
                 }
             }
-            LOGGER.info("Loaded " + userClasses.size() + " user classes");
+
+            LOGGER.info("Loaded " + userClasses.size() + " classes");
+
         } catch (Exception e) {
-            LOGGER.severe("Failed to load user classes: " + e.getMessage());
+            LOGGER.severe("Failed to load classes: " + e.getMessage());
         }
     }
 
-    /**
-     * Load leaderboard data for selected class.
-     */
     @FXML
     private void loadLeaderboard() {
         try {
             Classes selectedClass = classComboBox.getValue();
+
             if (selectedClass == null) {
                 LOGGER.warning("No class selected");
                 return;
             }
 
             ObservableList<UserRank> data = FXCollections.observableArrayList();
-            String sql = "SELECT username, points FROM users WHERE class_id = ? ORDER BY points DESC";
+
+            String sql = "SELECT u.username, u.points FROM users u "
+                       + "JOIN user_classes uc ON u.id = uc.user_id "
+                       + "WHERE uc.class_id = ? "
+                       + "ORDER BY u.points DESC";
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
 
                 stmt.setInt(1, selectedClass.getId());
+
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        data.add(new UserRank(rs.getString("username"), rs.getInt("points")));
+                        data.add(new UserRank(
+                                rs.getString("username"),
+                                rs.getInt("points")
+                        ));
                     }
                 }
 
@@ -118,16 +126,16 @@ public class LeaderboardController {
                     table.setItems(data);
                     table.setVisible(true);
                 }
-                LOGGER.info("Loaded " + data.size() + " users for leaderboard");
+
+                LOGGER.info("Leaderboard loaded: " + data.size() + " users");
+
             }
+
         } catch (Exception e) {
             LOGGER.severe("Failed to load leaderboard: " + e.getMessage());
         }
     }
 
-    /**
-     * Navigate back to Dashboard.
-     */
     @FXML
     private void goBack() {
         try {

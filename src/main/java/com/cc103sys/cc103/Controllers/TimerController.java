@@ -9,10 +9,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-/**
- * Controller for Focus Timer functionality.
- * Displays and manages countdown timer with preset durations.
- */
 public class TimerController {
     private static final Logger LOGGER = Logger.getLogger(TimerController.class.getName());
     private static final String[] TIMER_PRESETS = {
@@ -25,9 +21,6 @@ public class TimerController {
     private Timeline timeline;
     private int remainingSeconds;
 
-    /**
-     * Initialize timer controller with preset options.
-     */
     @FXML
     public void initialize() {
         if (timeSelect != null) {
@@ -37,9 +30,6 @@ public class TimerController {
         updateTimerDisplay();
     }
 
-    /**
-     * Start the timer with selected duration.
-     */
     @SuppressWarnings("StringConcatenationInFormatCall")
     @FXML
     public void startTimer() {
@@ -50,7 +40,6 @@ public class TimerController {
                 return;
             }
 
-            // Stop existing timer if running
             stopTimer();
 
             remainingSeconds = convertToSeconds(selected);
@@ -61,9 +50,6 @@ public class TimerController {
         }
     }
 
-    /**
-     * Start countdown and update display every second.
-     */
     private void startCountdown() {
         timeline = new Timeline(
             new KeyFrame(Duration.seconds(1), event -> {
@@ -81,42 +67,29 @@ public class TimerController {
         timeline.play();
     }
 
-    /**
-     * Stop the running timer.
-     */
     private void stopTimer() {
         if (timeline != null) {
             timeline.stop();
         }
     }
 
-    /**
-     * Update timer label with current time.
-     */
     private void updateTimerDisplay() {
         int minutes = remainingSeconds / 60;
         int seconds = remainingSeconds % 60;
         timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
-    /**
-     * Convert preset string to seconds.
-     */
     private int convertToSeconds(String preset) {
         if (preset.contains("Hour")) return 3600;
         if (preset.contains("30")) return 1800;
         if (preset.contains("10")) return 600;
         if (preset.contains("5")) return 300;
-        return 60; // 1 Minute default
+        return 60;
     }
 
-    /**
-     * Handle timer completion (can play sound or notification here).
-     */
     private void onTimerComplete() {
         LOGGER.info("Timer completed!");
         timerLabel.setStyle("-fx-text-fill: #4caf50;");
-        // TODO: Add notification/sound when timer completes
     }
 }
 

@@ -14,10 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-/**
- * Controller for Login scene.
- * Handles user authentication and navigation to Dashboard or Register.
- */
 public class LoginController {
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
 
@@ -25,23 +21,17 @@ public class LoginController {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
-    /**
-     * Handle login button action.
-     * Validates input, authenticates user, and switches scene on success.
-     */
     @FXML
     private void handleLogin() {
         try {
             String username = usernameField.getText() == null ? "" : usernameField.getText().trim();
             String password = passwordField.getText() == null ? "" : passwordField.getText().trim();
 
-            // Validate input
             if (!validateLoginInput(username, password)) {
                 displayError("Username and password are required.");
                 return;
             }
 
-            // Authenticate user
             boolean authenticated = authenticateUser(username, password);
             if (authenticated) {
                 Session.setUsername(username);
@@ -57,10 +47,6 @@ public class LoginController {
         }
     }
 
-    /**
-     * Handle register button action.
-     * Navigates to Register scene.
-     */
     @FXML
     private void goRegister() {
         try {
@@ -71,17 +57,11 @@ public class LoginController {
         }
     }
 
-    /**
-     * Validate login input fields.
-     */
     private boolean validateLoginInput(String username, String password) {
         return username != null && !username.isBlank() 
             && password != null && !password.isBlank();
     }
 
-    /**
-     * Authenticate user against database.
-     */
     private boolean authenticateUser(String username, String password) {
         String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
 
@@ -100,9 +80,6 @@ public class LoginController {
         }
     }
 
-    /**
-     * Display error message to user.
-     */
     private void displayError(String message) {
         messageLabel.setText(message);
         messageLabel.setStyle("-fx-text-fill: #d32f2f;");

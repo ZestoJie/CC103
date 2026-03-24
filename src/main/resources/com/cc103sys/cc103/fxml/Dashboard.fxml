@@ -25,7 +25,7 @@
         <Button layoutX="642.0" layoutY="160.0" onAction="#handleAddTask" prefHeight="40" prefWidth="80" text="Add" AnchorPane.leftAnchor="642.0" AnchorPane.topAnchor="160.0" />
 
         <ScrollPane fitToWidth="true" prefHeight="462.0" prefWidth="700.0" style="-fx-border-radius: 5;" AnchorPane.bottomAnchor="218.0" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="720" AnchorPane.topAnchor="220">
-            <ListView fx:id="taskList" prefHeight="278.0" prefWidth="698.0" />
+            <ListView fx:id="taskList" prefHeight="280.0" prefWidth="582.0" />
         </ScrollPane>
 
         <Button layoutX="343.0" layoutY="515.0" onAction="#handleMarkDone" prefHeight="40" prefWidth="109.0" text="Done" AnchorPane.bottomAnchor="165.0" AnchorPane.leftAnchor="343.0" AnchorPane.rightAnchor="989.8000000000002" />

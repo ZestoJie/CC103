@@ -3,6 +3,7 @@ package com.cc103sys.cc103.Controllers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -13,44 +14,41 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
-/**
- * Controller for Classes scene.
- * Manages class enrollment and viewing available classes.
- */
 public class ClassesController {
     private static final Logger LOGGER = Logger.getLogger(ClassesController.class.getName());
 
     @FXML private ListView<Classes> classList;
     @FXML private TextField codeField;
+    @FXML private TextField classNameField;
+    @FXML private TextField privateClassCodeField;
+    @FXML private CheckBox publicClassCheckbox;
 
-    /**
-     * Initialize classes controller.
-     */
     @FXML
     public void initialize() {
-        try {
-            loadPublicClasses();
-            LOGGER.info("Classes controller initialized");
-        } catch (Exception e) {
-            LOGGER.severe("Classes initialization error: " + e.getMessage());
-        }
+        loadPublicClasses();
+        loadOwnedClasses();
     }
 
-    /**
-     * Load public classes not yet enrolled in.
-     */
     private void loadPublicClasses() {
         ObservableList<Classes> publicClasses = FXCollections.observableArrayList();
-        String sql = "SELECT id, class_name FROM classes WHERE is_public = 1 AND id NOT IN (SELECT class_id FROM users WHERE username = ?)";
+        Integer userId = getCurrentUserId();
+
+        String sql = "SELECT id, class_name FROM classes WHERE is_public = 1";
+        if (userId != null) {
+            sql += " AND id NOT IN (SELECT class_id FROM user_classes WHERE user_id = ?)";
+        }
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+            if (userId != null) {
+                stmt.setInt(1, userId);
+            }
 
-            stmt.setString(1, Session.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     publicClasses.add(new Classes(rs.getInt("id"), rs.getString("class_name")));
@@ -61,58 +59,103 @@ public class ClassesController {
                 classList.setItems(publicClasses);
                 classList.setCellFactory(lv -> new ClassListCell());
             }
-            LOGGER.info("Loaded " + publicClasses.size() + " public classes");
         } catch (Exception e) {
             LOGGER.severe("Failed to load public classes: " + e.getMessage());
         }
     }
 
-    /**
-     * Join class by ID and reload class list.
-     */
-    private void joinClass(int classId) {
-        String sql = "UPDATE users SET class_id = ? WHERE username = ?";
+    private void loadOwnedClasses() {
+        Integer userId = getCurrentUserId();
+        if (userId == null) return;
+
+        ObservableList<Classes> owned = FXCollections.observableArrayList();
+        String sql = "SELECT c.id, c.class_name FROM classes c JOIN user_classes uc ON c.id = uc.class_id WHERE uc.user_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    owned.add(new Classes(rs.getInt("id"), rs.getString("class_name")));
+                }
+            }
+            if (classList != null && !owned.isEmpty()) {
+                classList.getItems().addAll(owned);
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Failed to load owned classes: " + e.getMessage());
+        }
+    }
 
-            stmt.setInt(1, classId);
-            stmt.setString(2, Session.getUsername());
+    @FXML
+    private void createClass() {
+        String name = classNameField.getText();
+        if (name == null || name.isBlank()) return;
+
+        boolean isPublic = publicClassCheckbox.isSelected();
+        String code = isPublic ? null : generateJoinCode();
+
+        String sql = "INSERT INTO classes (class_name, is_public, join_code) VALUES (?, ?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, isPublic ? 1 : 0);
+            stmt.setString(3, code);
             stmt.executeUpdate();
 
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int newClassId = rs.getInt(1);
+                    joinClass(newClassId);
+                }
+            }
+            classNameField.clear();
+            publicClassCheckbox.setSelected(false);
             loadPublicClasses();
-            LOGGER.info("User joined class ID: " + classId);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to create class: " + e.getMessage());
+        }
+    }
+
+    private String generateJoinCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder(6);
+        Random rnd = new Random();
+        for (int i = 0; i < 6; i++) {
+            code.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return code.toString();
+    }
+
+    private void joinClass(int classId) {
+        Integer userId = getCurrentUserId();
+        if (userId == null) return;
+
+        String sql = "INSERT IGNORE INTO user_classes (user_id, class_id) VALUES (?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, classId);
+            stmt.executeUpdate();
+            loadPublicClasses();
         } catch (Exception e) {
             LOGGER.severe("Failed to join class: " + e.getMessage());
         }
     }
 
-    /**
-     * Join private class by code.
-     */
     @FXML
     private void joinPrivateClass() {
-        try {
-            String code = codeField.getText();
-            if (code == null || code.isBlank()) {
-                LOGGER.warning("Class code is empty");
-                return;
-            }
+        String code = codeField.getText();
+        if (code == null || code.isBlank()) return;
 
-            String getClassSql = "SELECT id FROM classes WHERE join_code = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(getClassSql)) {
-
-                stmt.setString(1, code);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        int classId = rs.getInt("id");
-                        joinClass(classId);
-                        codeField.clear();
-                        LOGGER.info("Joined private class with code: " + code);
-                    } else {
-                        LOGGER.warning("Invalid class code: " + code);
-                    }
+        String query = "SELECT id FROM classes WHERE join_code = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, code);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    joinClass(rs.getInt("id"));
+                    codeField.clear();
                 }
             }
         } catch (Exception e) {
@@ -120,9 +163,22 @@ public class ClassesController {
         }
     }
 
-    /**
-     * Custom ListCell for displaying classes with join button.
-     */
+    private Integer getCurrentUserId() {
+        String sql = "SELECT id FROM users WHERE username = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Failed to get current user ID: " + e.getMessage());
+        }
+        return null;
+    }
+
     private class ClassListCell extends ListCell<Classes> {
         private final Button joinButton = new Button("Join");
 

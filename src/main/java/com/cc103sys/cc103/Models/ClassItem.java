@@ -15,6 +15,6 @@ public class ClassItem {
 
     @Override
     public String toString() {
-        return className; // IMPORTANT for ComboBox display
+        return className;
     }
 }

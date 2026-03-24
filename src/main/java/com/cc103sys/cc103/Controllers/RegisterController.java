@@ -12,10 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-/**
- * Controller for Register scene.
- * Handles user registration and navigation back to Login.
- */
 public class RegisterController {
     private static final Logger LOGGER = Logger.getLogger(RegisterController.class.getName());
     private static final int MIN_USERNAME_LENGTH = 3;
@@ -25,10 +21,6 @@ public class RegisterController {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
-    /**
-     * Handle register button action.
-     * Validates input and creates new user account.
-     */
     @SuppressWarnings("StringConcatenationInFormatCall")
     @FXML
     public void handleRegister() {
@@ -36,12 +28,10 @@ public class RegisterController {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            // Validate input
             if (!validateRegisterInput(username, password)) {
                 return;
             }
 
-            // Register user
             if (registerUser(username, password)) {
                 displaySuccess("Registration successful! Redirecting to login...");
                 redirectToLogin();
@@ -54,9 +44,6 @@ public class RegisterController {
         }
     }
 
-    /**
-     * Handle back to login button action.
-     */
     @SuppressWarnings("StringConcatenationInFormatCall")
     @FXML
     public void goLogin() {
@@ -68,9 +55,6 @@ public class RegisterController {
         }
     }
 
-    /**
-     * Validate registration input with specific requirements.
-     */
     private boolean validateRegisterInput(String username, String password) {
         if (username == null || username.isBlank()) {
             displayError("Username is required.");
@@ -91,9 +75,6 @@ public class RegisterController {
         return true;
     }
 
-    /**
-     * Register user in database.
-     */
     @SuppressWarnings("StringConcatenationInFormatCall")
     private boolean registerUser(String username, String password) {
         String sql = "INSERT INTO users(username, password) VALUES (?, ?)";
@@ -113,9 +94,6 @@ public class RegisterController {
         }
     }
 
-    /**
-     * Redirect to login after small delay.
-     */
     @SuppressWarnings("StringConcatenationInFormatCall")
     private void redirectToLogin() {
         new Thread(() -> {
@@ -134,17 +112,11 @@ public class RegisterController {
         }).start();
     }
 
-    /**
-     * Display error message to user.
-     */
     private void displayError(String message) {
         messageLabel.setText(message);
         messageLabel.setStyle("-fx-text-fill: #d32f2f;");
     }
 
-    /**
-     * Display success message to user.
-     */
     private void displaySuccess(String message) {
         messageLabel.setText(message);
         messageLabel.setStyle("-fx-text-fill: #4caf50;");

@@ -20,10 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
-/**
- * Controller for Dashboard scene.
- * Manages tasks, timer, and leaderboard preview.
- */
 public class DashboardController {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
     private static final int TASK_COMPLETION_BONUS = 10;
@@ -41,9 +37,6 @@ public class DashboardController {
     private int remainingSeconds;
     private ObservableList<Task> tasks = FXCollections.observableArrayList();
 
-    /**
-     * Initialize dashboard controller.
-     */
     @FXML
     public void initialize() {
         try {
@@ -98,11 +91,17 @@ public class DashboardController {
 
     private void loadTasks() {
         tasks.clear();
-        String sql = "SELECT id, task_name, task_date, status FROM tasks WHERE username = ?";
+        Classes selectedClass = classSelector == null ? null : classSelector.getValue();
+        if (selectedClass == null) {
+            return;
+        }
+
+        String sql = "SELECT id, task_name, task_date, status FROM tasks WHERE username = ? AND class_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, Session.getUsername());
+            stmt.setInt(2, selectedClass.getId());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     tasks.add(new Task(
@@ -121,7 +120,10 @@ public class DashboardController {
 
     private void loadUserClassesForLeaderboard() {
         ObservableList<Classes> userClasses = FXCollections.observableArrayList();
-        String sql = "SELECT DISTINCT c.id, c.class_name FROM classes c WHERE c.id IN (SELECT class_id FROM users WHERE username = ?)";
+        String sql = "SELECT DISTINCT c.id, c.class_name FROM classes c "
+                   + "JOIN user_classes uc ON c.id = uc.class_id "
+                   + "JOIN users u ON uc.user_id = u.id "
+                   + "WHERE u.username = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -134,9 +136,17 @@ public class DashboardController {
 
             if (classSelector != null) {
                 classSelector.setItems(userClasses);
+                classSelector.setOnAction(e -> {
+                    loadLeaderboardPreviewForClass();
+                    loadTasks();
+                });
+
                 if (!userClasses.isEmpty()) {
                     classSelector.setValue(userClasses.get(0));
                     loadLeaderboardPreviewForClass();
+                    loadTasks();
+                } else {
+                    tasks.clear();
                 }
             }
             LOGGER.info("Loaded " + userClasses.size() + " user classes");
@@ -155,13 +165,20 @@ public class DashboardController {
                 return;
             }
 
-            String sql = "INSERT INTO tasks(username, task_name, task_date, status) VALUES (?, ?, ?, ?)";
+            Classes selectedClass = classSelector == null ? null : classSelector.getValue();
+            if (selectedClass == null) {
+                LOGGER.warning("No class selected for task");
+                return;
+            }
+
+            String sql = "INSERT INTO tasks(username, task_name, task_date, status, class_id) VALUES (?, ?, ?, ?, ?)";
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, Session.getUsername());
                 stmt.setString(2, taskName);
                 stmt.setDate(3, Date.valueOf(date));
                 stmt.setString(4, "Pending");
+                stmt.setInt(5, selectedClass.getId());
                 stmt.executeUpdate();
 
                 loadTasks();
@@ -249,7 +266,9 @@ public class DashboardController {
             }
 
             ObservableList<UserRank> data = FXCollections.observableArrayList();
-            String sql = "SELECT username, points FROM users WHERE class_id = ? ORDER BY points DESC LIMIT 5";
+            String sql = "SELECT u.username, u.points FROM users u "
+                       + "JOIN user_classes uc ON u.id = uc.user_id "
+                       + "WHERE uc.class_id = ? ORDER BY u.points DESC LIMIT 5";
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {

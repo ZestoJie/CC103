@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="10" styleClass="card"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.TimerController">
-    <Label text="Focus Timer" styleClass="title"/>
-    <ComboBox fx:id="timeSelect"/>
-    <Label fx:id="timerLabel" text="00:00"/>
-    <Button text="Start Timer" onAction="#startTimer"/>
-</VBox>
+
+<AnchorPane prefWidth="400" prefHeight="200" style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 0, 1);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TimerController">
+    <children>
+        <Label text="Focus Timer" style="-fx-font-size: 16; -fx-font-weight: bold;" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" alignment="CENTER" />
+        <ComboBox fx:id="timeSelect" promptText="Select Duration" prefHeight="40" AnchorPane.topAnchor="30" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
+        <Label fx:id="timerLabel" text="00:00" alignment="CENTER" style="-fx-font-size: 48; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" AnchorPane.topAnchor="80" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+        <Button text="Start Timer" onAction="#startTimer" prefHeight="45" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
+    </children>
+</AnchorPane>

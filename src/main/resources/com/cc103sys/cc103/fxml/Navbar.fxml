@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="274.0" prefWidth="428.0" spacing="15" styleClass="card" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goTasks" text="Tasks" translateX="20.0" />
-
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goDashboard" text="Dashboard" translateX="-80.0" translateY="40.0" />
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goClasses" text="Classes" translateX="-180.0" translateY="80.0" />
-
-    <Region maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#logout" text="Logout" translateX="-315.0" translateY="160.0" />
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goLeaderboard" text="Leaderboard" translateX="-385.0" translateY="120.0" />
-</HBox>
+<AnchorPane prefHeight="60.0" prefWidth="1440.0" style="-fx-padding: 10 20 10 20; -fx-background-color: #2c3e50; -fx-border-color: #34495e;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
+    <children>
+        <Button text="Tasks" onAction="#goTasks" style="-fx-padding: 10 15 10 15; -fx-font-size: 12; -fx-text-fill: white;" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="20" />
+        <Button text="Dashboard" onAction="#goDashboard" style="-fx-padding: 10 15 10 15; -fx-font-size: 12; -fx-text-fill: white;" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="100" />
+        <Button text="Classes" onAction="#goClasses" style="-fx-padding: 10 15 10 15; -fx-font-size: 12; -fx-text-fill: white;" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="200" />
+        <Button text="Leaderboard" onAction="#goLeaderboard" style="-fx-padding: 10 15 10 15; -fx-font-size: 12; -fx-text-fill: white;" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="300" />
+        <Button text="Logout" onAction="#logout" style="-fx-padding: 10 15 10 15; -fx-font-size: 12; -fx-text-fill: white; -fx-background-color: #e74c3c;" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="20" />
+    </children>
+</AnchorPane>

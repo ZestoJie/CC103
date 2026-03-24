@@ -4,18 +4,23 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<VBox alignment="CENTER" prefHeight="281.0" prefWidth="206.0" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.RegisterController">
+<AnchorPane prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.RegisterController" style="-fx-background-color: #f5f5f5;">
+    <children>
+        <!-- Background card -->
+        <AnchorPane style="-fx-background-color: white; -fx-border-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="200" AnchorPane.rightAnchor="200" AnchorPane.topAnchor="100" AnchorPane.bottomAnchor="100">
+            <children>
+                <Label text="REGISTER" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #333;" AnchorPane.topAnchor="50" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" alignment="CENTER" />
+                
+                <TextField fx:id="usernameField" promptText="Username" prefHeight="45.0" style="-fx-font-size: 14; -fx-padding: 10; -fx-border-radius: 5;" AnchorPane.topAnchor="120" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
+                <PasswordField fx:id="passwordField" promptText="Password" prefHeight="45.0" style="-fx-font-size: 14; -fx-padding: 10; -fx-border-radius: 5;" AnchorPane.topAnchor="180" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
 
-    <Label styleClass="title" text="REGISTER" />
+                <Button text="Register" onAction="#handleRegister" prefHeight="45.0" prefWidth="150.0" style="-fx-font-size: 14; -fx-padding: 10 30 10 30; -fx-background-radius: 5; -fx-cursor: hand;" AnchorPane.topAnchor="250" AnchorPane.leftAnchor="175" />
+                <Button text="Back to Login" onAction="#goLogin" prefHeight="45.0" prefWidth="150.0" style="-fx-font-size: 14; -fx-padding: 10 30 10 30; -fx-background-radius: 5; -fx-cursor: hand;" AnchorPane.topAnchor="250" AnchorPane.rightAnchor="175" />
 
-    <TextField fx:id="usernameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Username" />
-    <PasswordField fx:id="passwordField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="130.0" promptText="Password" />
-
-    <Button onAction="#handleRegister" text="Register" />
-    <Button onAction="#goLogin" text="Back to Login" />
-
-    <Label fx:id="messageLabel" />
-
-</VBox>
+                <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #d32f2f; -fx-font-size: 12;" AnchorPane.topAnchor="320" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" alignment="CENTER" />
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

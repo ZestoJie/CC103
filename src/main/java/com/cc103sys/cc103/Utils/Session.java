@@ -3,7 +3,7 @@ package com.cc103sys.cc103.Utils;
 public class Session {
 
     private static String username;
-    private static int selectedClassId; // add this
+    private static int selectedClassId;
 
     public static void setUsername(String user) {
         username = user;
@@ -23,6 +23,6 @@ public class Session {
 
     public static void clear() {
         username = null;
-        selectedClassId = 0; // reset class
+        selectedClassId = 0;
     }
 }

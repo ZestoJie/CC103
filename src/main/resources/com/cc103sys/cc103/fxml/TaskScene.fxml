@@ -3,30 +3,28 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox spacing="15"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+<AnchorPane prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController" style="-fx-background-color: #ecf0f1;">
+    <children>
+        <!-- Navbar -->
+        <fx:include source="Navbar.fxml" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
 
-    <fx:include source="Navbar.fxml"/>
+        <!-- Title -->
+        <Label text="Task Manager" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
 
-    <Label text="Task Manager" styleClass="title"/>
+        <!-- Add New Task Section -->
+        <Label text="Add New Task" style="-fx-font-size: 14; -fx-font-weight: bold;" AnchorPane.topAnchor="120" AnchorPane.leftAnchor="270" />
+        <TextField fx:id="taskField" promptText="Enter Task Description" prefHeight="40" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="470" />
+        <DatePicker fx:id="taskDate" prefHeight="40" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="470" />
+        <Button text="Add Task" onAction="#handleAddTask" prefHeight="40" prefWidth="120" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="570" />
 
-    <VBox spacing="10" styleClass="card">
+        <!-- Tasks List -->
+        <Label text="Your Tasks" style="-fx-font-size: 14; -fx-font-weight: bold;" AnchorPane.topAnchor="210" AnchorPane.leftAnchor="270" />
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-border-radius: 5;" AnchorPane.topAnchor="240" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="270">
+            <ListView fx:id="taskList" />
+        </ScrollPane>
 
-        <HBox spacing="10">
-            <TextField fx:id="taskField" promptText="Enter Task"/>
-            <DatePicker fx:id="taskDate"/>
-            <Button text="Add Task" onAction="#handleAddTask"/>
-        </HBox>
-
-        <ListView fx:id="taskList" prefHeight="400"/>
-
-        <HBox spacing="10">
-            <Button text="Mark Done" onAction="#handleMarkDone"/>
-            <Button text="Delete Task" onAction="#handleDeleteTask"/>
-        </HBox>
-
-    </VBox>
-
-</VBox>
+        <!-- Action Buttons -->
+        <Button text="Mark Done" onAction="#handleMarkDone" prefHeight="40" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="570" />
+        <Button text="Delete Task" onAction="#handleDeleteTask" prefHeight="40" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="570" AnchorPane.rightAnchor="270" />
+    </children>
+</AnchorPane>

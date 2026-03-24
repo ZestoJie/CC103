@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<VBox spacing="15"
-      alignment="CENTER"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.ClassesController">
+<AnchorPane prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController">
+    <children>
 
-    <fx:include source="Navbar.fxml"/>
+        <fx:include source="Navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
 
-    <Label text="Classes" styleClass="title"/>
+        <Label alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" text="My Classes" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="70" />
 
-    <ListView fx:id="classList" prefWidth="400" prefHeight="250"/>
+        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Enrolled Classes" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="120" />
+        <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-border-radius: 5; -fx-background-color: white; -fx-padding: 20; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 0, 1);" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="500" AnchorPane.topAnchor="150">
+            <ListView fx:id="classList" />
+        </ScrollPane>
 
-    <VBox spacing="10" styleClass="card">
-        <Label text="Join Private Class"/>
-        <TextField fx:id="codeField" promptText="Enter class code"/>
-        <Button text="Join Class" onAction="#joinPrivateClass"/>
-    </VBox>
-
-</VBox>
+        <Label layoutX="1130.0" layoutY="101.0" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Join Private Class" AnchorPane.leftAnchor="1130.0" AnchorPane.topAnchor="101.0" />
+        <Separator AnchorPane.leftAnchor="550" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="150" />
+        <Label layoutX="982.0" layoutY="162.0" style="-fx-font-size: 12;" text="Enter Class Code" AnchorPane.leftAnchor="982.0" AnchorPane.topAnchor="162.0" />
+        <TextField fx:id="codeField" layoutX="971.2" prefHeight="40" prefWidth="449.0" promptText="e.g., ABC123" AnchorPane.leftAnchor="971.0" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="190" />
+        <Button layoutX="971.2" onAction="#joinPrivateClass" prefHeight="46.0" prefWidth="449.0" style="-fx-font-size: 14;" text="Join Class" AnchorPane.leftAnchor="971.0" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="250" />
+        <Label layoutX="1094.0" layoutY="318.0" style="-fx-font-size: 11; -fx-text-fill: #666;" text="Tip: Ask your instructor for the class code" wrapText="true" AnchorPane.leftAnchor="1094.0" AnchorPane.rightAnchor="-522.8" AnchorPane.topAnchor="318.0" />
+    </children>
+</AnchorPane>

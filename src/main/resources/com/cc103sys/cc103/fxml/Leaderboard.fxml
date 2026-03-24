@@ -3,30 +3,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController"
-      styleClass="card">
+<AnchorPane prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;">
+    <children>
+        <!-- Navbar -->
+        <fx:include source="Navbar.fxml" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
 
-    <Label text="Choose a Class Leaderboard" styleClass="title"/>
+        <!-- Title -->
+        <Label text="Class Leaderboard" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
 
-    <ComboBox fx:id="classComboBox" promptText="Select Class" />
+        <!-- Filter Panel -->
+        <Label text="Select Class:" style="-fx-font-size: 14;" AnchorPane.topAnchor="130" AnchorPane.leftAnchor="20" />
+        <ComboBox fx:id="classComboBox" promptText="Select Class" prefHeight="40" AnchorPane.topAnchor="130" AnchorPane.leftAnchor="120" AnchorPane.rightAnchor="120" />
+        <Button text="View" onAction="#loadLeaderboard" prefHeight="40" prefWidth="100" AnchorPane.topAnchor="130" AnchorPane.rightAnchor="20" />
 
-    <Button text="View Leaderboard" onAction="#loadLeaderboard"/>
-
-    <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="400">
-        <content>
-            <TableView fx:id="table" prefWidth="500" visible="false">
-
+        <!-- Leaderboard TableView -->
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-border-radius: 5;" AnchorPane.topAnchor="190" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
+            <TableView fx:id="table" prefWidth="1200" visible="false" style="-fx-font-size: 12; -fx-background-color: white;">
                 <columns>
-                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="250"/>
-                    <TableColumn fx:id="pointsCol" text="Points" prefWidth="250"/>
+                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="600" />
+                    <TableColumn fx:id="pointsCol" text="Points" prefWidth="600" />
                 </columns>
-
             </TableView>
-        </content>
-    </ScrollPane>
+        </ScrollPane>
 
-    <Button text="Back to Dashboard" onAction="#goBack"/>
-</VBox>
+        <!-- Back Button -->
+        <Button text="Back to Dashboard" onAction="#goBack" prefHeight="45" prefWidth="150" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" alignment="CENTER" />
+    </children>
+</AnchorPane>

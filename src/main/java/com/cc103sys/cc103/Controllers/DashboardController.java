@@ -29,106 +29,96 @@ import javafx.scene.control.TextField;
 import javafx.util.Duration;
 
 public class DashboardController {
-    
+
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
+
+    // ✅ RESTORED (IMPORTANT)
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
+
     @FXML private ListView<Task> taskList;
     @FXML private Label timerLabel;
     @FXML private ListView<UserRank> leaderboardPreview;
+    @FXML private ComboBox<String> timerPreset;
+
+    // ✅ NEW (for empty state)
+    @FXML private Label noTaskLabel;
+
     private Timeline timeline;
     private int seconds;
 
-
-
     private ObservableList<Task> tasks = FXCollections.observableArrayList();
-    @FXML
-    private ComboBox<String> timerPreset;
 
     @FXML
     public void initialize() {
-        welcomeLabel.setText("Welcome, " + Session.getUsername());
+
+        // ✅ Dynamic username
+        welcomeLabel.setText("Welcome back, " + Session.getUsername() + "!");
+
         taskList.setItems(tasks);
+
         taskList.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Task task, boolean empty) {
                 super.updateItem(task, empty);
-                if(empty || task == null){
+
+                if (empty || task == null) {
                     setText(null);
                 } else {
-                        setText(
-                        task.getTaskName() + " | " +
-                        task.getDate() + " | " +
-                        task.getStatus()
-                        );
-                    }
+                    setText(task.getTaskName() + " | " +
+                            task.getDate() + " | " +
+                            task.getStatus());
                 }
             }
-        );
-    
+        });
+
         loadTasks();
         loadUserClassesForLeaderboard();
+
         classSelector.setOnAction(e -> loadLeaderboardPreviewForClass());
 
+        // Timer presets
         if (timerPreset != null) {
             timerPreset.getItems().addAll("1 Minute", "5 Minutes", "10 Minutes", "1 Hour");
             timerPreset.setValue("1 Minute");
-        } else {
-            System.err.println("timerPreset is null! FXML not injected properly.");
         }
-        
+
         loadLeaderboardPreviewForClass();
     }
-    private void loadUserClassesForLeaderboard() {
-        ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
-        String sql = """
-            SELECT c.id, c.class_name
-            FROM classes c
-            JOIN users u ON c.id = u.class_id
-            WHERE u.username = ?
-        """;
-
-        try (Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, Session.getUsername());
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("class_name");
-                System.out.println("Found class: " + id + " - " + name);
-                userClasses.add(new Classes(id, name));
-            }
-
-            System.out.println("Total classes loaded: " + userClasses.size());
-            classSelector.setItems(userClasses);
-
-            if (!userClasses.isEmpty()) {
-                classSelector.setValue(userClasses.get(0));
-                loadLeaderboardPreviewForClass();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // =========================
+    // ✅ SETTINGS NAVIGATION
+    // =========================
+    @FXML
+    private void goSettings() {
+        Navigator.switchScene("Settings");
     }
-    private void loadTasks(){
+
+    // =========================
+    // ✅ TIMER POPUP TRIGGER
+    // =========================
+    @FXML
+    private void openTimerPopup() {
+        System.out.println("Open Timer Popup (Next Step)");
+    }
+
+    // =========================
+    // TASKS
+    // =========================
+    private void loadTasks() {
 
         tasks.clear();
 
         String sql = "SELECT * FROM tasks WHERE username=?";
 
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, Session.getUsername());
-
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 tasks.add(new Task(
                         rs.getInt("id"),
                         rs.getString("task_name"),
@@ -137,23 +127,28 @@ public class DashboardController {
                 ));
             }
 
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // ✅ EMPTY STATE CHECK
+        if (noTaskLabel != null) {
+            noTaskLabel.setVisible(tasks.isEmpty());
         }
     }
 
     @FXML
-    private void handleAddTask(){
+    private void handleAddTask() {
 
         String taskName = taskField.getText();
         LocalDate date = taskDate.getValue();
 
-        if(taskName.isEmpty() || date == null) return;
+        if (taskName == null || taskName.isEmpty() || date == null) return;
 
         String sql = "INSERT INTO tasks(username,task_name,task_date,status) VALUES (?,?,?,?)";
 
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, Session.getUsername());
             stmt.setString(2, taskName);
@@ -168,90 +163,12 @@ public class DashboardController {
             taskField.clear();
             taskDate.setValue(null);
 
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @FXML
-    private void handleDeleteTask(){
-
-        Task selected = taskList.getSelectionModel().getSelectedItem();
-        if(selected == null) return;
-
-        String sql = "DELETE FROM tasks WHERE id=?";
-
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-
-            stmt.setInt(1, selected.getId());
-            stmt.executeUpdate();
-
-            loadTasks();
-
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void handleMarkDone(){
-
-        Task selected = taskList.getSelectionModel().getSelectedItem();
-        if(selected == null) return;
-
-        String sql = "UPDATE tasks SET status='Done' WHERE id=?";
-        String updatePoints = "UPDATE users SET points = points + 10 WHERE username=?";
-
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1, selected.getId());
-            stmt.executeUpdate();
-
-            loadTasks();
-
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement pts = conn.prepareStatement(updatePoints)){
-            pts.setString(1, Session.getUsername());
-            pts.executeUpdate();
-        } catch (Exception e){
-            e.printStackTrace();
-          }
-    }
-    
-    @FXML
-    private void handleMarkUndone(){
-
-        Task selected = taskList.getSelectionModel().getSelectedItem();
-        if(selected == null) return;
-
-        String sql = "UPDATE tasks SET status='Pending' WHERE id=?";
-        String updatePoints = "UPDATE users SET points = points - 10 WHERE username=?";
-
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1, selected.getId());
-            stmt.executeUpdate();
-
-            loadTasks();
-
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement pts = conn.prepareStatement(updatePoints)){
-            pts.setString(1, Session.getUsername());
-            pts.executeUpdate();
-        } catch (Exception e){
-            e.printStackTrace();
-          }
-    }
-    private void playAnimation(){
+    private void playAnimation() {
 
         FadeTransition fade = new FadeTransition(Duration.seconds(1), taskList);
         fade.setFromValue(0);
@@ -265,20 +182,9 @@ public class DashboardController {
         slide.play();
     }
 
-    @FXML
-    private void handleLogout(){
-        Session.clear();
-        Navigator.switchScene("Login");
-    }
-    @FXML
-    private void openLeaderboardScene() {
-        Classes selectedClass = classSelector.getValue();
-        if (selectedClass == null) return;
-
-        Session.setSelectedClassId(selectedClass.getId()); // save selected class in session
-        Navigator.switchScene("Leaderboard");
-    }
-
+    // =========================
+    // TIMER
+    // =========================
     @FXML
     private void handleStartTimer() {
 
@@ -290,18 +196,17 @@ public class DashboardController {
         if (timeline != null) timeline.stop();
 
         timeline = new Timeline(
-            new KeyFrame(
-                Duration.seconds(1), e -> {
-                seconds--;
-                updateTimerLabel();
-                if (seconds <= 0) timeline.stop();
-            }
-        )
-    );
+                new KeyFrame(Duration.seconds(1), e -> {
+                    seconds--;
+                    updateTimerLabel();
+                    if (seconds <= 0) timeline.stop();
+                })
+        );
 
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
+
     private void updateTimerLabel() {
         int min = seconds / 60;
         int sec = seconds % 60;
@@ -314,14 +219,52 @@ public class DashboardController {
         if (value.contains("5")) return 300;
         return 60;
     }
-    
+
+    // =========================
+    // LEADERBOARD
+    // =========================
+    private void loadUserClassesForLeaderboard() {
+
+        ObservableList<Classes> userClasses = FXCollections.observableArrayList();
+
+        String sql = """
+            SELECT c.id, c.class_name
+            FROM classes c
+            JOIN users u ON c.id = u.class_id
+            WHERE u.username = ?
+        """;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, Session.getUsername());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                userClasses.add(new Classes(
+                        rs.getInt("id"),
+                        rs.getString("class_name")
+                ));
+            }
+
+            classSelector.setItems(userClasses);
+
+            if (!userClasses.isEmpty()) {
+                classSelector.setValue(userClasses.get(0));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadLeaderboardPreviewForClass() {
+
         Classes selectedClass = classSelector.getValue();
         if (selectedClass == null) return;
 
         ObservableList<UserRank> data = FXCollections.observableArrayList();
 
-        // Use users.class_id instead of class_members
         String sql = """
             SELECT username, points
             FROM users
@@ -331,29 +274,31 @@ public class DashboardController {
         """;
 
         try (Connection conn = DBUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, selectedClass.getId());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String username = rs.getString("username");
-                int points = rs.getInt("points");
-                data.add(new UserRank(username, points));
+                data.add(new UserRank(
+                        rs.getString("username"),
+                        rs.getInt("points")
+                ));
             }
 
             leaderboardPreview.setItems(data);
-            leaderboardPreview.setCellFactory(param -> new ListCell<>() {
-                @Override
-                protected void updateItem(UserRank item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? null :
-                            item.getUsername() + " - " + item.getPoints() + " pts");
-                }
-            });
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void openLeaderboardScene() {
+        Classes selectedClass = classSelector.getValue();
+        if (selectedClass == null) return;
+
+        Session.setSelectedClassId(selectedClass.getId());
+        Navigator.switchScene("Leaderboard");
     }
 }

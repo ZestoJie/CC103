@@ -1,17 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="274.0" prefWidth="428.0" spacing="15" styleClass="card" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goTasks" text="Tasks" translateX="20.0" />
+<VBox prefWidth="230" spacing="15" style="-fx-background-color: linear-gradient(#0a1f2e, #163a52); -fx-padding: 20;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
 
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goDashboard" text="Dashboard" translateX="-80.0" translateY="40.0" />
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goClasses" text="Classes" translateX="-180.0" translateY="80.0" />
+    <!-- LOGO -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <ImageView fitHeight="35" fitWidth="35">
+            <image>
+                <Image url="@../../../../../../src/main/resources/images/logowhite.png" />
+            </image>
+        </ImageView>
 
-    <Region maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+        <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;" text="KyusiyuVenture" />
+    </HBox>
 
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#logout" text="Logout" translateX="-315.0" translateY="160.0" />
-    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#goLeaderboard" text="Leaderboard" translateX="-385.0" translateY="120.0" />
-</HBox>
+    <!-- PROFILE -->
+    <VBox alignment="CENTER" spacing="8">
+        <ImageView fitHeight="70" fitWidth="70" style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
+            <image>
+                <Image url="@/images/logo.png" />
+            </image>
+        </ImageView>
+
+        <Label style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" text="Username" />
+
+        <Label style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;" text="Apprentice (Level 1)" />
+
+        <ProgressBar prefWidth="120" progress="0.4" style="-fx-accent: #facc15;" />
+    </VBox>
+
+    <!-- MENU -->
+    <VBox spacing="12">
+
+        <!-- Dashboard -->
+        <Button fx:id="dashboardBtn" maxWidth="Infinity" onAction="#goDashboard" style="-fx-background-color: #2c5d7c; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Dashboard">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16">
+                    <image>
+                        <Image url="@../../../../../../src/main/resources/images/icon-dashboard.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <!-- Classes -->
+        <Button fx:id="classesBtn" maxWidth="Infinity" onAction="#goClasses" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Classes">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16">
+                    <image>
+                        <Image url="@../../../../../../src/main/resources/images/icon-class.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <!-- Leaderboard -->
+        <Button fx:id="leaderboardBtn" maxWidth="Infinity" onAction="#goLeaderboard" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Leaderboard">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16">
+                    <image>
+                        <Image url="@../../../../../../src/main/resources/images/icon-lboard.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <!-- Tasks -->
+        <Button fx:id="tasksBtn" maxWidth="Infinity" onAction="#goTasks" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Tasks">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16">
+                    <image>
+                        <Image url="@../../../../../../src/main/resources/images/icon-tasks.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <!-- Settings -->
+        <Button fx:id="settingsBtn" maxWidth="Infinity" onAction="#goSettings" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Settings">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16">
+                    <image>
+                        <Image url="@../../../../../../src/main/resources/images/icon-settings.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+
+    </VBox>
+
+    <!-- PUSH DOWN -->
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- LOGOUT -->
+    <Button maxWidth="Infinity" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Logout">
+        <graphic>
+            <ImageView fitHeight="16" fitWidth="16">
+                <image>
+                    <Image url="@../../../../../../src/main/resources/images/icon-logout.png" />
+                </image>
+            </ImageView>
+        </graphic>
+    </Button>
+
+</VBox>

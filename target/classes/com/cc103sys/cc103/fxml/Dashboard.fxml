@@ -1,47 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1440.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+<HBox prefHeight="700" prefWidth="1200"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+
     <children>
 
-        <fx:include source="Navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+        <!-- NAVBAR -->
+        <fx:include prefWidth="230" source="navbar.fxml"/>
 
-        <Label fx:id="welcomeLabel" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="70" />
+        <!-- MAIN CONTENT -->
+        <VBox spacing="20" style="-fx-background-color: #f5f7fb;" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
 
-        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Task Manager" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="120" />
-        <Separator AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="720" AnchorPane.topAnchor="150" />
+            <!-- HEADER -->
+            <HBox alignment="CENTER_LEFT">
+                <children>
 
-        <TextField fx:id="taskField" layoutX="20.0" layoutY="160.0" prefHeight="40" prefWidth="402.0" promptText="Enter Task" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="1018.0" AnchorPane.topAnchor="160.0" />
-        <DatePicker fx:id="taskDate" layoutX="450.0" layoutY="160.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="159.0" AnchorPane.leftAnchor="450.0" AnchorPane.topAnchor="160.0" />
-        <Button layoutX="642.0" layoutY="160.0" onAction="#handleAddTask" prefHeight="40" prefWidth="80" text="Add" AnchorPane.leftAnchor="642.0" AnchorPane.topAnchor="160.0" />
+                    <!-- Dynamic Welcome -->
+                    <Label fx:id="welcomeLabel"
+                           text="Welcome back, User!"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold;" />
 
-        <ScrollPane fitToWidth="true" prefHeight="462.0" prefWidth="700.0" style="-fx-border-radius: 5;" AnchorPane.bottomAnchor="218.0" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="720" AnchorPane.topAnchor="220">
-            <ListView fx:id="taskList" prefHeight="280.0" prefWidth="582.0" />
-        </ScrollPane>
+                    <Region HBox.hgrow="ALWAYS"/>
 
-        <Button layoutX="343.0" layoutY="515.0" onAction="#handleMarkDone" prefHeight="40" prefWidth="109.0" text="Done" AnchorPane.bottomAnchor="165.0" AnchorPane.leftAnchor="343.0" AnchorPane.rightAnchor="989.8000000000002" />
-        <Button layoutX="20.0" layoutY="515.0" onAction="#handleMarkUndone" prefHeight="40" prefWidth="166.0" text="Undo" AnchorPane.bottomAnchor="165.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="1253.6" />
-        <Button layoutX="201.0" layoutY="515.0" onAction="#handleDeleteTask" prefHeight="40" prefWidth="129.0" text="Delete" AnchorPane.bottomAnchor="165.0" AnchorPane.leftAnchor="201.0" />
+                    <!-- SETTINGS BUTTON -->
+                    <Button onAction="#goSettings"
+                            style="-fx-background-color: transparent;">
+                        <graphic>
+                            <ImageView fitHeight="20" fitWidth="20">
+                                <image>
+                                    <Image url="@/images/icon-settingsblue.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-        <Label layoutX="1039.0" layoutY="88.0" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Game Timer" AnchorPane.leftAnchor="1039.0" AnchorPane.topAnchor="88.0" />
-        <ComboBox fx:id="timerPreset" layoutX="751.0" layoutY="113.0" prefHeight="40" promptText="Select Preset" AnchorPane.leftAnchor="751.0" AnchorPane.rightAnchor="20.200000000000045" AnchorPane.topAnchor="113.0" />
-        <Label fx:id="timerLabel" alignment="CENTER" layoutX="750.0" layoutY="165.0" style="-fx-font-size: 48; -fx-font-weight: bold; -fx-text-fill: #2980b9;" text="00:00" AnchorPane.leftAnchor="750.0" AnchorPane.rightAnchor="20.40000000000009" AnchorPane.topAnchor="165.0" />
-        <Button layoutX="751.0" layoutY="268.0" onAction="#handleStartTimer" prefHeight="45" text="Start Timer" AnchorPane.leftAnchor="751.0" AnchorPane.rightAnchor="19.40000000000009" AnchorPane.topAnchor="268.0" />
+                </children>
+            </HBox>
 
-        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Leaderboard Preview" AnchorPane.leftAnchor="750" AnchorPane.topAnchor="350" />
-        <ComboBox fx:id="classSelector" prefHeight="40" promptText="Select Class" AnchorPane.leftAnchor="750" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="380" />
-        <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-border-radius: 5;" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="750" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="430">
-            <ListView fx:id="leaderboardPreview" />
-        </ScrollPane>
-        <Button onAction="#openLeaderboardScene" prefHeight="45" text="Full Leaderboard" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="750" AnchorPane.rightAnchor="20" />
+            <!-- MAIN GRID -->
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+                <!-- LEFT COLUMN -->
+                <VBox spacing="20" prefWidth="550" VBox.vgrow="ALWAYS">
+
+                    <!-- TASK PANEL -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="TaskScene"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label text="Upcoming Deadlines"
+                               style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" />
+
+                        <!-- INPUT -->
+                        <HBox spacing="10">
+                            <TextField fx:id="taskField" promptText="Enter Task"/>
+                            <DatePicker fx:id="taskDate"/>
+                            <Button text="Add" onAction="#handleAddTask"/>
+                        </HBox>
+
+                        <!-- TASK LIST -->
+                        <ListView fx:id="taskList" VBox.vgrow="ALWAYS"/>
+
+                        <!-- EMPTY STATE -->
+                        <Label fx:id="noTaskLabel"
+                               text="No activities to accomplish"
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12;"
+                               visible="false"/>
+                    </VBox>
+
+                    <!-- MINI LEADERBOARD -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <!-- HEADER -->
+                        <HBox>
+                            <Label text="Mini Leaderboard"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                            <Region HBox.hgrow="ALWAYS"/>
+
+                            <ComboBox fx:id="classSelector" promptText="Class"/>
+                        </HBox>
+
+                        <ListView fx:id="leaderboardPreview" VBox.vgrow="ALWAYS"/>
+
+                        <Button text="Open Full Leaderboard"
+                                onAction="#openLeaderboardScene"/>
+                    </VBox>
+
+                </VBox>
+
+                <!-- RIGHT COLUMN -->
+                <VBox spacing="20" HBox.hgrow="ALWAYS">
+
+                    <!-- TIMER PANEL -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          onMouseClicked="#openTimerPopup"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="Timer Panel"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label fx:id="timerLabel"
+                               text="00:00"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+
+                        <Button text="Start" onAction="#handleStartTimer"/>
+                    </VBox>
+
+                    <!-- DAILY PROGRESS -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="Daily Goal Progress"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <!-- Placeholder for Chart -->
+                        <Label text="Chart will display here"
+                               style="-fx-text-fill: #9ca3af;" />
+                    </VBox>
+
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
     </children>
-</AnchorPane>
+</HBox>

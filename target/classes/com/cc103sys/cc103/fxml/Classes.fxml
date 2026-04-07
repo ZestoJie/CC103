@@ -12,7 +12,7 @@
 <AnchorPane prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController">
     <children>
 
-        <fx:include source="Navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+        <fx:include prefWidth="230" source="navbar.fxml"/>
 
         <Label alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" text="My Classes" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="70" />
 

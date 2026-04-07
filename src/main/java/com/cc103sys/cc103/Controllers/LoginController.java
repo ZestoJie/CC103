@@ -10,7 +10,6 @@ import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -19,7 +18,6 @@ public class LoginController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private Label messageLabel;
 
     @FXML
     private void handleLogin() {
@@ -28,22 +26,23 @@ public class LoginController {
             String password = passwordField.getText() == null ? "" : passwordField.getText().trim();
 
             if (!validateLoginInput(username, password)) {
-                displayError("Username and password are required.");
                 return;
             }
 
             boolean authenticated = authenticateUser(username, password);
             if (authenticated) {
                 Session.setUsername(username);
+
+               
+
                 Navigator.switchScene("Dashboard");
                 LOGGER.info("User logged in: " + username);
             } else {
-                displayError("Invalid username or password. Check credentials and try again.");
-                LOGGER.warning("Authentication failed for username: " + username);
+                
             }
         } catch (Exception e) {
             LOGGER.severe("Login error: " + e.getMessage());
-            displayError("Login failed due to technical issue. Contact admin.");
+           
         }
     }
 
@@ -53,7 +52,6 @@ public class LoginController {
             Navigator.switchScene("Register");
         } catch (Exception e) {
             LOGGER.severe("Navigation error: " + e.getMessage());
-            displayError("Failed to navigate to Register.");
         }
     }
 
@@ -78,11 +76,6 @@ public class LoginController {
             LOGGER.severe("Database error during authentication: " + e.getMessage());
             return false;
         }
-    }
-
-    private void displayError(String message) {
-        messageLabel.setText(message);
-        messageLabel.setStyle("-fx-text-fill: #d32f2f;");
     }
 }
 

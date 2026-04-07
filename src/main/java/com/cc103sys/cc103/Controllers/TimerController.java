@@ -2,6 +2,8 @@ package com.cc103sys.cc103.Controllers;
 
 import java.util.logging.Logger;
 
+import com.cc103sys.cc103.Utils.Navigator;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -90,6 +92,15 @@ public class TimerController {
     private void onTimerComplete() {
         LOGGER.info("Timer completed!");
         timerLabel.setStyle("-fx-text-fill: #4caf50;");
+    }
+
+    @FXML
+    private void goSettings() {
+        try {
+            Navigator.switchScene("Settings");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+        }
     }
 }
 

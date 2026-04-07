@@ -1,6 +1,9 @@
 package com.cc103sys.cc103.Controllers;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
@@ -17,7 +20,12 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.util.Duration;
 
 public class DashboardController {
@@ -26,8 +34,11 @@ public class DashboardController {
 
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
+
+    // ✅ RESTORED (IMPORTANT)
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
+
     @FXML private ListView<Task> taskList;
     @FXML private Label timerLabel;
     @FXML private ListView<UserRank> leaderboardPreview;
@@ -153,6 +164,7 @@ public class DashboardController {
         } catch (Exception e) {
             LOGGER.severe("Failed to load user classes: " + e.getMessage());
         }
+
     }
 
     @FXML
@@ -381,5 +393,24 @@ public class DashboardController {
             return false;
         }
         return true;
+    }
+
+    @FXML
+    private void goSettings() {
+        try {
+            Navigator.switchScene("Settings");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void openTimerPopup() {
+        try {
+            LOGGER.info("Opening timer popup");
+            // Placeholder: Can be expanded to show a popup window or modal
+        } catch (Exception e) {
+            LOGGER.severe("Failed to open timer popup: " + e.getMessage());
+        }
     }
 }

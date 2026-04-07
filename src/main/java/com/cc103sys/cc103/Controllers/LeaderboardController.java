@@ -1,10 +1,15 @@
 package com.cc103sys.cc103.Controllers;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.logging.Logger;
+
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.UserRank;
-import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.Navigator;
+import com.cc103sys.cc103.Utils.Session;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,11 +18,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.logging.Logger;
 
 public class LeaderboardController {
 
@@ -142,6 +142,15 @@ public class LeaderboardController {
             Navigator.switchScene("Dashboard");
         } catch (Exception e) {
             LOGGER.severe("Navigation error: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void goSettings() {
+        try {
+            Navigator.switchScene("Settings");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
         }
     }
 }

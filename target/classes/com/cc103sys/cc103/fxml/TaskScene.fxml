@@ -5,8 +5,7 @@
 
 <AnchorPane prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController" style="-fx-background-color: #ecf0f1;">
     <children>
-    
-        <fx:include source="Navbar.fxml" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+        <fx:include prefWidth="230" source="navbar.fxml"/>
 
         <Label text="Task Manager" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
 

@@ -23,12 +23,12 @@ public class RegisterController {
 
     @SuppressWarnings("StringConcatenationInFormatCall")
     @FXML
-    public void handleRegister() {
+    private void handleRegister(){
         try {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            if (!validateRegisterInput(username, password)) {
+            if(!validateRegisterInput(username, password)){
                 return;
             }
 
@@ -79,8 +79,8 @@ public class RegisterController {
     private boolean registerUser(String username, String password) {
         String sql = "INSERT INTO users(username, password) VALUES (?, ?)";
 
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try(Connection conn = DBUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
 
             stmt.setString(1, username);
             stmt.setString(2, password);

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox spacing="20" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS">
+<VBox spacing="20" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TaskController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS">
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>

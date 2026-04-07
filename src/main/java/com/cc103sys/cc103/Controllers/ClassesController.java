@@ -25,13 +25,19 @@ public class ClassesController {
     @FXML private ListView<Classes> classList;
     @FXML private TextField codeField;
     @FXML private TextField classNameField;
-    @FXML private TextField privateClassCodeField;
+
+    @FXML@SuppressWarnings("unused")
+    private TextField privateClassCodeField;
+
     @FXML private CheckBox publicClassCheckbox;
 
     @FXML
     public void initialize() {
         loadPublicClasses();
         loadOwnedClasses();
+
+        // Set navbar active
+        NavbarController.getInstance().setActive("classes");
     }
 
     private void loadPublicClasses() {
@@ -60,7 +66,7 @@ public class ClassesController {
                 classList.setCellFactory(lv -> new ClassListCell());
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load public classes: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load public classes: " + e.getMessage());
         }
     }
 
@@ -83,11 +89,12 @@ public class ClassesController {
                 classList.getItems().addAll(owned);
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load owned classes: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load owned classes: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void createClass() {
         String name = classNameField.getText();
         if (name == null || name.isBlank()) return;
@@ -113,7 +120,7 @@ public class ClassesController {
             publicClassCheckbox.setSelected(false);
             loadPublicClasses();
         } catch (Exception e) {
-            LOGGER.severe("Failed to create class: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to create class: " + e.getMessage());
         }
     }
 
@@ -139,11 +146,12 @@ public class ClassesController {
             stmt.executeUpdate();
             loadPublicClasses();
         } catch (Exception e) {
-            LOGGER.severe("Failed to join class: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to join class: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void joinPrivateClass() {
         String code = codeField.getText();
         if (code == null || code.isBlank()) return;
@@ -159,7 +167,7 @@ public class ClassesController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to join private class: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to join private class: " + e.getMessage());
         }
     }
 
@@ -174,7 +182,7 @@ public class ClassesController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to get current user ID: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to get current user ID: " + e.getMessage());
         }
         return null;
     }

@@ -4,14 +4,15 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefWidth="230" spacing="15"
+<VBox prefWidth="230" spacing="15" VBox.vgrow="ALWAYS"
       style="-fx-background-color: linear-gradient(#0a1f2e, #163a52); -fx-padding: 20;"
       xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cc103sys.cc103.Controllers.NavbarController">
 
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <ImageView fitHeight="35" fitWidth="35">
+        <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
             <image>
                 <Image url="@/images/logowhite.png"/>
             </image>
@@ -21,12 +22,11 @@
                style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;"/>
     </HBox>
 
-    <!-- PROFILE -->
     <VBox alignment="CENTER" spacing="8">
-        <ImageView fitHeight="70" fitWidth="70"
+        <ImageView fitHeight="35" fitWidth="35"
                    style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
             <image>
-                <Image url="@/images/logo.png"/>
+                <Image url="@/images/logowhite.png"/>
             </image>
         </ImageView>
 
@@ -40,15 +40,16 @@
                      style="-fx-accent: #facc15;" />
     </VBox>
 
-    <!-- MENU -->
     <VBox spacing="12">
 
-        <!-- Dashboard -->
         <Button fx:id="dashboardBtn" text="Dashboard" onAction="#goDashboard"
                 maxWidth="Infinity"
-                style="-fx-background-color: #2c5d7c; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
+                contentDisplay="LEFT"
+                graphicTextGap="10"
+                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
             <graphic>
-                <ImageView fitHeight="16" fitWidth="16">
+                <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                     <image>
                         <Image url="@/images/icon-dashboard.png"/>
                     </image>
@@ -56,12 +57,14 @@
             </graphic>
         </Button>
 
-        <!-- Classes -->
         <Button fx:id="classesBtn" text="Classes" onAction="#goClasses"
                 maxWidth="Infinity"
+                contentDisplay="LEFT"
+                graphicTextGap="10"
                 style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
             <graphic>
-                <ImageView fitHeight="16" fitWidth="16">
+                <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                     <image>
                         <Image url="@/images/icon-class.png"/>
                     </image>
@@ -69,12 +72,14 @@
             </graphic>
         </Button>
 
-        <!-- Leaderboard -->
         <Button fx:id="leaderboardBtn" text="Leaderboard" onAction="#goLeaderboard"
                 maxWidth="Infinity"
+                contentDisplay="LEFT"
+                graphicTextGap="10"
                 style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
             <graphic>
-                <ImageView fitHeight="16" fitWidth="16">
+                <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                     <image>
                         <Image url="@/images/icon-lboard.png"/>
                     </image>
@@ -82,12 +87,14 @@
             </graphic>
         </Button>
 
-        <!-- Tasks -->
         <Button fx:id="tasksBtn" text="Tasks" onAction="#goTasks"
                 maxWidth="Infinity"
+                contentDisplay="LEFT"
+                graphicTextGap="10"
                 style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
             <graphic>
-                <ImageView fitHeight="16" fitWidth="16">
+                <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                     <image>
                         <Image url="@/images/icon-tasks.png"/>
                     </image>
@@ -95,12 +102,14 @@
             </graphic>
         </Button>
 
-        <!-- Settings -->
         <Button fx:id="settingsBtn" text="Settings" onAction="#goSettings"
                 maxWidth="Infinity"
+                contentDisplay="LEFT"
+                graphicTextGap="10"
                 style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
             <graphic>
-                <ImageView fitHeight="16" fitWidth="16">
+                <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                     <image>
                         <Image url="@/images/icon-settings.png"/>
                     </image>
@@ -110,15 +119,16 @@
 
     </VBox>
 
-    <!-- PUSH DOWN -->
     <Region VBox.vgrow="ALWAYS"/>
 
-    <!-- LOGOUT -->
     <Button text="Logout" onAction="#logout"
             maxWidth="Infinity"
+            contentDisplay="LEFT"
+            graphicTextGap="10"
             style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
         <graphic>
-            <ImageView fitHeight="16" fitWidth="16">
+            <ImageView fitHeight="35" fitWidth="35"
+                   style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                 <image>
                     <Image url="@/images/icon-logout.png"/>
                 </image>

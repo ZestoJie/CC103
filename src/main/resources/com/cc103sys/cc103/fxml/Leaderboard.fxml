@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" spacing="15">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
     <children>
         
-        <fx:include prefWidth="230" source="navbar.fxml"/>
+        <HBox spacing="15">
+            <children>
+                
+                <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+                
+                <VBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label text="Class Leaderboard" style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
-        <Label text="Class Leaderboard" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Select Class:" style="-fx-font-size: 14;" />
+                                <ComboBox fx:id="classComboBox" promptText="Select Class" HBox.hgrow="ALWAYS"/>
+                                <Button text="View" onAction="#loadLeaderboard" />
+                            </children>
+                        </HBox>
 
-        <Label text="Select Class:" style="-fx-font-size: 14;" AnchorPane.topAnchor="130" AnchorPane.leftAnchor="20" />
-        <ComboBox fx:id="classComboBox" promptText="Select Class" prefHeight="40" AnchorPane.topAnchor="130" AnchorPane.leftAnchor="120" AnchorPane.rightAnchor="120" />
-        <Button text="View" onAction="#loadLeaderboard" prefHeight="40" prefWidth="100" AnchorPane.topAnchor="130" AnchorPane.rightAnchor="20" />
+                        <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
+                            <TableView fx:id="table" visible="false" style="-fx-font-size: 12; -fx-background-color: white;">
+                                <columns>
+                                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="300" />
+                                    <TableColumn fx:id="pointsCol" text="Points" prefWidth="300" />
+                                </columns>
+                            </TableView>
+                        </ScrollPane>
 
-        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-border-radius: 5;" AnchorPane.topAnchor="190" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
-            <TableView fx:id="table" prefWidth="1200" visible="false" style="-fx-font-size: 12; -fx-background-color: white;">
-                <columns>
-                    <TableColumn fx:id="usernameCol" text="Username" prefWidth="600" />
-                    <TableColumn fx:id="pointsCol" text="Points" prefWidth="600" />
-                </columns>
-            </TableView>
-        </ScrollPane>
-
-        <Button text="Back to Dashboard" onAction="#goBack" prefHeight="45" prefWidth="150" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" alignment="CENTER" />
+                        <Button text="Back to Dashboard" onAction="#goBack" style="-fx-padding: 10px;" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
     </children>
-</AnchorPane>
+</VBox>

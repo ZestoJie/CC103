@@ -3,6 +3,7 @@ package com.cc103sys.cc103.Controllers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -35,12 +36,20 @@ public class LeaderboardController {
             loadUserClasses();
 
             if (classComboBox != null) {
-                classComboBox.setOnAction(e -> loadLeaderboard());
+                classComboBox.setOnAction(e -> {
+                    try {
+                        loadLeaderboard();
+                    } catch (Exception e1) {
+                    }
+                });
             }
+
+            // Set navbar active
+            NavbarController.getInstance().setActive("leaderboard");
 
             LOGGER.info("Leaderboard initialized");
         } catch (Exception e) {
-            LOGGER.severe("Initialization error: " + e.getMessage());
+            LOGGER.severe(() -> "Initialization error: " + e.getMessage());
         }
     }
 
@@ -84,15 +93,15 @@ public class LeaderboardController {
                 }
             }
 
-            LOGGER.info("Loaded " + userClasses.size() + " classes");
+            LOGGER.info(() -> "Loaded " + userClasses.size() + " classes");
 
         } catch (Exception e) {
-            LOGGER.severe("Failed to load classes: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load classes: " + e.getMessage());
         }
     }
 
     @FXML
-    private void loadLeaderboard() {
+    private void loadLeaderboard() throws Exception {
         try {
             Classes selectedClass = classComboBox.getValue();
 
@@ -127,30 +136,32 @@ public class LeaderboardController {
                     table.setVisible(true);
                 }
 
-                LOGGER.info("Leaderboard loaded: " + data.size() + " users");
+                LOGGER.info(() -> "Leaderboard loaded: " + data.size() + " users");
 
             }
 
-        } catch (Exception e) {
-            LOGGER.severe("Failed to load leaderboard: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to load leaderboard: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
             Navigator.switchScene("Dashboard");
         } catch (Exception e) {
-            LOGGER.severe("Navigation error: " + e.getMessage());
+            LOGGER.severe(() -> "Navigation error: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goSettings() {
         try {
             Navigator.switchScene("Settings");
         } catch (Exception e) {
-            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
         }
     }
 }

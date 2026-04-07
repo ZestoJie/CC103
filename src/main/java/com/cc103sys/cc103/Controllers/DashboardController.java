@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public class DashboardController {
 
     private Timeline timeline;
     private int remainingSeconds;
-    private ObservableList<Task> tasks = FXCollections.observableArrayList();
+    private final ObservableList<Task> tasks = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -58,11 +59,20 @@ public class DashboardController {
             loadUserClassesForLeaderboard();
             
             if (classSelector != null) {
-                classSelector.setOnAction(e -> loadLeaderboardPreviewForClass());
+                classSelector.setOnAction(e -> {
+                    try {
+                        loadLeaderboardPreviewForClass();
+                    } catch (Exception e1) {
+                    }
+                });
             }
+
+            // Set navbar active
+            NavbarController.getInstance().setActive("dashboard");
+
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
-            LOGGER.severe("Dashboard initialization error: " + e.getMessage());
+            LOGGER.severe(() -> "Dashboard initialization error: " + e.getMessage());
         }
     }
 
@@ -123,9 +133,9 @@ public class DashboardController {
                     ));
                 }
             }
-            LOGGER.info("Loaded " + tasks.size() + " tasks");
+            LOGGER.info(() -> "Loaded " + tasks.size() + " tasks");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load tasks: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
         }
     }
 
@@ -148,7 +158,10 @@ public class DashboardController {
             if (classSelector != null) {
                 classSelector.setItems(userClasses);
                 classSelector.setOnAction(e -> {
-                    loadLeaderboardPreviewForClass();
+                    try {
+                        loadLeaderboardPreviewForClass();
+                    } catch (Exception e1) {
+                    }
                     loadTasks();
                 });
 
@@ -160,15 +173,16 @@ public class DashboardController {
                     tasks.clear();
                 }
             }
-            LOGGER.info("Loaded " + userClasses.size() + " user classes");
+            LOGGER.info(() -> "Loaded " + userClasses.size() + " user classes");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load user classes: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load user classes: " + e.getMessage());
         }
 
     }
 
     @FXML
-    private void handleAddTask() {
+    @SuppressWarnings("unused")
+    private void handleAddTask() throws Exception {
         try {
             String taskName = taskField.getText();
             LocalDate date = taskDate.getValue();
@@ -197,15 +211,16 @@ public class DashboardController {
                 playAddTaskAnimation();
                 taskField.clear();
                 taskDate.setValue(null);
-                LOGGER.info("Task added: " + taskName);
+                LOGGER.info(() -> "Task added: " + taskName);
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to add task: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to add task: " + e.getMessage());
         }
     }
 
     @FXML
-    private void handleDeleteTask() {
+    @SuppressWarnings("unused")
+    private void handleDeleteTask() throws Exception {
         try {
             Task selected = taskList.getSelectionModel().getSelectedItem();
             if (selected == null) {
@@ -219,24 +234,26 @@ public class DashboardController {
                 stmt.setInt(1, selected.getId());
                 stmt.executeUpdate();
                 loadTasks();
-                LOGGER.info("Task deleted: " + selected.getTaskName());
+                LOGGER.info(() -> "Task deleted: " + selected.getTaskName());
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to delete task: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to delete task: " + e.getMessage());
         }
     }
 
     @FXML
-    private void handleMarkDone() {
+    @SuppressWarnings("unused")
+    private void handleMarkDone() throws Exception {
         updateTaskStatus("Done", TASK_COMPLETION_BONUS);
     }
 
     @FXML
-    private void handleMarkUndone() {
+    @SuppressWarnings("unused")
+    private void handleMarkUndone() throws Exception {
         updateTaskStatus("Pending", -TASK_COMPLETION_BONUS);
     }
 
-    private void updateTaskStatus(String status, int pointsChange) {
+    private void updateTaskStatus(String status, int pointsChange) throws Exception {
         try {
             Task selected = taskList.getSelectionModel().getSelectedItem();
             if (selected == null) {
@@ -262,14 +279,14 @@ public class DashboardController {
                 
                 loadTasks();
                 loadLeaderboardPreviewForClass();
-                LOGGER.info("Task " + status + ", points adjusted: " + pointsChange);
+                LOGGER.info(() -> "Task " + status + ", points adjusted: " + pointsChange);
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to update task status: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to update task status: " + e.getMessage());
         }
     }
 
-    private void loadLeaderboardPreviewForClass() {
+    private void loadLeaderboardPreviewForClass() throws Exception {
         try {
             Classes selectedClass = classSelector.getValue();
             if (selectedClass == null) {
@@ -303,12 +320,13 @@ public class DashboardController {
                     });
                 }
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to load leaderboard preview: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to load leaderboard preview: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void openLeaderboardScene() {
         try {
             Classes selectedClass = classSelector.getValue();
@@ -319,11 +337,12 @@ public class DashboardController {
             Session.setSelectedClassId(selectedClass.getId());
             Navigator.switchScene("Leaderboard");
         } catch (Exception e) {
-            LOGGER.severe("Failed to open leaderboard: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to open leaderboard: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleStartTimer() {
         try {
             String selected = timerPreset.getValue();
@@ -335,9 +354,9 @@ public class DashboardController {
             stopTimer();
             remainingSeconds = convertToSeconds(selected);
             startCountdown();
-            LOGGER.info("Timer started: " + remainingSeconds + " seconds");
+            LOGGER.info(() -> "Timer started: " + remainingSeconds + " seconds");
         } catch (Exception e) {
-            LOGGER.severe("Failed to start timer: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to start timer: " + e.getMessage());
         }
     }
 
@@ -396,21 +415,23 @@ public class DashboardController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goSettings() {
         try {
             Navigator.switchScene("Settings");
         } catch (Exception e) {
-            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void openTimerPopup() {
         try {
             LOGGER.info("Opening timer popup");
             // Placeholder: Can be expanded to show a popup window or modal
         } catch (Exception e) {
-            LOGGER.severe("Failed to open timer popup: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to open timer popup: " + e.getMessage());
         }
     }
 }

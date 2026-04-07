@@ -43,6 +43,17 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.cc103sys.cc103.Launcher</mainClass>
+                    <arguments>
+                        <argument>-Dprism.order=sw</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
@@ -52,7 +63,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.cc103sys.cc103.App</mainClass>
+                            <mainClass>com.cc103sys.cc103.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -62,22 +73,6 @@
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.cc103sys.cc103.App</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <goals>
-                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>

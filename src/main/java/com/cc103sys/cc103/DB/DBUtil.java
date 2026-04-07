@@ -2,6 +2,7 @@ package com.cc103sys.cc103.DB;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBUtil {
 
@@ -34,7 +35,7 @@ public class DBUtil {
             if (!foreignKeyExists(conn, "tasks", "fk_tasks_class_id")) {
                 try {
                     stmt.executeUpdate("ALTER TABLE tasks ADD CONSTRAINT fk_tasks_class_id FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL");
-                } catch (Exception e) {
+                } catch (SQLException e) {
                 }
             }
         } catch (Exception e) {

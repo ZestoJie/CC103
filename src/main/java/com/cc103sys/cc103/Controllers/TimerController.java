@@ -30,6 +30,9 @@ public class TimerController {
             timeSelect.setValue(TIMER_PRESETS[0]);
         }
         updateTimerDisplay();
+
+        // Set navbar active
+        NavbarController.getInstance().setActive("tasks");
     }
 
     @SuppressWarnings("StringConcatenationInFormatCall")
@@ -46,9 +49,9 @@ public class TimerController {
 
             remainingSeconds = convertToSeconds(selected);
             startCountdown();
-            LOGGER.info("Timer started: " + remainingSeconds + " seconds");
+            LOGGER.info(() -> "Timer started: " + remainingSeconds + " seconds");
         } catch (Exception e) {
-            LOGGER.severe("Timer start error: " + e);
+            LOGGER.severe(() -> "Timer start error: " + e);
         }
     }
 
@@ -95,11 +98,12 @@ public class TimerController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goSettings() {
         try {
             Navigator.switchScene("Settings");
         } catch (Exception e) {
-            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
         }
     }
 }

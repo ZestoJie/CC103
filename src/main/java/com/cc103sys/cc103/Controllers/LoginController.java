@@ -20,6 +20,7 @@ public class LoginController {
     @FXML private PasswordField passwordField;
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleLogin() {
         try {
             String username = usernameField.getText() == null ? "" : usernameField.getText().trim();
@@ -36,22 +37,23 @@ public class LoginController {
                
 
                 Navigator.switchScene("Dashboard");
-                LOGGER.info("User logged in: " + username);
+                LOGGER.info(() -> "User logged in: " + username);
             } else {
                 
             }
         } catch (Exception e) {
-            LOGGER.severe("Login error: " + e.getMessage());
+            LOGGER.severe(() -> "Login error: " + e.getMessage());
            
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goRegister() {
         try {
             Navigator.switchScene("Register");
         } catch (Exception e) {
-            LOGGER.severe("Navigation error: " + e.getMessage());
+            LOGGER.severe(() -> "Navigation error: " + e.getMessage());
         }
     }
 
@@ -73,7 +75,7 @@ public class LoginController {
                 return rs.next();
             }
         } catch (Exception e) {
-            LOGGER.severe("Database error during authentication: " + e.getMessage());
+            LOGGER.severe(() -> "Database error during authentication: " + e.getMessage());
             return false;
         }
     }

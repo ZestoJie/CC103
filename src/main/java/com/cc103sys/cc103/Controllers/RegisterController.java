@@ -21,7 +21,7 @@ public class RegisterController {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
-    @SuppressWarnings("StringConcatenationInFormatCall")
+    @SuppressWarnings({"StringConcatenationInFormatCall", "unused"})
     @FXML
     private void handleRegister(){
         try {
@@ -39,7 +39,7 @@ public class RegisterController {
                 displayError("Registration failed. Username may already exist.");
             }
         } catch (Exception e) {
-            LOGGER.severe("Registration error: " + e);
+            LOGGER.severe(() -> "Registration error: " + e);
             displayError("Registration failed. Please try again.");
         }
     }
@@ -50,7 +50,7 @@ public class RegisterController {
         try {
             Navigator.switchScene("Login");
         } catch (Exception e) {
-            LOGGER.severe("Navigation error: " + e);
+            LOGGER.severe(() -> "Navigation error: " + e);
             displayError("Failed to navigate to Login.");
         }
     }
@@ -86,10 +86,10 @@ public class RegisterController {
             stmt.setString(2, password);
             stmt.executeUpdate();
             
-            LOGGER.info("User registered: " + username);
+            LOGGER.info(() -> "User registered: " + username);
             return true;
         } catch (Exception e) {
-            LOGGER.severe("Database error during registration: " + e);
+            LOGGER.severe(() -> "Database error during registration: " + e);
             return false;
         }
     }
@@ -103,7 +103,7 @@ public class RegisterController {
                     try {
                         Navigator.switchScene("Login");
                     } catch (Exception e) {
-                        LOGGER.severe("Navigation error: " + e);
+                        LOGGER.severe(() -> "Navigation error: " + e);
                     }
                 });
             } catch (InterruptedException e) {

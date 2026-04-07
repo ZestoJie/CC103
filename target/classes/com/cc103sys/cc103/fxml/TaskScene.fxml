@@ -1,25 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController" style="-fx-background-color: #ecf0f1;">
+<VBox spacing="20" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
     <children>
-        <fx:include prefWidth="230" source="navbar.fxml"/>
+        <HBox spacing="20" VBox.vgrow="ALWAYS">
+            <children>
+                <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
-        <Label text="Task Manager" alignment="CENTER" style="-fx-font-size: 24; -fx-font-weight: bold;" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+                <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label text="Task Manager" style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
-        <Label text="Add New Task" style="-fx-font-size: 14; -fx-font-weight: bold;" AnchorPane.topAnchor="120" AnchorPane.leftAnchor="270" />
-        <TextField fx:id="taskField" promptText="Enter Task Description" prefHeight="40" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="470" />
-        <DatePicker fx:id="taskDate" prefHeight="40" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="470" />
-        <Button text="Add Task" onAction="#handleAddTask" prefHeight="40" prefWidth="120" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="570" />
+                        <VBox spacing="10">
+                            <children>
+                                <Label text="Add New Task" style="-fx-font-size: 14; -fx-font-weight: bold;" />
+                                <HBox spacing="10">
+                                    <children>
+                                        <TextField fx:id="taskField" promptText="Enter Task Description" HBox.hgrow="ALWAYS"/>
+                                        <DatePicker fx:id="taskDate"/>
+                                        <Button text="Add Task" onAction="#handleAddTask" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
 
-        <Label text="Your Tasks" style="-fx-font-size: 14; -fx-font-weight: bold;" AnchorPane.topAnchor="210" AnchorPane.leftAnchor="270" />
-        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-border-radius: 5;" AnchorPane.topAnchor="240" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="270">
-            <ListView fx:id="taskList" />
-        </ScrollPane>
+                        <Label text="Your Tasks" style="-fx-font-size: 14; -fx-font-weight: bold;" />
+                        <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
+                            <ListView fx:id="taskList" />
+                        </ScrollPane>
 
-        <Button text="Mark Done" onAction="#handleMarkDone" prefHeight="40" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="270" AnchorPane.rightAnchor="570" />
-        <Button text="Delete Task" onAction="#handleDeleteTask" prefHeight="40" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="570" AnchorPane.rightAnchor="270" />
+                        <HBox spacing="10">
+                            <children>
+                                <Button text="Mark Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS"/>
+                                <Button text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
     </children>
-</AnchorPane>
+</VBox>

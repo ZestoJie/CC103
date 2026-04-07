@@ -1,5 +1,7 @@
 package com.cc103sys.cc103.Utils;
 
+import java.io.IOException;
+
 import javafx.scene.Scene;
 
 public class Navigator {
@@ -13,8 +15,7 @@ public class Navigator {
     public static void switchScene(String fxml) {
         try {
             scene.setRoot(ResourceLoader.loadFXML(fxml));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
         }
     }
 }

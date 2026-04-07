@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launcher",
+            "request": "launch",
+            "mainClass": "com.cc103sys.cc103.Launcher",
+            "projectName": "CC103_Client"
+        },
+        {
+            "type": "java",
             "name": "Run JavaFX App",
             "request": "launch",
             "mainClass": "com.cc103sys.cc103.App",

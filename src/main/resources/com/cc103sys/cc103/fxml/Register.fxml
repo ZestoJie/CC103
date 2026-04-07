@@ -18,35 +18,28 @@
 
         <children>
 
-            <!-- Logo -->
             <ImageView fitHeight="58.0" fitWidth="58.0" preserveRatio="true">
                 <image>
-                    <!-- TEMP: keep this for now, we will fix path later -->
-                    <Image url="@../../../../images/logo.png" />
+                    <Image url="@/images/logo.png" />
                 </image>
             </ImageView>
 
-            <!-- TITLE (FIXED: removed fx:id) -->
             <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2d3a; -fx-font-family: 'Segoe UI Semibold';" text="REGISTER" />
 
-            <!-- INPUTS -->
             <TextField fx:id="usernameField" prefHeight="40.0" prefWidth="250.0" promptText="Username" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 
             <PasswordField fx:id="passwordField" prefHeight="40.0" prefWidth="250.0" promptText="Password" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 
             <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" prefWidth="250.0" promptText="Confirm Password" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 
-            <!-- MESSAGE LABEL (ONLY ONE) -->
             <Label fx:id="messageLabel" style="-fx-text-fill: red; -fx-font-size: 12px;">
                 <VBox.margin>
                     <Insets top="5.0" />
                 </VBox.margin>
             </Label>
 
-            <!-- BUTTON -->
             <Button onAction="#handleRegister" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #2c5d7c; -fx-text-fill: white; -fx-background-radius: 25;" text="CREATE ACCOUNT" />
 
-            <!-- LOGIN LINK -->
             <HBox alignment="CENTER" spacing="3.0">
                 <children>
                     <Label text="Already have account?" />

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+    <children>
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        
+        <VBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #ecf0f1;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <children>
+                <Label text="Leaderboard" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+                <HBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="12" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label text="Class Leaderboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Select Class:" style="-fx-font-size: 14;" />
+                                        <ComboBox fx:id="classComboBox" promptText="Select Class" HBox.hgrow="ALWAYS"/>
+                                        <Button text="View" onAction="#loadLeaderboard" />
+                                    </children>
+                                </HBox>
+                                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
+                                    <TableView fx:id="table" visible="false" style="-fx-font-size: 12; -fx-background-color: white;">
+                                        <columns>
+                                            <TableColumn fx:id="usernameCol" text="Username" prefWidth="220" />
+                                            <TableColumn fx:id="pointsCol" text="Points" prefWidth="120" />
+                                            <TableColumn fx:id="levelCol" text="Level" prefWidth="120" />
+                                        </columns>
+                                    </TableView>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="12" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label text="Overall Leaderboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
+                                    <TableView fx:id="overallTable" style="-fx-font-size: 12; -fx-background-color: white;">
+                                        <columns>
+                                            <TableColumn fx:id="overallUsernameCol" text="Username" prefWidth="220" />
+                                            <TableColumn fx:id="overallPointsCol" text="Points" prefWidth="120" />
+                                            <TableColumn fx:id="overallLevelCol" text="Level" prefWidth="120" />
+                                        </columns>
+                                    </TableView>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <Button text="Back to Dashboard" onAction="#goBack" style="-fx-padding: 10px;" />
+            </children>
+        </VBox>
+    </children>
+</HBox>

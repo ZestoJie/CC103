@@ -1,0 +1,57 @@
+
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.javaÄ
+2com.cc103sys.cc103.Controllers.DashboardControllerCLASSO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java ( ")
+packagecom.cc103sys.cc103.Controllers"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"q
+declarationString\<mark class="modifier">public </mark><mark class="modifier">class </mark>DashboardController"
+accesspublic*DashboardController2ü
+?com.cc103sys.cc103.Controllers.DashboardController.initialize()DECLARATIONO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (2°
+Acom.cc103sys.cc103.Controllers.DashboardController.handleLogout()DECLARATIONO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (2©
+Icom.cc103sys.cc103.Controllers.DashboardController?welcomeLabel@9.24:9.36DECLARATIONO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java	 	($»
+?com.cc103sys.cc103.Controllers.DashboardController.initialize()METHODO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java ("
+isFinalfalse"∞
+declarationStringö<mark class="annotation">@FXML</mark> <br><mark class="modifier">public </mark><mark class="modifier">void</mark> <mark class="method">initialize</mark>()"
+isStaticfalse"
+accesspublic"
+
+isAbstractfalse"
+typevoid*
+initialize2á
+.com.cc103sys.cc103.Utils.Session.getUsername()CALLO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java3 (>2¢
+Icom.cc103sys.cc103.Controllers.DashboardController?welcomeLabel@9.24:9.36CALLO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (2d
+voidRETURN_TYPEO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (¡
+Acom.cc103sys.cc103.Controllers.DashboardController.handleLogout()METHODO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java ("
+isFinalfalse"≥
+declarationStringù<mark class="annotation">@FXML</mark> <br><mark class="modifier">private </mark><mark class="modifier">void</mark> <mark class="method">handleLogout</mark>()"
+isStaticfalse"
+accessprivate"
+
+isAbstractfalse"
+typevoid*handleLogout2Å
+(com.cc103sys.cc103.Utils.Session.clear()CALLO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (2ô
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)CALLO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (2d
+voidRETURN_TYPEO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java (‡
+Icom.cc103sys.cc103.Controllers.DashboardController?welcomeLabel@9.24:9.36VARIABLEO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java	 	($"
+isFinalfalse"
+typeLabel"n
+declarationStringY<mark class="modifier">private </mark>Label <mark class="class-field">welcomeLabel</mark>"
+isStaticfalse"
+accessprivate*welcomeLabel2s
+javafx.scene.control.LabelTYPEO
+Esrc\main\java\com\cc103sys\cc103\Controllers\DashboardController.java	 	(

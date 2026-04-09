@@ -50,10 +50,10 @@
                           style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
 
-                        <Label text="My Tasks"
+                        <Label text="TaskScene"
                                style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
-                        <Label text="Tasks assigned to you"
+                        <Label text="Upcoming Deadlines"
                                style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" />
 
                         <HBox spacing="10">
@@ -92,60 +92,30 @@
 
                 <VBox spacing="20" HBox.hgrow="ALWAYS">
 
-                    <VBox spacing="12" VBox.vgrow="ALWAYS"
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          onMouseClicked="#openTimerPopup"
                           style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
 
                         <Label text="Timer Panel"
                                style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <Label text="Mode:" style="-fx-font-size: 13px;" />
-                                <RadioButton fx:id="studyModeRadio" text="Study" selected="true" toggleGroup="$timerModeGroup" onAction="#handleModeChange" />
-                                <RadioButton fx:id="breakModeRadio" text="Break" toggleGroup="$timerModeGroup" onAction="#handleModeChange" />
-                            </children>
-                        </HBox>
+                        <Label fx:id="timerLabel"
+                               text="00:00"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold;" />
 
-                        <TextField fx:id="timerSubjectField" promptText="Subject" />
-
-                        <HBox alignment="CENTER" style="-fx-background-color: #eef2f7; -fx-padding: 20; -fx-background-radius: 12;">
-                            <children>
-                                <Label fx:id="timerLabel"
-                                       text="00:00"
-                                       style="-fx-font-size: 32px; -fx-font-weight: bold;" />
-                            </children>
-                        </HBox>
-
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <ComboBox fx:id="timerPreset" promptText="Select Duration" HBox.hgrow="ALWAYS" />
-                                <Button fx:id="timerStartButton" text="Start" onAction="#handleStartTimer" />
-                                <Button fx:id="timerPauseButton" text="Pause" onAction="#handlePauseTimer" />
-                            </children>
-                        </HBox>
-
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <CheckBox fx:id="xpActiveCheckbox" text="XP Earning Active" selected="true" onAction="#updateXpStatus" />
-                            </children>
-                        </HBox>
+                        <Button text="Start" onAction="#handleStartTimer"/>
                     </VBox>
 
-                    <VBox spacing="12" VBox.vgrow="ALWAYS"
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
                           style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
 
                         <Label text="Daily Goal Progress"
                                style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
-                        <Label fx:id="dailyGoalSummary"
-                               text="Loading today's progress..."
-                               style="-fx-text-fill: #6b7280;" />
-
-                        <ProgressBar fx:id="dailyProgressBar" progress="0.0" maxWidth="Infinity" />
-
-                        <Label fx:id="dailyGoalTip" text="Complete your tasks to earn more XP." style="-fx-text-fill: #9ca3af;" />
+                        <Label text="Chart will display here"
+                               style="-fx-text-fill: #9ca3af;" />
                     </VBox>
 
                 </VBox>

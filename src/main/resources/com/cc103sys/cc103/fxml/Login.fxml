@@ -20,7 +20,7 @@
 
             <ImageView fitHeight="60.0" fitWidth="60.0" preserveRatio="true">
                 <image>
-                    <Image url="@/images/logo.png" />
+                    <Image url="@../../../../images/logo.png" />
                 </image>
             </ImageView>
 
@@ -30,7 +30,7 @@
 
             <PasswordField fx:id="passwordField" prefHeight="40.0" prefWidth="250.0" promptText="Password" style="-fx-background-color: eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 
-            <Label fx:id="errorLabel" style="-fx-text-fill: #d32f2f; -fx-font-size: 12px;" text="" visible="false" managed="false" />
+            <Label fx:id="errorLabel" managed="false" style="-fx-text-fill: #d32f2f; -fx-font-size: 12px;" text="" visible="false" />
 
             <HBox alignment="CENTER_LEFT" spacing="5.0">
                 <children>

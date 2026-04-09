@@ -4,104 +4,145 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<HBox spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.SettingsController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<!-- Root Container: Fills the screen -->
+<HBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.cc103sys.cc103.Controllers.SettingsController" 
+      style="-fx-background-color: #f0f2f5;">
     <children>
+        <!-- Navbar (Fixed Width) -->
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
         
-        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #ecf0f1;">
+        <!-- Main Content Area (Grows to fill remaining width) -->
+        <VBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
+            <!-- Main Padding -->
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="30" right="40" bottom="30" left="40"/>
             </padding>
+            
             <children>
-                <Label text="Settings" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+                <!-- Page Header -->
+                <Label text="Settings" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                    <VBox.margin>
+                        <Insets bottom="20" />
+                    </VBox.margin>
+                </Label>
                 
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-padding: 0;">
+                <!-- Scrollable Content (Grows to fill remaining height) -->
+                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
+                            style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
                     <content>
-                        <VBox spacing="20">
-                            <!-- Account Settings Section -->
-                            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
-                                <children>
-                                    <Label text="Account" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-                                    
-                                    <!-- Profile Picture -->
-                                    <HBox spacing="20" alignment="TOP_LEFT">
-                                        <children>
-                                            <VBox alignment="CENTER" spacing="10">
-                                                <ImageView fx:id="profilePictureImageView" fitHeight="100" fitWidth="100" style="-fx-border-radius: 50; -fx-background-radius: 50;" />
+                        <!-- Container with MaxWidth to prevent stretching on ultrawide screens -->
+                        <HBox alignment="TOP_CENTER">
+                            <VBox spacing="30" maxWidth="900" HBox.hgrow="ALWAYS" fillWidth="true">
+                                
+                                <!-- CARD 1: Player Profile -->
+                                <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                    <children>
+                                        <Label text="Player Profile" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                        
+                                        <!-- Profile Picture Section -->
+                                        <HBox spacing="30" alignment="CENTER_LEFT">
+                                            <children>
+                                                <VBox alignment="CENTER" spacing="10" style="-fx-background-color: #eef2f7; -fx-background-radius: 100; -fx-padding: 5;">
+                                                    <children>
+                                                        <ImageView fx:id="profilePictureImageView" fitHeight="140" fitWidth="140" pickOnBounds="true" preserveRatio="true" 
+                                                                   style="-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #fff; -fx-border-width: 4;" />
+                                                    </children>
+                                                </VBox>
+                                                
+                                                <VBox spacing="15" alignment="CENTER_LEFT">
+                                                    <children>
+                                                        <Button fx:id="uploadPictureButton" text="Upload New Avatar" onAction="#handleUploadPicture" 
+                                                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12px 30px; -fx-font-size: 14; -fx-font-weight: bold; -fx-cursor: hand;" />
+                                                        <Label text="JPG or PNG. Max 5MB." style="-fx-font-size: 13; -fx-text-fill: #95a5a6;" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <Separator style="-fx-opacity: 0.3;" />
+                                        
+                                        <!-- Account Details Form -->
+                                        <VBox spacing="20">
+                                            <!-- Full Name Row -->
+                                            <VBox spacing="8">
+                                                <Label text="Full Name" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;" />
+                                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                                    <TextField fx:id="fullNameField" HBox.hgrow="ALWAYS" 
+                                                               style="-fx-padding: 14; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd; -fx-font-size: 14;" />
+                                                    <Button fx:id="editFullNameButton" text="Edit" onAction="#handleEditFullName" 
+                                                            style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-background-radius: 8; -fx-padding: 10px 25px; -fx-font-weight: 600; -fx-font-size: 13; -fx-cursor: hand;" />
+                                                </HBox>
                                             </VBox>
-                                            <VBox spacing="10" HBox.hgrow="ALWAYS">
-                                                <children>
-                                                    <Button fx:id="uploadPictureButton" text="Upload Picture" onAction="#handleUploadPicture" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 10px 20px;" />
-                                                    <Label text="Accepted formats: JPG, PNG. Max size: 5MB" style="-fx-font-size: 11; -fx-text-fill: #666;" wrapText="true" />
-                                                </children>
+
+                                            <!-- Username Row -->
+                                            <VBox spacing="8">
+                                                <Label text="Username" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;" />
+                                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                                    <TextField fx:id="usernameField" HBox.hgrow="ALWAYS" 
+                                                               style="-fx-padding: 14; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd; -fx-font-size: 14;" />
+                                                    <Button fx:id="editUsernameButton" text="Edit" onAction="#handleEditUsername" 
+                                                            style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-background-radius: 8; -fx-padding: 10px 25px; -fx-font-weight: 600; -fx-font-size: 13; -fx-cursor: hand;" />
+                                                </HBox>
                                             </VBox>
-                                        </children>
-                                    </HBox>
-                                    
-                                    <Separator />
-                                    
-                                    <!-- Full Name -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Full Name" style="-fx-font-size: 14;" prefWidth="150" />
-                                            <TextField fx:id="fullNameField" HBox.hgrow="ALWAYS" />
-                                            <Button fx:id="editFullNameButton" text="Edit" onAction="#handleEditFullName" style="-fx-background-color: #f5f7fb; -fx-background-radius: 5; -fx-padding: 8px 16px;" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    <!-- Username -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Username" style="-fx-font-size: 14;" prefWidth="150" />
-                                            <TextField fx:id="usernameField" HBox.hgrow="ALWAYS" />
-                                            <Button fx:id="editUsernameButton" text="Edit" onAction="#handleEditUsername" style="-fx-background-color: #f5f7fb; -fx-background-radius: 5; -fx-padding: 8px 16px;" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    <!-- Email Address -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Email Address" style="-fx-font-size: 14;" prefWidth="150" />
-                                            <TextField fx:id="emailField" HBox.hgrow="ALWAYS" />
-                                            <Button fx:id="editEmailButton" text="Edit" onAction="#handleEditEmail" style="-fx-background-color: #f5f7fb; -fx-background-radius: 5; -fx-padding: 8px 16px;" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    <!-- Password -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Password" style="-fx-font-size: 14;" prefWidth="150" />
-                                            <PasswordField fx:id="passwordField" HBox.hgrow="ALWAYS" promptText="●●●●●●●●" editable="false" />
-                                            <Button fx:id="changePasswordButton" text="Change" onAction="#handleChangePassword" style="-fx-background-color: #f5f7fb; -fx-background-radius: 5; -fx-padding: 8px 16px;" />
-                                        </children>
-                                    </HBox>
-                                </children>
+
+                                            <!-- Email Row -->
+                                            <VBox spacing="8">
+                                                <Label text="Email Address" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;" />
+                                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                                    <TextField fx:id="emailField" HBox.hgrow="ALWAYS" 
+                                                               style="-fx-padding: 14; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd; -fx-font-size: 14;" />
+                                                    <Button fx:id="editEmailButton" text="Edit" onAction="#handleEditEmail" 
+                                                            style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-background-radius: 8; -fx-padding: 10px 25px; -fx-font-weight: 600; -fx-font-size: 13; -fx-cursor: hand;" />
+                                                </HBox>
+                                            </VBox>
+
+                                            <!-- Password Row -->
+                                            <VBox spacing="8">
+                                                <Label text="Password" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;" />
+                                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                                    <PasswordField fx:id="passwordField" HBox.hgrow="ALWAYS" promptText="••••••••" editable="false" 
+                                                                   style="-fx-padding: 14; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd; -fx-font-size: 14;" />
+                                                    <Button fx:id="changePasswordButton" text="Change" onAction="#handleChangePassword" 
+                                                            style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-background-radius: 8; -fx-padding: 10px 25px; -fx-font-weight: 600; -fx-font-size: 13; -fx-cursor: hand;" />
+                                                </HBox>
+                                            </VBox>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                                
+                                <!-- CARD 2: System Preferences -->
+                                <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                    <children>
+                                        <Label text="System Preferences" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                        
+                                        <!-- Enable Music -->
+                                        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                                            <children>
+                                                <Label text="Background Music" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
+                                                <CheckBox fx:id="enableMusicToggle" style="-fx-scale-x: 1.2; -fx-scale-y: 1.2;" />
+                                            </children>
+                                        </HBox>
+                                        
+                                        <Separator style="-fx-opacity: 0.1;" />
+                                        
+                                        <!-- Enable SFX -->
+                                        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                                            <children>
+                                                <Label text="Sound Effects (SFX)" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
+                                                <CheckBox fx:id="enableSFXToggle" style="-fx-scale-x: 1.2; -fx-scale-y: 1.2;" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                                
+                                <!-- Footer Spacer -->
+                                <Region prefHeight="20" />
+                                
                             </VBox>
-                            
-                            <!-- Sounds Section -->
-                            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
-                                <children>
-                                    <Label text="Sounds" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-                                    
-                                    <!-- Enable Music -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Enable Music" style="-fx-font-size: 14;" HBox.hgrow="ALWAYS" />
-                                            <CheckBox fx:id="enableMusicToggle" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    <!-- Enable SFX -->
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Enable SFX" style="-fx-font-size: 14;" HBox.hgrow="ALWAYS" />
-                                            <CheckBox fx:id="enableSFXToggle" />
-                                        </children>
-                                    </HBox>
-                                </children>
-                            </VBox>
-                        </VBox>
+                        </HBox>
                     </content>
                 </ScrollPane>
             </children>

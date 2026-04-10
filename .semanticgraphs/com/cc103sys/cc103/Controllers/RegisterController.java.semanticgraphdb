@@ -1,0 +1,185 @@
+
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.javaÑ	
+1com.cc103sys.cc103.Controllers.RegisterControllerCLASSN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (")
+packagecom.cc103sys.cc103.Controllers"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"p
+declarationString[<mark class="modifier">public </mark><mark class="modifier">class </mark>RegisterController"
+accesspublic*RegisterController2¡
+Bcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2š
+;com.cc103sys.cc103.Controllers.RegisterController.goLogin()DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java1 1(2ª
+Kcom.cc103sys.cc103.Controllers.RegisterController?usernameField@15.28:15.41DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ()2ª
+Kcom.cc103sys.cc103.Controllers.RegisterController?passwordField@16.32:16.45DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java  (-2©
+Jcom.cc103sys.cc103.Controllers.RegisterController?messageLabel@17.24:17.36DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ($©)
+Bcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()METHODN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ("
+isFinalfalse"µ
+declarationStringŸ<mark class="annotation">@FXML</mark> <br><mark class="modifier">private </mark><mark class="modifier">void</mark> <mark class="method">handleRegister</mark>()"
+isStaticfalse"
+accessprivate"
+
+isAbstractfalse"
+typevoid*handleRegister2r
+java.lang.String.isEmpty()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2r
+java.lang.String.isEmpty()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java* (12„
+,com.cc103sys.cc103.DB.DBUtil.getConnection()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java %  (22Ž
+6java.sql.Connection.prepareStatement(java.lang.String)CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!* !(:2“
+;java.sql.PreparedStatement.setString(int, java.lang.String)CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java# #(2“
+;java.sql.PreparedStatement.setString(int, java.lang.String)CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java$ $(2‚
+*java.sql.PreparedStatement.executeUpdate()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java& &(2}
+%java.lang.Throwable.printStackTrace()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java+ +(2£
+Kcom.cc103sys.cc103.Controllers.RegisterController?usernameField@15.28:15.41CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ('2£
+Kcom.cc103sys.cc103.Controllers.RegisterController?passwordField@16.32:16.45CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ('2¯
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?username@22.15:22.23CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2¯
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?password@23.15:23.23CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java! ()2¢
+Jcom.cc103sys.cc103.Controllers.RegisterController?messageLabel@17.24:17.36CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2«
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?conn@32.23:32.27CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!% !()2ª
+Rcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?sql@30.15:30.18CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!; !(>2«
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?stmt@33.30:33.34CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java# #(2¯
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?username@22.15:22.23CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java# #(&2«
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?stmt@33.30:33.34CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java$ $(2¯
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?password@23.15:23.23CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java$ $(&2«
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?stmt@33.30:33.34CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java& &(2¢
+Jcom.cc103sys.cc103.Controllers.RegisterController?messageLabel@17.24:17.36CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java( ((2¨
+Pcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?e@42.26:42.27CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java+ +(2¢
+Jcom.cc103sys.cc103.Controllers.RegisterController?messageLabel@17.24:17.36CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java, ,(2¶
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?username@22.15:22.23DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2¶
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?password@23.15:23.23DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2±
+Rcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?sql@30.15:30.18DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2²
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?conn@32.23:32.27DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java   (2²
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?stmt@33.30:33.34DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java! !("2¯
+Pcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?e@42.26:42.27DECLARATIONN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java* *(2c
+voidRETURN_TYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (ï
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?username@22.15:22.23VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ("
+typeString"
+isFinalfalse"~
+declarationStringi<mark class="modifier"> </mark>String <mark class="class-field">username</mark> = usernameField.getText()*username2h
+java.lang.StringTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2£
+Kcom.cc103sys.cc103.Controllers.RegisterController?usernameField@15.28:15.41CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ('ï
+Wcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?password@23.15:23.23VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ("
+typeString"
+isFinalfalse"~
+declarationStringi<mark class="modifier"> </mark>String <mark class="class-field">password</mark> = passwordField.getText()*password2h
+java.lang.StringTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (2£
+Kcom.cc103sys.cc103.Controllers.RegisterController?passwordField@16.32:16.45CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ('ö
+Rcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?sql@30.15:30.18VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ("
+typeString"
+isFinalfalse"´
+declarationStringž<mark class="modifier"> </mark>String <mark class="class-field">sql</mark> = "INSERT INTO users(username,password) VALUES (?<mark class="modifier">,</mark>?)"*sql2h
+java.lang.StringTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (Î
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?conn@32.23:32.27VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java   ("
+type
+Connection"
+isFinalfalse"}
+declarationStringh<mark class="modifier"> </mark>Connection <mark class="class-field">conn</mark> = DBUtil.getConnection()*conn2k
+java.sql.ConnectionTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java   (2„
+,com.cc103sys.cc103.DB.DBUtil.getConnection()CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java %  (2Í
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?stmt@33.30:33.34VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java! !(""
+typePreparedStatement"
+isFinalfalse"ˆ
+declarationStrings<mark class="modifier"> </mark>PreparedStatement <mark class="class-field">stmt</mark> = conn.prepareStatement(sql)*stmt2r
+java.sql.PreparedStatementTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java! !(2Ž
+6java.sql.Connection.prepareStatement(java.lang.String)CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!* !(:2«
+Scom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?conn@32.23:32.27CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!% !()2ª
+Rcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?sql@30.15:30.18CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java!; !(>ã
+Pcom.cc103sys.cc103.Controllers.RegisterController.handleRegister()?e@42.26:42.27VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java* *("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2k
+java.lang.ExceptionTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java* *(ª
+;com.cc103sys.cc103.Controllers.RegisterController.goLogin()METHODN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java1 1("
+isFinalfalse"®
+declarationString˜<mark class="annotation">@FXML</mark> <br><mark class="modifier">private </mark><mark class="modifier">void</mark> <mark class="method">goLogin</mark>()"
+isStaticfalse"
+accessprivate"
+
+isAbstractfalse"
+typevoid*goLogin2˜
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)CALLN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java2 2(2c
+voidRETURN_TYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java1 1(î
+Kcom.cc103sys.cc103.Controllers.RegisterController?usernameField@15.28:15.41VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ()"
+isFinalfalse"
+type	TextField"s
+declarationString^<mark class="modifier">private </mark>TextField <mark class="class-field">usernameField</mark>"
+isStaticfalse"
+accessprivate*usernameField2v
+javafx.scene.control.TextFieldTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (ú
+Kcom.cc103sys.cc103.Controllers.RegisterController?passwordField@16.32:16.45VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java  (-"
+isFinalfalse"
+typePasswordField"w
+declarationStringb<mark class="modifier">private </mark>PasswordField <mark class="class-field">passwordField</mark>"
+isStaticfalse"
+accessprivate*passwordField2z
+"javafx.scene.control.PasswordFieldTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (ß
+Jcom.cc103sys.cc103.Controllers.RegisterController?messageLabel@17.24:17.36VARIABLEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java ($"
+isFinalfalse"
+typeLabel"n
+declarationStringY<mark class="modifier">private </mark>Label <mark class="class-field">messageLabel</mark>"
+isStaticfalse"
+accessprivate*messageLabel2r
+javafx.scene.control.LabelTYPEN
+Dsrc\main\java\com\cc103sys\cc103\Controllers\RegisterController.java (

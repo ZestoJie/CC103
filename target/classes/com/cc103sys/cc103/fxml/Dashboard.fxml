@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cc103sys.cc103.Controllers.DashboardController"
+      style="-fx-background-color: #f5f7fb;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+
+    <children>
+
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+
+        <VBox spacing="20" style="-fx-background-color: #f5f7fb;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <children>
+
+                    <Label fx:id="welcomeLabel"
+                           text="Welcome back, User!"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button onAction="#goSettings"
+                            style="-fx-background-color: transparent;">
+                        <graphic>
+                            <ImageView fitHeight="20" fitWidth="20">
+                                <image>
+                                    <Image url="@/images/icon-settingsblue.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                </children>
+            </HBox>
+
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+                <VBox spacing="20" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="TaskScene"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label text="Upcoming Deadlines"
+                               style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" />
+
+                        <HBox spacing="10">
+                            <TextField fx:id="taskField" promptText="Enter Task"/>
+                            <DatePicker fx:id="taskDate"/>
+                            <Button text="Add" onAction="#handleAddTask"/>
+                        </HBox>
+
+                        <ListView fx:id="taskList" VBox.vgrow="ALWAYS"/>
+
+                        <Label fx:id="noTaskLabel"
+                               text="No activities to accomplish"
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12;"
+                               visible="false"/>
+                    </VBox>
+
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+                        <HBox>
+                            <Label text="Mini Leaderboard"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                            <Region HBox.hgrow="ALWAYS"/>
+
+                            <ComboBox fx:id="classSelector" promptText="Class"/>
+                        </HBox>
+
+                        <ListView fx:id="leaderboardPreview" VBox.vgrow="ALWAYS"/>
+
+                        <Button text="Open Full Leaderboard"
+                                onAction="#openLeaderboardScene"/>
+                    </VBox>
+
+                </VBox>
+
+                <VBox spacing="20" HBox.hgrow="ALWAYS">
+
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          onMouseClicked="#openTimerPopup"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="Timer Panel"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label text="Select a task from the list above to start the timer"
+                               style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+
+                        <Label fx:id="timerLabel"
+                               text="00:00"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+
+                        <ComboBox fx:id="timerPreset" promptText="Select Duration" />
+
+                        <TextField fx:id="customTimeField" promptText="Custom minutes" visible="false" managed="false" />
+
+                        <HBox spacing="10">
+                            <Button fx:id="timerStartButton" text="Start" onAction="#handleStartTimer"/>
+                            <Button fx:id="timerPauseButton" text="Pause" onAction="#handlePauseTimer" disable="true"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="10" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+
+                        <Label text="Daily Goal Progress"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <Label text="Chart will display here"
+                               style="-fx-text-fill: #9ca3af;" />
+                    </VBox>
+
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+    </children>
+</HBox>

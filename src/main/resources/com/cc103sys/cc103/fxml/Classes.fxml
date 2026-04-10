@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<!-- Root Container: Sidebar + Main Content -->
+<HBox spacing="0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.cc103sys.cc103.Controllers.ClassesController" 
+      style="-fx-background-color: #f0f2f5;">
+    <children>
+        <!-- Navbar (Fixed Width) -->
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        
+        <!-- Main Content Area -->
+        <VBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="30" right="40" bottom="30" left="40"/>
+            </padding>
+            
+            <children>
+                <!-- Page Header -->
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <children>
+                        <Label text="Classes" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                            <VBox.margin>
+                                <Insets bottom="20" />
+                            </VBox.margin>
+                        </Label>
+                        
+                        <!-- Add Class Button (Host Only) -->
+                        <Button fx:id="addClassButton" text="Create New Class" onAction="#toggleCreateSection" 
+                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-font-size: 13; -fx-cursor: hand;">
+                            <HBox.margin>
+                                <Insets left="10" bottom="20" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+                
+                <!-- Scrollable Content -->
+                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
+                            style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+                    <content>
+                        <!-- Max Width Container for Desktop Sizing -->
+                        <HBox alignment="TOP_CENTER">
+                            <VBox spacing="25" maxWidth="900" HBox.hgrow="ALWAYS" fillWidth="true">
+                                
+                                <HBox spacing="25" VBox.vgrow="ALWAYS">
+                                    
+                                    <!-- LEFT COLUMN: Explore & Join -->
+                                    <VBox spacing="25" HBox.hgrow="ALWAYS">
+                                        
+                                        <!-- CARD: Create Class (Host Only) -->
+                                        <VBox fx:id="createClassSection" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                            <children>
+                                                <Label text="Create New Class" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                                
+                                                <VBox spacing="5">
+                                                    <Label text="Class Name" style="-fx-font-size: 13; -fx-text-fill: #7f8c8d;" />
+                                                    <TextField fx:id="classNameField" promptText="e.g., CS101 - Intro to Programming" 
+                                                               style="-fx-padding: 12; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
+                                                </VBox>
+                                                
+                                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                                    <children>
+                                                        <CheckBox fx:id="publicClassCheckbox" text="Public Class" style="-fx-font-size: 14;" />
+                                                    </children>
+                                                </HBox>
+                                                
+                                                <VBox spacing="5">
+                                                    <Label text="Private Code (Optional)" style="-fx-font-size: 13; -fx-text-fill: #7f8c8d;" />
+                                                    <TextField fx:id="privateClassCodeField" promptText="Leave blank to auto-generate" 
+                                                               style="-fx-padding: 12; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
+                                                </VBox>
+
+                                                <Button onAction="#createClass" text="Create Class" 
+                                                        style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: bold; -fx-cursor: hand;" />
+                                            </children>
+                                        </VBox>
+                                        
+                                        <!-- CARD: Join Private Class -->
+                                        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                            <children>
+                                                <Label text="Join Private Class" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                                
+                                                <VBox spacing="5">
+                                                    <Label text="Enter Class Code" style="-fx-font-size: 13; -fx-text-fill: #7f8c8d;" />
+                                                    <HBox spacing="10">
+                                                        <TextField fx:id="codeField" promptText="ABC123" HBox.hgrow="ALWAYS" 
+                                                                   style="-fx-padding: 12; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
+                                                        <Button onAction="#joinPrivateClass" text="Join" 
+                                                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 25; -fx-font-weight: bold; -fx-cursor: hand;" />
+                                                    </HBox>
+                                                </VBox>
+                                            </children>
+                                        </VBox>
+                                        
+                                        <!-- CARD: Public Classes List -->
+                                        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 0; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <VBox spacing="10" style="-fx-padding: 25 25 10 25;">
+                                                    <Label text="Available Public Classes" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                                </VBox>
+                                                <!-- Clean List View -->
+                                                <ListView fx:id="classList" VBox.vgrow="ALWAYS" 
+                                                          style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0 10 10 10;" />
+                                            </children>
+                                        </VBox>
+
+                                    </VBox>
+                                    
+                                    <!-- RIGHT COLUMN: My Classes -->
+                                    <VBox spacing="25" HBox.hgrow="ALWAYS">
+                                        
+                                        <!-- CARD: My Classes -->
+                                        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 0; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <VBox spacing="10" style="-fx-padding: 25 25 10 25;">
+                                                    <Label text="My Classes" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                                    <Label text="Classes you have joined or created" style="-fx-font-size: 13; -fx-text-fill: #95a5a6;" />
+                                                </VBox>
+                                                <!-- Clean List View -->
+                                                <ListView fx:id="myClassList" VBox.vgrow="ALWAYS" 
+                                                          style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0 10 10 10;" />
+                                            </children>
+                                        </VBox>
+                                        
+                                    </VBox>
+                                    
+                                </HBox>
+                                
+                                <!-- Footer Spacer -->
+                                <Region prefHeight="20" />
+                                
+                            </VBox>
+                        </HBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

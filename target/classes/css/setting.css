@@ -1,0 +1,35 @@
+/* Buttons hover */
+.button:hover {
+    -fx-background-color: #dfe6e9;
+    -fx-cursor: hand;
+}
+
+/* Edit / action buttons */
+.button:focused:hover {
+    -fx-background-color: #d0d7de;
+}
+
+/* Cards hover effect (VBox cards with white background) */
+.vbox {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+}
+
+.vbox:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 25, 0, 0, 8);
+    -fx-translate-y: -2;
+}
+
+/* Upload button hover */
+#uploadPictureButton:hover {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+}
+
+/* Edit buttons hover */
+#editFullNameButton:hover,
+#editUsernameButton:hover,
+#editEmailButton:hover,
+#changePasswordButton:hover {
+    -fx-background-color: #d6dbdf;
+}

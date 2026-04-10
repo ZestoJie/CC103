@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" fillWidth="false" prefHeight="600.0" prefWidth="900.0" spacing="20.0" style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #0a1f2e, #163a52, #1f4e6b);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.RegisterController">
+
+    <VBox alignment="CENTER" maxWidth="-Infinity" prefWidth="350.0" spacing="13.0" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15;">
+
+        <children>
+
+            <ImageView fitHeight="58.0" fitWidth="58.0" preserveRatio="true">
+                <image>
+                    <Image url="@../../../../images/logo.png" />
+                </image>
+            </ImageView>
+
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2d3a; -fx-font-family: 'Segoe UI Semibold';" text="REGISTER" />
+
+            <TextField fx:id="usernameField" prefHeight="40.0" prefWidth="250.0" promptText="Username" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
+
+            <PasswordField fx:id="passwordField" prefHeight="40.0" prefWidth="250.0" promptText="Password" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
+
+            <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" prefWidth="250.0" promptText="Confirm Password" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
+
+            <ComboBox fx:id="roleComboBox" prefHeight="40.0" prefWidth="250.0" promptText="Select Role" style="-fx-background-radius: 20; -fx-padding: 10 15;" />
+
+            <Label fx:id="messageLabel" style="-fx-text-fill: red; -fx-font-size: 12px;">
+                <VBox.margin>
+                    <Insets top="5.0" />
+                </VBox.margin>
+            </Label>
+
+            <Button onAction="#handleRegister" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #2c5d7c; -fx-text-fill: white; -fx-background-radius: 25;" text="CREATE ACCOUNT" />
+
+            <HBox alignment="CENTER" spacing="3.0">
+                <children>
+                    <Label text="Already have account?" />
+                    <Label onMouseClicked="#goLogin" style="-fx-text-fill: #2c5d7c; -fx-font-weight: bold;" text="Login" />
+                </children>
+            </HBox>
+
+        </children>
+
+        <effect>
+            <DropShadow offsetY="6.0" spread="0.2" />
+        </effect>
+
+    </VBox>
+
+    <padding>
+        <Insets top="40.0" />
+    </padding>
+
+</VBox>

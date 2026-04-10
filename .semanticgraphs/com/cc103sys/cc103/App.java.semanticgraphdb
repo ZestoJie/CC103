@@ -1,0 +1,82 @@
+
+)src\main\java\com\cc103sys\cc103\App.java§
+com.cc103sys.cc103.AppCLASS3
+)src\main\java\com\cc103sys\cc103\App.java ("
+packagecom.cc103sys.cc103"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"“
+declarationString~<mark class="modifier">public </mark><mark class="modifier">class </mark>App<mark class="modifier"> extends </mark>Application"
+accesspublic*App2t
+0com.cc103sys.cc103.App.start(javafx.stage.Stage)DECLARATION3
+)src\main\java\com\cc103sys\cc103\App.java (2s
+/com.cc103sys.cc103.App.main(java.lang.String[])DECLARATION3
+)src\main\java\com\cc103sys\cc103\App.java (2]
+javafx.application.ApplicationEXTEND3
+)src\main\java\com\cc103sys\cc103\App.java ($‡
+0com.cc103sys.cc103.App.start(javafx.stage.Stage)METHOD3
+)src\main\java\com\cc103sys\cc103\App.java ("
+isFinalfalse"‡
+declarationStringñ<mark class="annotation">@Override</mark> <br><mark class="modifier">public </mark><mark class="modifier">void</mark> <mark class="method">start</mark>(Stage stage)<mark class="modifier"> <mark class="modifier">throws</mark> </mark>Exception"
+isStaticfalse"
+accesspublic"
+
+isAbstractfalse"
+typevoid*start2
+Bcom.cc103sys.cc103.Utils.ResourceLoader.loadFXML(java.lang.String)CALL3
+)src\main\java\com\cc103sys\cc103\App.java/ (72|
+?com.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)CALL3
+)src\main\java\com\cc103sys\cc103\App.java (2
+Bcom.cc103sys.cc103.App.start(javafx.stage.Stage)?scene@13.14:13.19CALL3
+)src\main\java\com\cc103sys\cc103\App.java ( 2s
+6com.cc103sys.cc103.App.start(javafx.stage.Stage)!stageCALL3
+)src\main\java\com\cc103sys\cc103\App.java (2s
+6com.cc103sys.cc103.App.start(javafx.stage.Stage)!stageCALL3
+)src\main\java\com\cc103sys\cc103\App.java (2
+Bcom.cc103sys.cc103.App.start(javafx.stage.Stage)?scene@13.14:13.19CALL3
+)src\main\java\com\cc103sys\cc103\App.java (2s
+6com.cc103sys.cc103.App.start(javafx.stage.Stage)!stageCALL3
+)src\main\java\com\cc103sys\cc103\App.java (2x
+6com.cc103sys.cc103.App.start(javafx.stage.Stage)!stage	PARAMETER3
+)src\main\java\com\cc103sys\cc103\App.java (!2†
+Bcom.cc103sys.cc103.App.start(javafx.stage.Stage)?scene@13.14:13.19DECLARATION3
+)src\main\java\com\cc103sys\cc103\App.java (2H
+voidRETURN_TYPE3
+)src\main\java\com\cc103sys\cc103\App.java (·
+Bcom.cc103sys.cc103.App.start(javafx.stage.Stage)?scene@13.14:13.19VARIABLE3
+)src\main\java\com\cc103sys\cc103\App.java ("
+typeScene"
+isFinalfalse"·
+declarationString¡<mark class="modifier"> </mark>Scene <mark class="class-field">scene</mark> = new Scene(ResourceLoader.loadFXML("Login")<mark class="modifier">,</mark> 500, 400)*scene2O
+javafx.scene.SceneTYPE3
+)src\main\java\com\cc103sys\cc103\App.java (2
+Bcom.cc103sys.cc103.Utils.ResourceLoader.loadFXML(java.lang.String)CALL3
+)src\main\java\com\cc103sys\cc103\App.java/ (7“
+6com.cc103sys.cc103.App.start(javafx.stage.Stage)!stage	PARAMETER3
+)src\main\java\com\cc103sys\cc103\App.java (!"
+typeStage"
+isFinalfalse" 
+declarationStringStage stage*stage2O
+javafx.stage.StageTYPE3
+)src\main\java\com\cc103sys\cc103\App.java (Ä
+/com.cc103sys.cc103.App.main(java.lang.String[])METHOD3
+)src\main\java\com\cc103sys\cc103\App.java ("
+isFinalfalse"²
+declarationStringœ<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">main</mark>(String[] args)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*main2v
+4com.cc103sys.cc103.App.main(java.lang.String[])!args	PARAMETER3
+)src\main\java\com\cc103sys\cc103\App.java% ()2H
+voidRETURN_TYPE3
+)src\main\java\com\cc103sys\cc103\App.java (•
+4com.cc103sys.cc103.App.main(java.lang.String[])!args	PARAMETER3
+)src\main\java\com\cc103sys\cc103\App.java% ()"
+typeString[]"
+isFinalfalse""
+declarationStringString[] args*args2O
+java.lang.String[]TYPE3
+)src\main\java\com\cc103sys\cc103\App.java ($

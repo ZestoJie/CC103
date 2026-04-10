@@ -294,6 +294,34 @@ public class ClassesController {
         }
     }
 
+    private void leaveClass(int classId) {
+        Integer currentUserId = getCurrentUserId();
+        if (currentUserId == null) return;
+
+        String leaveSql = "DELETE FROM user_classes WHERE user_id = ? AND class_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(leaveSql)) {
+            stmt.setInt(1, currentUserId);
+            stmt.setInt(2, classId);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to leave class: " + e.getMessage());
+        }
+
+        String deleteTasksSql = "DELETE FROM tasks WHERE user_id = ? AND class_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(deleteTasksSql)) {
+            stmt.setInt(1, currentUserId);
+            stmt.setInt(2, classId);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to remove class tasks after leaving: " + e.getMessage());
+        }
+
+        loadPublicClasses();
+        loadOwnedClasses();
+    }
+
     private Integer getCurrentUserId() {
         String sql = "SELECT id FROM users WHERE username = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -313,6 +341,7 @@ public class ClassesController {
     private class OwnedClassListCell extends ListCell<Classes> {
         private final Button viewButton = new Button("View");
         private final Button deleteButton = new Button("Delete");
+        private final Button leaveButton = new Button("Leave");
 
         {
             viewButton.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand; -fx-background-color: #4caf50; -fx-text-fill: white;");
@@ -331,6 +360,14 @@ public class ClassesController {
                     deleteClass(c.getId());
                 }
             });
+
+            leaveButton.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand; -fx-background-color: #ff9800; -fx-text-fill: white;");
+            leaveButton.setOnAction(e -> {
+                Classes c = getItem();
+                if (c != null) {
+                    leaveClass(c.getId());
+                }
+            });
         }
 
         @Override
@@ -345,10 +382,13 @@ public class ClassesController {
 
                 setText(item.getClassName());
                 javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(5);
-                buttonBox.getChildren().add(viewButton);
                 if (isOwner) {
+                    buttonBox.getChildren().add(viewButton);
                     buttonBox.getChildren().add(deleteButton);
+                } else {
+                    buttonBox.getChildren().add(leaveButton);
                 }
+
                 setGraphic(buttonBox);
             }
         }

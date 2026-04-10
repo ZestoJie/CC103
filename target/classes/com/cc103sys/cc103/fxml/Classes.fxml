@@ -10,16 +10,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
 
-<HBox spacing="20" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController" HBox.hgrow="ALWAYS">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
-    
+<HBox spacing="20" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
     <children>
 
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
-        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #ecf0f1;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
             <children>
                 <Label style="-fx-font-size: 24; -fx-font-weight: bold;" text="Classes" />
 
@@ -31,7 +30,6 @@
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <children>
                                         <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Available Classes" />
-                                        <Button fx:id="addClassButton" onAction="#toggleCreateSection" mnemonicParsing="false" style="-fx-background-color: #f5f7fb; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 18; -fx-font-size: 13;" text="Add +" />
                                     </children>
                                 </HBox>
                                 <VBox fx:id="createClassSection" spacing="14" style="-fx-background-color: white; -fx-padding: 18; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">

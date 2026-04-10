@@ -17,12 +17,16 @@
 
                 <VBox spacing="10">
                     <children>
-                        <Label text="Add New Task" style="-fx-font-size: 14; -fx-font-weight: bold;" />
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Add New Task" style="-fx-font-size: 14; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" />
+                                <Button text="Add Task" onAction="#handleAddTask" style="-fx-padding: 8px 20px; -fx-background-radius: 5;" />
+                            </children>
+                        </HBox>
                         <HBox spacing="10">
                             <children>
                                 <TextField fx:id="taskField" promptText="Enter Task Description" HBox.hgrow="ALWAYS"/>
                                 <DatePicker fx:id="taskDate"/>
-                                <Button text="Add Task" onAction="#handleAddTask" />
                             </children>
                         </HBox>
                     </children>

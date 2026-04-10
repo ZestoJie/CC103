@@ -48,11 +48,7 @@ public class NavbarController {
     }
 
     private void setupRoleBasedAccess() {
-        // Hide Classes button for participants
-        if (classesBtn != null) {
-            classesBtn.setVisible(Session.isHost());
-            classesBtn.setManaged(Session.isHost());
-        }
+        // All users can access classes - permissions are controlled within the page
     }
 
     public void loadUserInfo() {
@@ -180,14 +176,6 @@ public class NavbarController {
     @FXML
     @SuppressWarnings("unused")
     private void goClasses() {
-        if (!Session.isHost()) {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-            alert.setTitle("Access Denied");
-            alert.setHeaderText("Restricted Access");
-            alert.setContentText("Only hosts can access the Classes section.");
-            alert.showAndWait();
-            return;
-        }
         if (Navigator.switchScene("Classes")) {
             setActive("classes");
         }

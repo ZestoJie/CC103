@@ -1,7 +1,6 @@
 package com.cc103sys.cc103.Controllers;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,7 +10,6 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
-import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.fxml.FXML;

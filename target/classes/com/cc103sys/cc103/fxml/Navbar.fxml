@@ -130,7 +130,7 @@
             graphicTextGap="10"
             style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;">
         <graphic>
-            <ImageView fitHeight="35" fitWidth="35"
+            <ImageView fx:id="logoutIconImageView" fitHeight="20" fitWidth="20"
                    style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                 <image>
                     <Image url="@/images/icon-logout.png"/>

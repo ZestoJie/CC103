@@ -56,12 +56,6 @@
                         <Label text="Tasks assigned to you"
                                style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" />
 
-                        <HBox spacing="10">
-                            <TextField fx:id="taskField" promptText="Enter Task"/>
-                            <DatePicker fx:id="taskDate"/>
-                            <Button text="Add" onAction="#handleAddTask"/>
-                        </HBox>
-
                         <ListView fx:id="taskList" VBox.vgrow="ALWAYS"/>
 
                         <Label fx:id="noTaskLabel"

@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns="http://javafx.com/javafx/25"
+<HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cc103sys.cc103.Controllers.DashboardController"
       style="-fx-background-color: #f5f7fb;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
@@ -104,7 +104,14 @@
                                text="00:00"
                                style="-fx-font-size: 28px; -fx-font-weight: bold;" />
 
-                        <Button text="Start" onAction="#handleStartTimer"/>
+                        <ComboBox fx:id="timerPreset" promptText="Select Duration" />
+
+                        <TextField fx:id="customTimeField" promptText="Custom minutes" visible="false" managed="false" />
+
+                        <HBox spacing="10">
+                            <Button fx:id="timerStartButton" text="Start" onAction="#handleStartTimer"/>
+                            <Button fx:id="timerPauseButton" text="Pause" onAction="#handlePauseTimer" disable="true"/>
+                        </HBox>
                     </VBox>
 
                     <VBox spacing="10" VBox.vgrow="ALWAYS"

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
     <children>
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
         

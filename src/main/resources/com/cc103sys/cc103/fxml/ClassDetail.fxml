@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <!-- Root Container: Sidebar + Main Content -->
-<HBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+<HBox spacing="0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.cc103sys.cc103.Controllers.ClassDetailController" 
       style="-fx-background-color: #f0f2f5;">
     <children>

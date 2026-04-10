@@ -61,9 +61,11 @@ public class DashboardController {
     @FXML private ProgressBar dailyProgressBar;
     @FXML private Label dailyGoalSummary;
     @FXML private Label dailyGoalTip;
+    @FXML private TextField customTimeField;
 
     private Timeline timeline;
     private int remainingSeconds;
+    private int initialSeconds;
     private boolean timerRunning;
     private boolean timerPaused;
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
@@ -136,9 +138,20 @@ public class DashboardController {
     private void setupTimerPresets() {
         if (timerPreset != null) {
             timerPreset.getItems().addAll(
-                "1 Minute", "5 Minutes", "10 Minutes", "1 Hour"
+                "1 Minute", "5 Minutes", "10 Minutes", "15 Minutes", "25 Minutes", "45 Minutes", "1 Hour", "Custom"
             );
-            timerPreset.setValue("10 Minutes");
+            timerPreset.setValue("25 Minutes");
+            timerPreset.setOnAction(e -> handleTimerPresetChange());
+        }
+    }
+
+    private void handleTimerPresetChange() {
+        if ("Custom".equals(timerPreset.getValue()) && customTimeField != null) {
+            customTimeField.setVisible(true);
+            customTimeField.setManaged(true);
+        } else if (customTimeField != null) {
+            customTimeField.setVisible(false);
+            customTimeField.setManaged(false);
         }
     }
 
@@ -542,8 +555,29 @@ public class DashboardController {
                 return;
             }
 
+            if ("Custom".equals(selected)) {
+                if (customTimeField == null || customTimeField.getText().isBlank()) {
+                    LOGGER.warning("Custom time not specified");
+                    return;
+                }
+                try {
+                    int minutes = Integer.parseInt(customTimeField.getText().trim());
+                    if (minutes <= 0 || minutes > 480) { // Max 8 hours
+                        LOGGER.warning("Invalid custom time: " + minutes);
+                        return;
+                    }
+                    remainingSeconds = minutes * 60;
+                } catch (NumberFormatException e) {
+                    LOGGER.warning("Invalid custom time format");
+                    return;
+                }
+            } else {
+                remainingSeconds = convertToSeconds(selected);
+            }
+
+            initialSeconds = remainingSeconds;
+
             stopTimer();
-            remainingSeconds = convertToSeconds(selected);
             timerRunning = true;
             timerPaused = false;
             if (timerPauseButton != null) {
@@ -647,8 +681,19 @@ public class DashboardController {
         }
 
         if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
-            awardTimerXp(10);
+            int minutes = initialSeconds / 60;
+            int multiplier = calculateMultiplier(minutes);
+            int points = BASE_TASK_POINTS * multiplier;
+            awardTimerXp(points);
         }
+    }
+
+    private int calculateMultiplier(int minutes) {
+        if (minutes <= 5) return 1;
+        if (minutes <= 15) return 2; // 1.5x rounded up for int
+        if (minutes <= 30) return 2;
+        if (minutes <= 60) return 3; // 2.5x rounded up
+        return 3;
     }
 
     private void awardTimerXp(int points) {
@@ -693,6 +738,7 @@ public class DashboardController {
         if (value.contains("15")) return 900;
         if (value.contains("10")) return 600;
         if (value.contains("5")) return 300;
+        if (value.contains("1 Minute")) return 60;
         return 60;
     }
 

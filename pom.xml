@@ -47,7 +47,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.cc103sys.cc103.Launcher</mainClass>
+                    <mainClass>com.cc103sys.cc103.App</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -55,9 +55,13 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.cc103sys.cc103.Launcher</mainClass>
+                    <executable>java</executable>
                     <arguments>
                         <argument>-Dprism.order=sw</argument>
+                        <argument>-p</argument>
+                        <argument>${project.build.directory}/modules</argument>
+                        <argument>-m</argument>
+                        <argument>javafx.controls/com.cc103sys.cc103.App</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -71,7 +75,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.cc103sys.cc103.Launcher</mainClass>
+                            <mainClass>com.cc103sys.cc103.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

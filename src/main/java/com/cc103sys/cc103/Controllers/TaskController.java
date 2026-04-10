@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -13,6 +16,9 @@ import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
 
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,13 +28,24 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 public class TaskController {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
     private static final int LATE_TASK_POINTS = 5;
+    private static final int TIMER_PENALTY_POINTS = 15;
+
+    // Timer tracking
+    private Timer activeTimer;
+    private Task timerTask;
+    private AtomicInteger secondsRemaining = new AtomicInteger(0);
+    private AtomicInteger initialSeconds = new AtomicInteger(0);
+    private double currentMultiplier = 0;
+    private Timeline timerTimeline;
 
     @FXML
     private TextField taskField;
@@ -49,6 +66,21 @@ public class TaskController {
     @FXML
     @SuppressWarnings("unused")
     private Button deleteTaskBtn;
+    @FXML
+    private TextArea taskInstructions;
+    @FXML
+    private ListView<String> attachmentsList;
+    @FXML
+    private ComboBox<String> timerDuration;
+    @FXML
+    private Button uploadAttachmentBtn;
+    @FXML
+    private Button saveTaskInfoBtn;
+    @FXML
+    private Button startTimerBtn;
+    @FXML
+    private Label timerDisplayLabel;
+    private Label timerMultiplierLabel;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
@@ -58,12 +90,21 @@ public class TaskController {
     public void initialize() {
         setupRoleBasedUI();
         setupTaskListView();
+        setupTimerDropdown();
         loadUserClasses();
         loadAllClassTasks();
         loadFilteredTasks();
         // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
         LOGGER.info("Task scene initialized successfully");
+    }
+
+    private void setupTimerDropdown() {
+        if (timerDuration != null) {
+            ObservableList<String> durations = FXCollections.observableArrayList("5 min", "15 min", "30 min", "45 min", "60 min");
+            timerDuration.setItems(durations);
+            timerDuration.getSelectionModel().selectFirst();
+        }
     }
 
     private void setupRoleBasedUI() {
@@ -238,14 +279,27 @@ public class TaskController {
     }
 
     private int calculateTaskCompletionPoints(LocalDate dueDate) {
+        int basePoints;
         if (dueDate == null) {
-            return BASE_TASK_POINTS;
+            basePoints = BASE_TASK_POINTS;
+        } else {
+            long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
+            if (daysBefore < 0) {
+                basePoints = LATE_TASK_POINTS;
+            } else {
+                basePoints = BASE_TASK_POINTS + (int) Math.max(0, daysBefore) * 2;
+            }
         }
-        long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
-        if (daysBefore < 0) {
-            return LATE_TASK_POINTS;
+
+        // Apply timer multiplier if active
+        if (currentMultiplier > 0) {
+            int multipliedPoints = (int) Math.round(basePoints * currentMultiplier);
+            LOGGER.info(() -> "Applied timer multiplier " + String.format("%.1f", currentMultiplier) +
+                          "x to base points " + basePoints + " = " + multipliedPoints + " points");
+            return multipliedPoints;
         }
-        return BASE_TASK_POINTS + (int) Math.max(0, daysBefore) * 2;
+
+        return basePoints;
     }
 
     private void reloadTaskLists() {
@@ -411,6 +465,107 @@ public class TaskController {
             LOGGER.info("Task deleted");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to delete task: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleStartTimer() {
+        Task selected = getSelectedTask();
+        if (selected == null || timerDuration == null || timerDuration.getValue() == null) {
+            LOGGER.warning("No task selected or timer duration not set");
+            return;
+        }
+
+        // Stop any existing timer
+        if (timerTimeline != null) {
+            timerTimeline.stop();
+        }
+
+        String durationStr = timerDuration.getValue();
+        int minutes = Integer.parseInt(durationStr.replace(" min", ""));
+        int totalSeconds = minutes * 60;
+
+        // Calculate initial multiplier based on duration (longer = higher multiplier)
+        // 5 min = 3x, 15 min = 5x, 30 min = 7x, 45 min = 9x, 60 min = 11x
+        currentMultiplier = 3 + (minutes / 15) * 2; // 3, 5, 7, 9, 11
+
+        secondsRemaining.set(totalSeconds);
+        initialSeconds.set(totalSeconds);
+        timerTask = selected;
+
+        LOGGER.info(() -> "Timer started for " + minutes + " minutes on task: " + selected.getTaskName() +
+                      " with initial multiplier: " + currentMultiplier + "x");
+
+        // Create timeline for countdown
+        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            int remaining = secondsRemaining.decrementAndGet();
+
+            // Update multiplier: starts at max, decreases linearly to 0
+            double progress = (double) remaining / initialSeconds.get();
+            currentMultiplier = Math.max(0, currentMultiplier * progress);
+
+            if (remaining <= 0) {
+                // Timer finished - check if task is complete
+                timerTimeline.stop();
+                handleTimerFinished();
+            }
+        }));
+
+        timerTimeline.setCycleCount(totalSeconds);
+        timerTimeline.play();
+    }
+
+    private void handleTimerFinished() {
+        if (timerTask == null) return;
+
+        // Check if task was completed during timer
+        boolean taskCompleted = isTaskCompleted(timerTask);
+
+        if (!taskCompleted) {
+            // Apply penalty: -15 points but not below 0
+            int currentPoints = Session.getPoints();
+            int newPoints = Math.max(0, currentPoints - TIMER_PENALTY_POINTS);
+            Session.setPoints(newPoints);
+
+            LOGGER.info(() -> "Timer finished - task not completed. Applied " + TIMER_PENALTY_POINTS +
+                          " point penalty. Points: " + currentPoints + " -> " + newPoints);
+        } else {
+            LOGGER.info("Timer finished - task was completed during timer period");
+        }
+
+        // Reset timer state
+        timerTask = null;
+        currentMultiplier = 0;
+        secondsRemaining.set(0);
+        initialSeconds.set(0);
+    }
+
+    private boolean isTaskCompleted(Task task) {
+        // Check if task status is "Completed"
+        return "Completed".equals(task.getStatus());
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleUploadAttachment() {
+        Task selected = getSelectedTask();
+        if (selected == null) {
+            return;
+        }
+        LOGGER.info("Upload attachment handler for task: " + selected.getTaskName());
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleSaveTaskInfo() {
+        Task selected = getSelectedTask();
+        if (selected == null) {
+            return;
+        }
+        if (taskInstructions != null) {
+            String instructions = taskInstructions.getText();
+            LOGGER.info(() -> "Saved task info for task: " + selected.getTaskName());
         }
     }
 

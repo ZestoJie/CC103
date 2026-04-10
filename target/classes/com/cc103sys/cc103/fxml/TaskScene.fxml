@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <!-- Root Container: Sidebar + Main Content -->
-<HBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+<HBox spacing="0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.cc103sys.cc103.Controllers.TaskController" 
       style="-fx-background-color: #f0f2f5;">
     <children>
@@ -67,12 +67,12 @@
                                     </children>
                                 </VBox>
 
-                                <!-- DUAL COLUMN LAYOUT FOR LISTS -->
-                                <HBox spacing="25" VBox.vgrow="ALWAYS">
+                                <!-- THREE-COLUMN LAYOUT: All Tasks | Class Tasks | Task Info -->
+                                <HBox spacing="20" VBox.vgrow="ALWAYS">
                                     
                                     <!-- LEFT COLUMN: All Tasks -->
-                                    <VBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                        <Label text="All My Tasks" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="280">
+                                        <Label text="All My Tasks" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
                                         <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
                                             <padding>
                                                 <Insets top="10" right="10" bottom="10" left="10" />
@@ -84,9 +84,9 @@
                                         </VBox>
                                     </VBox>
                                     
-                                    <!-- RIGHT COLUMN: Filtered Tasks -->
-                                    <VBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                        <Label text="Class Tasks" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                    <!-- MIDDLE COLUMN: Class Tasks -->
+                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="280">
+                                        <Label text="Class Tasks" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
                                         <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
                                             <padding>
                                                 <Insets top="10" right="10" bottom="10" left="10" />
@@ -97,7 +97,37 @@
                                             </children>
                                         </VBox>
                                     </VBox>
-                                    
+
+                                    <!-- RIGHT COLUMN: Task Info/Details -->
+                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="320">
+                                        <Label text="Task Info" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <!-- Instructions -->
+                                                <Label text="Instructions" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
+                                                <TextArea fx:id="taskInstructions" promptText="Task instructions..." prefRowCount="4" wrapText="true"
+                                                          style="-fx-control-inner-background: #fdfdfd; -fx-border-color: #dfe6e9; -fx-padding: 6; -fx-font-size: 10;" VBox.vgrow="NEVER" />
+                                                
+                                                <!-- Attachments -->
+                                                <Label text="Attachments" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
+                                                <ListView fx:id="attachmentsList" prefHeight="60" style="-fx-background-color: #fdfdfd; -fx-border-color: #dfe6e9; -fx-font-size: 10;" VBox.vgrow="NEVER" />
+                                                <Button fx:id="uploadAttachmentBtn" text="+ Attachment" onAction="#handleUploadAttachment" 
+                                                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 12; -fx-font-size: 10;" />
+                                                
+                                                <!-- Timer -->
+                                                <Separator style="-fx-padding: 4 0;" />
+                                                <Label text="Timer" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
+                                                <ComboBox fx:id="timerDuration" promptText="Duration" style="-fx-padding: 6; -fx-border-color: #dfe6e9; -fx-background-color: #fdfdfd; -fx-font-size: 10;" />
+                                                <Button fx:id="startTimerBtn" text="▶ Start" onAction="#handleStartTimer" 
+                                                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 12; -fx-font-weight: bold; -fx-font-size: 10;" />
+                                                
+                                                <!-- Save -->
+                                                <Separator style="-fx-padding: 4 0;" />
+                                                <Button fx:id="saveTaskInfoBtn" text="💾 Save Info" onAction="#handleSaveTaskInfo" 
+                                                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 12; -fx-font-weight: bold; -fx-font-size: 10;" />
+                                            </children>
+                                        </VBox>
+                                    </VBox>
                                 </HBox>
 
                                 <!-- CARD: Global Actions (Bottom) -->

@@ -1,13 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="400" prefHeight="200" style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 0, 1);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TimerController">
+<VBox spacing="25" alignment="CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.cc103sys.cc103.Controllers.TimerController" 
+      style="-fx-background-color: #f0f2f5;">
+    
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+
     <children>
-        <Label text="Focus Timer" style="-fx-font-size: 16; -fx-font-weight: bold;" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" alignment="CENTER" />
-        <ComboBox fx:id="timeSelect" promptText="Select Duration" prefHeight="40" AnchorPane.topAnchor="30" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
-        <Label fx:id="timerLabel" text="00:00" alignment="CENTER" style="-fx-font-size: 48; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" AnchorPane.topAnchor="80" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
-        <Button text="Start Timer" onAction="#startTimer" prefHeight="45" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" />
+        <!-- Header -->
+        <Label text="Focus Timer" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+        <!-- Timer Duration Selector (Required by Controller) -->
+        <HBox alignment="CENTER">
+            <ComboBox fx:id="timeSelect" promptText="Select Duration" HBox.hgrow="ALWAYS" prefWidth="200"
+                      style="-fx-padding: 12 20; -fx-border-color: #dfe6e9; -fx-border-radius: 25; -fx-background-radius: 25; -fx-background-color: white; -fx-font-size: 14; -fx-font-weight: 600;" />
+        </HBox>
+
+        <!-- Circular Timer Display -->
+        <StackPane alignment="CENTER">
+            <!-- Outer Ring -->
+            <Circle fill="#ecf0f1" radius="130" stroke="#dfe6e9" strokeWidth="2" />
+            <!-- Inner Circle -->
+            <Circle fill="#ffffff" radius="120" stroke="#4a90e2" strokeWidth="6" />
+            
+            <!-- Timer Text -->
+            <VBox alignment="CENTER" spacing="5">
+                <Label fx:id="timerLabel" text="00:00" 
+                       style="-fx-font-size: 56; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                    <font>
+                        <Font name="System Monospaced" size="56" />
+                    </font>
+                </Label>
+                <Label text="Remaining" style="-fx-font-size: 12; -fx-text-fill: #95a5a6; -fx-font-weight: bold;" />
+            </VBox>
+        </StackPane>
+
+        <!-- Control Buttons (Play, Pause, Rewind) -->
+        <HBox spacing="25" alignment="CENTER">
+            <children>
+                <!-- Rewind (Visual) -->
+                <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                    <graphic>
+                        <ImageView fitHeight="40" fitWidth="40" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@icon-rewind.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <!-- Play (Functional) -->
+                <Button onAction="#startTimer" 
+                        style="-fx-background-color: #4a90e2; -fx-cursor: hand; -fx-background-radius: 50; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(74, 144, 226, 0.4), 10, 0, 0, 0);">
+                    <graphic>
+                        <ImageView fitHeight="50" fitWidth="50" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@icon-play.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <!-- Pause (Visual) -->
+                <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                    <graphic>
+                        <ImageView fitHeight="40" fitWidth="40" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@icon-pause.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </children>
+        </HBox>
+
+        <!-- Status & Mode Info (Enhanced Design) -->
+        <VBox spacing="10" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 15 30; -fx-background-radius: 50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+            <children>
+                <Label text="XP Earning Active" style="-fx-font-size: 14; -fx-text-fill: #27ae60; -fx-font-weight: bold;" />
+            </children>
+        </VBox>
+
     </children>
-</AnchorPane>
+</VBox>

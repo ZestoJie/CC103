@@ -1,14 +1,16 @@
 package com.cc103sys.cc103.Controllers;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
+import com.cc103sys.cc103.Models.ClassTask;
 import com.cc103sys.cc103.Models.Classes;
-import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.collections.FXCollections;
@@ -16,14 +18,21 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class ClassesController {
     private static final Logger LOGGER = Logger.getLogger(ClassesController.class.getName());
 
+    @FXML private TabPane classesTabPane;
+    @FXML private Tab detailTab;
     @FXML private ListView<Classes> classList;
     @FXML private ListView<Classes> myClassList;
     @FXML private TextField codeField;
@@ -31,14 +40,32 @@ public class ClassesController {
     @FXML private VBox createClassSection;
     @FXML private Button addClassButton;
 
-    @FXML@SuppressWarnings("unused")
+    @FXML private Label detailClassTitleLabel;
+    @FXML private Label detailClassDescriptionLabel;
+    @FXML private ListView<ClassTask> detailTasksListView;
+    @FXML private ListView<String> detailParticipantsListView;
+    @FXML private Label detailFormTitleLabel;
+    @FXML private TextField detailTaskTitleField;
+    @FXML private TextArea detailTaskDescriptionArea;
+    @FXML private DatePicker detailTaskDueDatePicker;
+    @FXML private Button detailSubmitTaskButton;
+    @FXML private Button detailCancelEditButton;
+    @FXML private Button detailEditTaskButton;
+    @FXML private Button detailDeleteTaskButton;
+
+    @FXML @SuppressWarnings("unused")
     private TextField privateClassCodeField;
 
     @FXML private CheckBox publicClassCheckbox;
 
+    private int currentDetailClassId = -1;
+    private ClassTask editingDetailTask = null;
+    private final ObservableList<ClassTask> detailClassTasks = FXCollections.observableArrayList();
+
     @FXML
     public void initialize() {
         setupRoleBasedUI();
+        initializeClassDetailTab();
         loadPublicClasses();
         loadOwnedClasses();
 
@@ -59,6 +86,33 @@ public class ClassesController {
         if (classNameField != null) classNameField.setVisible(isHost);
         if (publicClassCheckbox != null) publicClassCheckbox.setVisible(isHost);
         if (privateClassCodeField != null) privateClassCodeField.setVisible(isHost);
+        if (detailSubmitTaskButton != null) {
+            detailSubmitTaskButton.setVisible(isHost);
+            detailSubmitTaskButton.setManaged(isHost);
+        }
+        if (detailEditTaskButton != null) {
+            detailEditTaskButton.setVisible(isHost);
+            detailEditTaskButton.setManaged(isHost);
+        }
+        if (detailDeleteTaskButton != null) {
+            detailDeleteTaskButton.setVisible(isHost);
+            detailDeleteTaskButton.setManaged(isHost);
+        }
+    }
+
+    private void initializeClassDetailTab() {
+        if (detailTab != null) {
+            detailTab.setDisable(true);
+        }
+        if (detailCancelEditButton != null) {
+            detailCancelEditButton.setVisible(false);
+            detailCancelEditButton.setManaged(false);
+        }
+        if (detailTasksListView != null) {
+            detailTasksListView.setItems(detailClassTasks);
+            detailTasksListView.setCellFactory(lv -> new DetailTaskListCell());
+        }
+        clearDetailForm();
     }
 
     @FXML
@@ -129,7 +183,7 @@ public class ClassesController {
     @FXML
     @SuppressWarnings("unused")
     private void createClass() {
-        if (!com.cc103sys.cc103.Utils.Session.isHost()) {
+        if (!Session.isHost()) {
             LOGGER.warning("Only Hosts can create classes");
             return;
         }
@@ -255,7 +309,6 @@ public class ClassesController {
         Integer currentUserId = getCurrentUserId();
         if (currentUserId == null) return;
 
-        // Verify the current user is the owner
         String checkOwnerSql = "SELECT owner_id FROM classes WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement checkStmt = conn.prepareStatement(checkOwnerSql)) {
@@ -277,7 +330,6 @@ public class ClassesController {
             return;
         }
 
-        // Delete the class (cascade will handle related records)
         String deleteSql = "DELETE FROM classes WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
@@ -285,7 +337,7 @@ public class ClassesController {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 LOGGER.info(() -> "Class deleted successfully: " + classId);
-                loadOwnedClasses(); // Refresh the list
+                loadOwnedClasses();
             } else {
                 LOGGER.warning("No class was deleted");
             }
@@ -310,6 +362,230 @@ public class ClassesController {
         return null;
     }
 
+    private void showClassDetails(Classes selectedClass) {
+        if (selectedClass == null) return;
+        currentDetailClassId = selectedClass.getId();
+        if (detailTab != null) {
+            detailTab.setDisable(false);
+            classesTabPane.getSelectionModel().select(detailTab);
+        }
+        loadDetailClassInfo(selectedClass.getClassName());
+        loadDetailClassTasks();
+        loadDetailParticipants();
+        clearDetailForm();
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void goBackToClasses() {
+        if (classesTabPane != null) {
+            classesTabPane.getSelectionModel().selectFirst();
+        }
+    }
+
+    private void loadDetailClassInfo(String className) {
+        if (detailClassTitleLabel != null) {
+            detailClassTitleLabel.setText(className != null ? className : "Class Details");
+        }
+        if (detailClassDescriptionLabel != null) {
+            detailClassDescriptionLabel.setText("Welcome to " + (className != null ? className : "this class") + ". Here you can manage tasks and participants without leaving the Classes page.");
+        }
+    }
+
+    private void loadDetailClassTasks() {
+        detailClassTasks.clear();
+        if (currentDetailClassId == -1) return;
+
+        String sql = "SELECT id, class_id, task_name, description, due_date, owner_id, created_at FROM class_tasks WHERE class_id = ? ORDER BY due_date ASC";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, currentDetailClassId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    detailClassTasks.add(new ClassTask(
+                        rs.getInt("id"),
+                        rs.getInt("class_id"),
+                        rs.getString("task_name"),
+                        rs.getString("description"),
+                        rs.getDate("due_date") != null ? rs.getDate("due_date").toLocalDate() : null,
+                        rs.getInt("owner_id"),
+                        rs.getString("created_at")
+                    ));
+                }
+            }
+            LOGGER.info(() -> "Loaded " + detailClassTasks.size() + " class detail tasks");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to load class detail tasks: " + e.getMessage());
+        }
+    }
+
+    private void loadDetailParticipants() {
+        if (currentDetailClassId == -1 || detailParticipantsListView == null) {
+            return;
+        }
+        detailParticipantsListView.getItems().clear();
+        String sql = "SELECT u.username FROM users u "
+                   + "JOIN user_classes uc ON u.id = uc.user_id "
+                   + "WHERE uc.class_id = ? ORDER BY u.username";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, currentDetailClassId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    detailParticipantsListView.getItems().add(rs.getString("username"));
+                }
+            }
+            LOGGER.info(() -> "Loaded " + detailParticipantsListView.getItems().size() + " participants");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to load class participants: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleDetailSubmitTask() {
+        if (currentDetailClassId == -1) return;
+        String title = detailTaskTitleField.getText().trim();
+        if (title.isEmpty()) {
+            return;
+        }
+        String description = detailTaskDescriptionArea.getText().trim();
+        LocalDate dueDate = detailTaskDueDatePicker.getValue();
+
+        if (editingDetailTask != null) {
+            updateDetailClassTask(editingDetailTask.getId(), title, description, dueDate);
+        } else {
+            createDetailClassTask(title, description, dueDate);
+        }
+        clearDetailForm();
+        loadDetailClassTasks();
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleDetailCancelEdit() {
+        clearDetailForm();
+        editingDetailTask = null;
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleDetailEditTask() {
+        ClassTask selected = detailTasksListView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        editingDetailTask = selected;
+        detailFormTitleLabel.setText("Edit Task");
+        detailTaskTitleField.setText(selected.getTaskName());
+        detailTaskDescriptionArea.setText(selected.getDescription());
+        detailTaskDueDatePicker.setValue(selected.getDueDate());
+        detailSubmitTaskButton.setText("Update Task");
+        detailCancelEditButton.setVisible(true);
+        detailCancelEditButton.setManaged(true);
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleDetailDeleteTask() {
+        ClassTask selected = detailTasksListView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        deleteDetailClassTask(selected.getId());
+        loadDetailClassTasks();
+    }
+
+    private void createDetailClassTask(String title, String description, LocalDate dueDate) {
+        Integer ownerId = getCurrentUserId();
+        if (ownerId == null) return;
+        String sql = "INSERT INTO class_tasks (class_id, task_name, description, due_date, owner_id) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, currentDetailClassId);
+            stmt.setString(2, title);
+            stmt.setString(3, description);
+            stmt.setDate(4, dueDate != null ? Date.valueOf(dueDate) : null);
+            stmt.setInt(5, ownerId);
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int classTaskId = rs.getInt(1);
+                    assignTaskToClassMembers(classTaskId);
+                }
+            }
+            LOGGER.info("Class task created successfully");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to create class task: " + e.getMessage());
+        }
+    }
+
+    private void updateDetailClassTask(int taskId, String title, String description, LocalDate dueDate) {
+        String sql = "UPDATE class_tasks SET task_name = ?, description = ?, due_date = ? WHERE id = ? AND class_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, title);
+            stmt.setString(2, description);
+            stmt.setDate(3, dueDate != null ? Date.valueOf(dueDate) : null);
+            stmt.setInt(4, taskId);
+            stmt.setInt(5, currentDetailClassId);
+            stmt.executeUpdate();
+            LOGGER.info("Class task updated successfully");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to update class task: " + e.getMessage());
+        }
+    }
+
+    private void deleteDetailClassTask(int taskId) {
+        String sql = "DELETE FROM class_tasks WHERE id = ? AND class_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, taskId);
+            stmt.setInt(2, currentDetailClassId);
+            stmt.executeUpdate();
+            LOGGER.info("Class task deleted successfully");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to delete class task: " + e.getMessage());
+        }
+    }
+
+    private void assignTaskToClassMembers(int classTaskId) {
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
+                   + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
+                   + "FROM class_tasks ct "
+                   + "JOIN user_classes uc ON ct.class_id = uc.class_id "
+                   + "JOIN users u ON uc.user_id = u.id "
+                   + "WHERE ct.id = ? "
+                   + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, classTaskId);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to assign task to class members: " + e.getMessage());
+        }
+    }
+
+    private void clearDetailForm() {
+        if (detailTaskTitleField != null) {
+            detailTaskTitleField.clear();
+        }
+        if (detailTaskDescriptionArea != null) {
+            detailTaskDescriptionArea.clear();
+        }
+        if (detailTaskDueDatePicker != null) {
+            detailTaskDueDatePicker.setValue(null);
+        }
+        if (detailFormTitleLabel != null) {
+            detailFormTitleLabel.setText("Add New Task");
+        }
+        if (detailSubmitTaskButton != null) {
+            detailSubmitTaskButton.setText("Add Task");
+        }
+        if (detailCancelEditButton != null) {
+            detailCancelEditButton.setVisible(false);
+            detailCancelEditButton.setManaged(false);
+        }
+        editingDetailTask = null;
+    }
+
     private class OwnedClassListCell extends ListCell<Classes> {
         private final Button viewButton = new Button("View");
         private final Button deleteButton = new Button("Delete");
@@ -320,7 +596,7 @@ public class ClassesController {
                 Classes c = getItem();
                 if (c != null) {
                     Session.setCurrentClassId(c.getId());
-                    Navigator.navigateTo("ClassDetail");
+                    showClassDetails(c);
                 }
             });
 
@@ -342,7 +618,6 @@ public class ClassesController {
             } else {
                 Integer currentUserId = getCurrentUserId();
                 boolean isOwner = currentUserId != null && item.getOwnerId() != null && currentUserId.equals(item.getOwnerId());
-
                 setText(item.getClassName());
                 javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(5);
                 buttonBox.getChildren().add(viewButton);
@@ -376,6 +651,21 @@ public class ClassesController {
             } else {
                 setText(item.getClassName());
                 setGraphic(joinButton);
+            }
+        }
+    }
+
+    private class DetailTaskListCell extends ListCell<ClassTask> {
+        @Override
+        protected void updateItem(ClassTask task, boolean empty) {
+            super.updateItem(task, empty);
+            if (empty || task == null) {
+                setText(null);
+            } else {
+                String description = task.getDescription() != null && !task.getDescription().isEmpty()
+                    ? "\n" + task.getDescription()
+                    : "";
+                setText(task.getTaskName() + " (Due: " + task.getDueDate() + ")" + description);
             }
         }
     }

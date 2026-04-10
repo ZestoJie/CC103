@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -38,16 +37,11 @@ import javafx.util.Duration;
 public class DashboardController {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
-    private static final int LATE_TASK_POINTS = 5;
-
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
 
-    // ✅ RESTORED (IMPORTANT)
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
-    @FXML private Label noTaskLabel;
-
     @FXML private ListView<Task> taskList;
     @FXML private Label timerLabel;
     @FXML private ListView<UserRank> leaderboardPreview;
@@ -57,7 +51,6 @@ public class DashboardController {
     @FXML private RadioButton studyModeRadio;
     @FXML private RadioButton breakModeRadio;
     @FXML private CheckBox xpActiveCheckbox;
-    @FXML private TextField timerSubjectField;
     @FXML private ProgressBar dailyProgressBar;
     @FXML private Label dailyGoalSummary;
     @FXML private Label dailyGoalTip;
@@ -69,6 +62,7 @@ public class DashboardController {
     private boolean timerRunning;
     private boolean timerPaused;
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
+    private Task selectedTask;
 
     @FXML
     public void initialize() {
@@ -78,11 +72,14 @@ public class DashboardController {
             setupTimerPresets();
             setupRoleBasedUI();
             loadTasks();
+            checkMissedTasks();
             loadUserClassesForLeaderboard();
             
             if (classSelector != null) {
                 classSelector.setOnAction(e -> {
                     try {
+                        selectedTask = null;
+                        updateTimerAvailability();
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
                     }
@@ -97,10 +94,12 @@ public class DashboardController {
                 xpActiveCheckbox.setSelected(true);
             }
 
+            updateTimerAvailability();
+
             NavbarController.getInstance().setActive("dashboard");
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
-            LOGGER.severe("Dashboard initialization error: " + e.getMessage());
+            LOGGER.severe(() -> "Dashboard initialization error: " + e.getMessage());
         }
     }
 
@@ -132,6 +131,38 @@ public class DashboardController {
                     }
                 }
             });
+            taskList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                selectedTask = newSelection;
+                updateTimerAvailability();
+            });
+        }
+    }
+
+    private void updateTimerAvailability() {
+        boolean canStartTimer = selectedTask != null && !"Done".equals(selectedTask.getStatus()) && !"completed".equals(selectedTask.getStatus()) && !"missed".equals(selectedTask.getStatus());
+        if (timerStartButton != null) {
+            timerStartButton.setDisable(!canStartTimer);
+        }
+        if (timerPreset != null) {
+            timerPreset.setDisable(!canStartTimer);
+        }
+        if (customTimeField != null) {
+            customTimeField.setDisable(!canStartTimer);
+        }
+    }
+
+    private void updateTaskStatus(int taskId, String status) {
+        String sql = "UPDATE tasks SET status = ? WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, taskId);
+            stmt.executeUpdate();
+            selectedTask.setStatus(status);
+            taskList.refresh();
+            LOGGER.info(() -> "Task " + taskId + " status updated to: " + status);
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to update task status: " + e.getMessage());
         }
     }
 
@@ -183,9 +214,23 @@ public class DashboardController {
             if (dailyGoalSummary != null) {
                 updateDailyGoalProgress();
             }
-            LOGGER.info("Loaded " + tasks.size() + " tasks");
+            LOGGER.info(() -> "Loaded " + tasks.size() + " tasks");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load tasks: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
+        }
+    }
+
+    private void checkMissedTasks() {
+        String sql = "UPDATE tasks SET status = 'missed' WHERE username = ? AND status NOT IN ('Done', 'completed', 'missed') AND task_date < CURDATE()";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            int updated = stmt.executeUpdate();
+            if (updated > 0) {
+                LOGGER.info(() -> "Marked " + updated + " tasks as missed");
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to check missed tasks: " + e.getMessage());
         }
     }
 
@@ -220,7 +265,7 @@ public class DashboardController {
                 dailyGoalTip.setText(total == 0 ? "Try adding a new task and complete it today." : "Keep going — every completed task increases your XP.");
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to update daily goal progress: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to update daily goal progress: " + e.getMessage());
         }
     }
 
@@ -258,9 +303,9 @@ public class DashboardController {
                     tasks.clear();
                 }
             }
-            LOGGER.info("Loaded " + userClasses.size() + " user classes");
+            LOGGER.info(() -> "Loaded " + userClasses.size() + " user classes");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load user classes: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load user classes: " + e.getMessage());
         }
 
     }
@@ -294,7 +339,7 @@ public class DashboardController {
         try {
             int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
             if (classTaskId <= 0) {
-                LOGGER.severe("Failed to create class task for " + taskName);
+                LOGGER.severe(() -> "Failed to create class task for " + taskName);
                 return;
             }
 
@@ -306,97 +351,12 @@ public class DashboardController {
             try {
                 playAddTaskAnimation();
             } catch (Exception e) {
-                LOGGER.warning("Error playing animation: " + e.getMessage());
+                LOGGER.warning(() -> "Error playing animation: " + e.getMessage());
             }
-            LOGGER.info("Class task created and assigned: " + taskName);
+            LOGGER.info(() -> "Class task created and assigned: " + taskName);
         } catch (SQLException e) {
-            LOGGER.severe("Failed to create task: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to create task: " + e.getMessage());
         }
-    }
-
-    @FXML
-    @SuppressWarnings("unused")
-    private void handleDeleteTask() throws Exception {
-        try {
-            Task selected = taskList.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                LOGGER.warning("No task selected for deletion");
-                return;
-            }
-
-            String sql = "DELETE FROM tasks WHERE id = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, selected.getId());
-                stmt.executeUpdate();
-                loadTasks();
-                LOGGER.info("Task deleted: " + selected.getTaskName());
-            }
-        } catch (SQLException e) {
-            LOGGER.severe("Failed to delete task: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    @SuppressWarnings("unused")
-    private void handleMarkDone() throws Exception {
-        updateTaskStatus("Done");
-    }
-
-    private void updateTaskStatus(String status) throws Exception {
-        Task selected = taskList.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            LOGGER.warning("No task selected for status update");
-            return;
-        }
-
-        if (isTaskAlreadyCompleted(selected.getStatus())) {
-            LOGGER.warning("Task is already completed: " + selected.getTaskName());
-            return;
-        }
-
-        int points = calculateTaskCompletionPoints(selected.getDate());
-        String updateTaskSql = "UPDATE tasks SET status = ?, completed_date = ?, points_awarded = ? WHERE id = ?";
-        String updatePointsSql = "UPDATE users SET points = points + ? WHERE username = ?";
-
-        try (Connection conn = DBUtil.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(updateTaskSql)) {
-                stmt.setString(1, status);
-                stmt.setDate(2, Date.valueOf(LocalDate.now()));
-                stmt.setInt(3, points);
-                stmt.setInt(4, selected.getId());
-                stmt.executeUpdate();
-            }
-
-            try (PreparedStatement stmt = conn.prepareStatement(updatePointsSql)) {
-                stmt.setInt(1, points);
-                stmt.setString(2, Session.getUsername());
-                stmt.executeUpdate();
-            }
-
-            loadTasks();
-            loadLeaderboardPreviewForClass();
-            LOGGER.info("Task completed: " + selected.getTaskName() + " and awarded " + points + " points");
-        } catch (SQLException e) {
-            LOGGER.severe("Failed to update task status: " + e.getMessage());
-        }
-    }
-
-    private boolean isTaskAlreadyCompleted(String status) {
-        return status != null && ("Done".equalsIgnoreCase(status) || "completed".equalsIgnoreCase(status));
-    }
-
-    private int calculateTaskCompletionPoints(LocalDate dueDate) {
-        if (dueDate == null) {
-            return BASE_TASK_POINTS;
-        }
-
-        long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
-        if (daysBefore < 0) {
-            return LATE_TASK_POINTS;
-        }
-
-        return BASE_TASK_POINTS * (int) Math.max(1, daysBefore);
     }
 
     private boolean isCurrentUserClassOwner(int classId) {
@@ -419,7 +379,7 @@ public class DashboardController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to check class owner: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to check class owner: " + e.getMessage());
             return false;
         }
 
@@ -437,7 +397,7 @@ public class DashboardController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to get current user id: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to get current user id: " + e.getMessage());
         }
         return null;
     }
@@ -467,7 +427,7 @@ public class DashboardController {
         return -1;
     }
 
-    private void assignClassTaskToMembers(int classTaskId, int classId) {
+    private void assignClassTaskToMembers(int classTaskId, @SuppressWarnings("unused") int classId) {
         String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
                    + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
                    + "FROM class_tasks ct "
@@ -481,7 +441,7 @@ public class DashboardController {
             stmt.setInt(1, classTaskId);
             stmt.executeUpdate();
         } catch (Exception e) {
-            LOGGER.severe("Failed to assign class task to members: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to assign class task to members: " + e.getMessage());
         }
     }
 
@@ -520,7 +480,7 @@ public class DashboardController {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.severe("Failed to load leaderboard preview: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load leaderboard preview: " + e.getMessage());
         }
     }
 
@@ -536,7 +496,7 @@ public class DashboardController {
             Session.setCurrentClassId(selectedClass.getId());
             Navigator.switchScene("Leaderboard");
         } catch (Exception e) {
-            LOGGER.severe("Failed to open leaderboard: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to open leaderboard: " + e.getMessage());
         }
     }
 
@@ -544,6 +504,16 @@ public class DashboardController {
     @SuppressWarnings("unused")
     private void handleStartTimer() {
         try {
+            if (selectedTask == null) {
+                LOGGER.warning("No task selected for timer");
+                return;
+            }
+
+            if ("Done".equals(selectedTask.getStatus()) || "completed".equals(selectedTask.getStatus()) || "missed".equals(selectedTask.getStatus())) {
+                LOGGER.warning("Cannot start timer for completed or missed task");
+                return;
+            }
+
             if (timerRunning && timerPaused) {
                 resumeTimer();
                 return;
@@ -563,7 +533,7 @@ public class DashboardController {
                 try {
                     int minutes = Integer.parseInt(customTimeField.getText().trim());
                     if (minutes <= 0 || minutes > 480) { // Max 8 hours
-                        LOGGER.warning("Invalid custom time: " + minutes);
+                        LOGGER.warning(() -> "Invalid custom time: " + minutes);
                         return;
                     }
                     remainingSeconds = minutes * 60;
@@ -577,6 +547,9 @@ public class DashboardController {
 
             initialSeconds = remainingSeconds;
 
+            // Mark task as in progress
+            updateTaskStatus(selectedTask.getId(), "in progress");
+
             stopTimer();
             timerRunning = true;
             timerPaused = false;
@@ -588,9 +561,9 @@ public class DashboardController {
                 timerStartButton.setText("Restart");
             }
             startCountdown();
-            LOGGER.info("Timer started: " + remainingSeconds + " seconds");
+            LOGGER.info(() -> "Timer started for task: " + selectedTask.getTaskName() + " (" + remainingSeconds + " seconds)");
         } catch (Exception e) {
-            LOGGER.severe("Failed to start timer: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to start timer: " + e.getMessage());
         }
     }
 
@@ -680,6 +653,11 @@ public class DashboardController {
             timerLabel.setText("Done!");
         }
 
+        // Mark task as completed if timer was running for a task
+        if (selectedTask != null) {
+            updateTaskStatus(selectedTask.getId(), "completed");
+        }
+
         if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
             int minutes = initialSeconds / 60;
             int multiplier = calculateMultiplier(minutes);
@@ -689,11 +667,11 @@ public class DashboardController {
     }
 
     private int calculateMultiplier(int minutes) {
-        if (minutes <= 5) return 1;
-        if (minutes <= 15) return 2; // 1.5x rounded up for int
-        if (minutes <= 30) return 2;
-        if (minutes <= 60) return 3; // 2.5x rounded up
-        return 3;
+        if (minutes <= 5) return 3; // Shorter sessions get higher reward
+        if (minutes <= 15) return 2;
+        if (minutes <= 30) return 2; // 1.5x rounded up
+        if (minutes <= 60) return 1;
+        return 1;
     }
 
     private void awardTimerXp(int points) {
@@ -705,13 +683,13 @@ public class DashboardController {
             stmt.executeUpdate();
             Session.setPoints(Session.getPoints() + points);
             refreshNavbarPoints();
-            LOGGER.info("Timer XP awarded: " + points);
+            LOGGER.info(() -> "Timer XP awarded: " + points);
         } catch (Exception e) {
-            LOGGER.severe("Failed to award timer XP: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to award timer XP: " + e.getMessage());
         }
     }
 
-    private void refreshNavbarPoints() {
+    private void refreshNavbarPoints() throws Exception {
         if (NavbarController.getInstance() != null) {
             NavbarController.getInstance().loadUserInfo();
         }
@@ -769,7 +747,7 @@ public class DashboardController {
         try {
             Navigator.switchScene("Settings");
         } catch (Exception e) {
-            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
         }
     }
 
@@ -778,9 +756,8 @@ public class DashboardController {
     private void openTimerPopup() {
         try {
             LOGGER.info("Opening timer popup");
-            // Placeholder: Can be expanded to show a popup window or modal
         } catch (Exception e) {
-            LOGGER.severe("Failed to open timer popup: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to open timer popup: " + e.getMessage());
         }
     }
 }

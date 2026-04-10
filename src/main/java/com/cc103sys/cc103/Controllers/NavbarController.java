@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
@@ -41,7 +42,7 @@ public class NavbarController {
     private Button settingsBtn;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();
@@ -55,7 +56,7 @@ public class NavbarController {
         }
     }
 
-    public void loadUserInfo() {
+    public void loadUserInfo() throws Exception {
         if (usernameLabel != null) {
             usernameLabel.setText(Session.getUsername() != null ? Session.getUsername() : "Unknown User");
         }
@@ -73,7 +74,7 @@ public class NavbarController {
         loadProfilePicture();
     }
 
-    private void loadProfilePicture() {
+    private void loadProfilePicture() throws Exception {
         try {
             Integer userId = getCurrentUserId();
             if (userId != null) {
@@ -97,7 +98,7 @@ public class NavbarController {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Fall back to default
         }
         

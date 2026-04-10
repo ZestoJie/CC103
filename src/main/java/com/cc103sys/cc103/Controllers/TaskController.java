@@ -6,8 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -18,7 +16,6 @@ import com.cc103sys.cc103.Utils.Session;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,10 +36,8 @@ public class TaskController {
     private static final int LATE_TASK_POINTS = 5;
     private static final int TIMER_PENALTY_POINTS = 15;
 
-    // Timer tracking
-    private Timer activeTimer;
     private Task timerTask;
-    private AtomicInteger secondsRemaining = new AtomicInteger(0);
+    private final AtomicInteger secondsRemaining = new AtomicInteger(0);
     private AtomicInteger initialSeconds = new AtomicInteger(0);
     private double currentMultiplier = 0;
     private Timeline timerTimeline;
@@ -271,7 +266,7 @@ public class TaskController {
         return Session.getPoints();
     }
 
-    private void refreshNavbarUserInfo() {
+    private void refreshNavbarUserInfo() throws Exception {
         NavbarController navbar = NavbarController.getInstance();
         if (navbar != null) {
             navbar.loadUserInfo();
@@ -399,7 +394,7 @@ public class TaskController {
                     ));
                 }
             }
-            LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected == null ? "none" : selected.getClassName()));
+            LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected.getClassName()));
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to load filtered tasks: " + e.getMessage());
         }
@@ -553,7 +548,7 @@ public class TaskController {
         if (selected == null) {
             return;
         }
-        LOGGER.info("Upload attachment handler for task: " + selected.getTaskName());
+        LOGGER.info(() -> "Upload attachment handler for task: " + selected.getTaskName());
     }
 
     @FXML
@@ -578,5 +573,61 @@ public class TaskController {
             selected = allTaskList.getSelectionModel().getSelectedItem();
         }
         return selected;
+    }
+
+    public AtomicInteger getInitialSeconds() {
+        return initialSeconds;
+    }
+
+    public void setInitialSeconds(AtomicInteger initialSeconds) {
+        this.initialSeconds = initialSeconds;
+    }
+
+    public ListView<String> getAttachmentsList() {
+        return attachmentsList;
+    }
+
+    public void setAttachmentsList(ListView<String> attachmentsList) {
+        this.attachmentsList = attachmentsList;
+    }
+
+    public Button getSaveTaskInfoBtn() {
+        return saveTaskInfoBtn;
+    }
+
+    public void setSaveTaskInfoBtn(Button saveTaskInfoBtn) {
+        this.saveTaskInfoBtn = saveTaskInfoBtn;
+    }
+
+    public Button getUploadAttachmentBtn() {
+        return uploadAttachmentBtn;
+    }
+
+    public void setUploadAttachmentBtn(Button uploadAttachmentBtn) {
+        this.uploadAttachmentBtn = uploadAttachmentBtn;
+    }
+
+    public Label getTimerMultiplierLabel() {
+        return timerMultiplierLabel;
+    }
+
+    public void setTimerMultiplierLabel(Label timerMultiplierLabel) {
+        this.timerMultiplierLabel = timerMultiplierLabel;
+    }
+
+    public Button getStartTimerBtn() {
+        return startTimerBtn;
+    }
+
+    public void setStartTimerBtn(Button startTimerBtn) {
+        this.startTimerBtn = startTimerBtn;
+    }
+
+    public Label getTimerDisplayLabel() {
+        return timerDisplayLabel;
+    }
+
+    public void setTimerDisplayLabel(Label timerDisplayLabel) {
+        this.timerDisplayLabel = timerDisplayLabel;
     }
 }

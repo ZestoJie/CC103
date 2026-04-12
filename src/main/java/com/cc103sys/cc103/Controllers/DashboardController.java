@@ -189,7 +189,7 @@ public class DashboardController {
         }
     }
 
-    private void loadTasks() {
+    private void loadTasks() throws Exception {
         tasks.clear();
 
         try {
@@ -228,7 +228,7 @@ public class DashboardController {
                 updateDailyGoalProgress();
             }
             LOGGER.info(() -> "Loaded " + tasks.size() + " tasks");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
         }
     }
@@ -348,9 +348,9 @@ public class DashboardController {
                     try {
                         playAddTaskAnimation();
                     } catch (Exception e) {
-                        LOGGER.warning("Error playing animation: " + e.getMessage());
+                        LOGGER.warning(() -> "Error playing animation: " + e.getMessage());
                     }
-                    LOGGER.info("Class task created and assigned: " + taskName);
+                    LOGGER.info(() -> "Class task created and assigned: " + taskName);
                     return;
                 } catch (SQLException e) {
                     LOGGER.severe(() -> "Failed to create task: " + e.getMessage());
@@ -388,7 +388,7 @@ public class DashboardController {
             }
             LOGGER.info(() -> "Personal task created: " + taskName);
         } catch (SQLException e) {
-            LOGGER.severe("Failed to create personal task: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to create personal task: " + e.getMessage());
         }
     }
 

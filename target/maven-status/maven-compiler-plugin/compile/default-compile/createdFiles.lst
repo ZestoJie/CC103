@@ -2,6 +2,7 @@ com\cc103sys\cc103\Controllers\LoginController.class
 com\cc103sys\cc103\Controllers\TimerController.class
 com\cc103sys\cc103\Models\LeaderboardRow.class
 com\cc103sys\cc103\Controllers\ClassDetailController.class
+com\cc103sys\cc103\Controllers\DashboardController.class
 com\cc103sys\cc103\Controllers\RegisterController.class
 com\cc103sys\cc103\Controllers\DashboardController$1.class
 com\cc103sys\cc103\Controllers\ClassesController$ClassListCell.class
@@ -22,4 +23,5 @@ com\cc103sys\cc103\Models\UserRank.class
 com\cc103sys\cc103\DB\DBUtil.class
 com\cc103sys\cc103\Controllers\ClassesController.class
 com\cc103sys\cc103\Controllers\TaskController$1.class
+com\cc103sys\cc103\Controllers\TaskController.class
 com\cc103sys\cc103\Controllers\LeaderboardController.class

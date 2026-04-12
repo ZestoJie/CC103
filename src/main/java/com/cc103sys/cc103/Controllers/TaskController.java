@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,7 +83,7 @@ public class TaskController {
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         setupRoleBasedUI();
         setupTaskListView();
         setupTimerDropdown();
@@ -290,7 +291,7 @@ public class TaskController {
         return basePoints;
     }
 
-    private void reloadTaskLists() {
+    private void reloadTaskLists() throws Exception {
         loadAllClassTasks();
         loadFilteredTasks();
     }
@@ -313,7 +314,13 @@ public class TaskController {
 
             if (classFilterComboBox != null) {
                 classFilterComboBox.setItems(userClasses);
-                classFilterComboBox.setOnAction(e -> loadFilteredTasks());
+                classFilterComboBox.setOnAction(e -> {
+                    try {
+                        loadFilteredTasks();
+                    } catch (Exception e1) {
+
+                    }
+                });
                 if (!userClasses.isEmpty()) {
                     classFilterComboBox.getSelectionModel().selectFirst();
                 }
@@ -325,7 +332,7 @@ public class TaskController {
         }
     }
 
-    private void loadAllClassTasks() {
+    private void loadAllClassTasks() throws Exception {
         allTasks.clear();
         
         try {
@@ -349,7 +356,6 @@ public class TaskController {
                 stmt.setInt(1, userId);
                 LOGGER.info(() -> "Executing SQL: " + sql.replace("?", userId.toString()));
                 try (ResultSet rs = stmt.executeQuery()) {
-                    int count = 0;
                     while (rs.next()) {
                         int classId = rs.getInt("class_id");
                         String className = rs.getString("class_name");
@@ -370,7 +376,7 @@ public class TaskController {
                     LOGGER.info(() -> "Total tasks loaded: " + allTasks.size());
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
         }
     }
@@ -380,7 +386,7 @@ public class TaskController {
         return String.format("%s - %s%s (%s)", task.getTaskName(), task.getStatus(), classSuffix, task.getDate());
     }
 
-    private void loadFilteredTasks() {
+    private void loadFilteredTasks() throws Exception {
         filteredTasks.clear();
         Classes selected = classFilterComboBox == null ? null : classFilterComboBox.getValue();
         if (selected == null) {
@@ -417,7 +423,7 @@ public class TaskController {
                 }
             }
             LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected.getClassName()));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to load filtered tasks: " + e.getMessage());
         }
     }

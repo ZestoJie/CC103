@@ -39,7 +39,7 @@
                             <VBox spacing="30" maxWidth="900" HBox.hgrow="ALWAYS" fillWidth="true">
                                 
                                 <!-- CARD 1: Player Profile -->
-                                <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                <VBox spacing="25" style="-fx-background-color: #cbcbec; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(12, 11, 11, 0.08), 20, 0, 0, 6);">
                                     <children>
                                         <Label text="Player Profile" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
                                         
@@ -57,7 +57,7 @@
                                                     <children>
                                                         <Button fx:id="uploadPictureButton" text="Upload New Avatar" onAction="#handleUploadPicture" 
                                                                 style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12px 30px; -fx-font-size: 14; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                                        <Label text="JPG or PNG. Max 5MB." style="-fx-font-size: 13; -fx-text-fill: #95a5a6;" />
+                                                        <Label text="JPG or PNG. Max 5MB." style="-fx-font-size: 13; -fx-text-fill: #525a5a;" />
                                                     </children>
                                                 </VBox>
                                             </children>
@@ -110,14 +110,14 @@
                                 </VBox>
                                 
                                 <!-- CARD 2: System Preferences -->
-                                <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                <VBox spacing="20" style="-fx-background-color: #cbcbec; -fx-padding: 35; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
                                     <children>
-                                        <Label text="System Preferences" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                        <Label text="System Preferences" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #303336;" />
                                         
                                         <!-- Enable Music -->
                                         <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
                                             <children>
-                                                <Label text="Background Music" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
+                                                <Label text="Background Music" style="-fx-font-size: 15; -fx-text-fill: #3d3c3c;" HBox.hgrow="ALWAYS" />
                                                 <CheckBox fx:id="enableMusicToggle" style="-fx-scale-x: 1.2; -fx-scale-y: 1.2;" />
                                             </children>
                                         </HBox>
@@ -127,7 +127,7 @@
                                         <!-- Enable SFX -->
                                         <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
                                             <children>
-                                                <Label text="Sound Effects (SFX)" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
+                                                <Label text="Sound Effects (SFX)" style="-fx-font-size: 15; -fx-text-fill: #3d3c3c;" HBox.hgrow="ALWAYS" />
                                                 <CheckBox fx:id="enableSFXToggle" style="-fx-scale-x: 1.2; -fx-scale-y: 1.2;" />
                                             </children>
                                         </HBox>

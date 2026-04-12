@@ -1,0 +1,183 @@
+/* ROOT BACKGROUND */
+.root {
+    -fx-view-order: -1;
+    -fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);
+    background-color: linear-gradient(to bottom right, #0f172a, #1e293b);
+    -fx-font-family: "Segoe UI", sans-serif;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* PAGE TITLE */
+.page-title {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 26px;
+    font-size: 26px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 0 0 20 0;
+    padding: 0 0 20 0;
+}
+
+/* GENERAL CARD */
+.card {
+    -fx-background-color: rgba(255,255,255,0.05);
+    background-color: rgba(255,255,255,0.05);
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.2, 0, 4);
+
+    /* smooth hover animation feel */
+    -fx-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    -fx-background-color: rgba(255,255,255,0.08);
+    background-color: rgba(255,255,255,0.08);
+    -fx-translate-y: -2;
+}
+
+/* TITLES */
+.card-title {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.subtitle {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    font-size: 13px;
+}
+
+.section-title {
+    -fx-text-fill: #cbd5f5;
+    -fx-font-size: 15px;
+    font-size: 15px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+
+
+.text-field:focused, .date-picker:focused, .combo-box:focused {
+    -fx-border-color: #6366f1;
+    border-color: #6366f1;
+    -fx-border-width: 1.5;
+    border-width: 1.5;
+}
+
+/* BUTTONS */
+.button {
+    -fx-background-color: linear-gradient(to right, #6366f1, #8b5cf6);
+    background-color: linear-gradient(to right, #6366f1, #8b5cf6);
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-padding: 8 15;
+    padding: 8 15;
+
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.4), 10, 0.3, 0, 2);
+}
+
+/* BUTTON HOVER ANIMATION */
+.button:hover {
+    -fx-background-color: linear-gradient(to right, #7c83ff, #a78bfa);
+    background-color: linear-gradient(to right, #7c83ff, #a78bfa);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+.text-field {
+    -fx-pref-width: 250;
+}
+
+.date-picker {
+    -fx-pref-width: 180;
+}
+
+.button {
+    -fx-pref-width: 120;
+}
+
+
+/* SUCCESS BUTTON */
+.success-btn {
+    -fx-background-color: linear-gradient(to right, #22c55e, #16a34a);
+    background-color: linear-gradient(to right, #22c55e, #16a34a);
+}
+
+.success-btn:hover {
+    -fx-background-color: linear-gradient(to right, #4ade80, #22c55e);
+    background-color: linear-gradient(to right, #4ade80, #22c55e);
+}
+
+/* DANGER BUTTON */
+.danger-btn {
+    -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
+    background-color: linear-gradient(to right, #ef4444, #dc2626);
+}
+
+.danger-btn:hover {
+    -fx-background-color: linear-gradient(to right, #f87171, #ef4444);
+    background-color: linear-gradient(to right, #f87171, #ef4444);
+}
+
+/* LIST VIEW */
+.list-view {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-border-color: transparent;
+    border-color: transparent;
+}
+
+/* LIST CELLS */
+.list-cell {
+    -fx-background-color: rgba(255,255,255,0.05);
+    background-color: rgba(255,255,255,0.05);
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    padding: 10;
+    -fx-margin: 5;
+    margin: 5;
+
+    -fx-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.list-cell:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.1);
+    -fx-translate-x: 3;
+}
+
+/* SELECTED CELL */
+.list-cell:selected {
+    -fx-background-color: linear-gradient(to right, #6366f1, #8b5cf6);
+    background-color: linear-gradient(to right, #6366f1, #8b5cf6);
+}
+
+/* SCROLL CLEAN */
+.scroll-clean {
+    -fx-background: transparent;
+    background: transparent;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255,255,255,0.2);
+    -fx-background-radius: 10;
+}

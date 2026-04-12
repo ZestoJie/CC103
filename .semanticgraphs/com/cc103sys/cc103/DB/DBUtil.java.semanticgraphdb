@@ -1,0 +1,66 @@
+
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.javaŸ
+com.cc103sys.cc103.DB.DBUtilCLASS9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (" 
+packagecom.cc103sys.cc103.DB"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"d
+declarationStringO<mark class="modifier">public </mark><mark class="modifier">class </mark>DBUtil"
+accesspublic*DBUtil2v
+,com.cc103sys.cc103.DB.DBUtil.getConnection()DECLARATION9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (*2t
+*com.cc103sys.cc103.DB.DBUtil?URL@7.32:7.35DECLARATION9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java  (#2u
++com.cc103sys.cc103.DB.DBUtil?USER@8.32:8.36DECLARATION9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java  ($2y
+/com.cc103sys.cc103.DB.DBUtil?PASSWORD@9.32:9.40DECLARATION9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java	  	((—
+,com.cc103sys.cc103.DB.DBUtil.getConnection()METHOD9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (*"
+isFinalfalse"ã
+declarationStringÍ<mark class="modifier">public </mark><mark class="modifier">static </mark>Connection <mark class="method">getConnection</mark>()<mark class="modifier"> <mark class="modifier">throws</mark> </mark>Exception"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+type
+Connection*getConnection2
+Zjava.sql.DriverManager.getConnection(java.lang.String, java.lang.String, java.lang.String)CALL9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (*2m
+*com.cc103sys.cc103.DB.DBUtil?URL@7.32:7.35CALL9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java+ (.2n
++com.cc103sys.cc103.DB.DBUtil?USER@8.32:8.36CALL9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java0 (42r
+/com.cc103sys.cc103.DB.DBUtil?PASSWORD@9.32:9.40CALL9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java6 (>2]
+java.sql.ConnectionRETURN_TYPE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (°
+*com.cc103sys.cc103.DB.DBUtil?URL@7.32:7.35VALUE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java  (#"
+isFinaltrue"
+typeString"Ÿ
+declarationString‰<mark class="modifier">private </mark><mark class="modifier">static </mark><mark class="modifier">final </mark>String <mark class="class-field">URL</mark> = "jdbc:mysql://localhost:3306/cc103?allowPublicKeyRetrieval=true&useSSL=<mark class="modifier">false</mark>";"
+isStatictrue"
+accessprivate*URL2S
+java.lang.StringTYPE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (Î
++com.cc103sys.cc103.DB.DBUtil?USER@8.32:8.36VALUE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java  ($"
+isFinaltrue"
+typeString"»
+declarationString¥<mark class="modifier">private </mark><mark class="modifier">static </mark><mark class="modifier">final </mark>String <mark class="class-field">USER</mark> = "root";"
+isStatictrue"
+accessprivate*USER2S
+java.lang.StringTYPE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java (ƒ
+/com.cc103sys.cc103.DB.DBUtil?PASSWORD@9.32:9.40VALUE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java	  	(("
+isFinaltrue"
+typeString"è
+declarationStringÒ<mark class="modifier">private </mark><mark class="modifier">static </mark><mark class="modifier">final </mark>String <mark class="class-field">PASSWORD</mark> = "Databasecc103.javafxmavenarchetype.sysproject";"
+isStatictrue"
+accessprivate*PASSWORD2S
+java.lang.StringTYPE9
+/src\main\java\com\cc103sys\cc103\DB\DBUtil.java	 	(

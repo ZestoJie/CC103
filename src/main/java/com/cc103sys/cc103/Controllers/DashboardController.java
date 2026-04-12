@@ -1,0 +1,821 @@
+
+package com.cc103sys.cc103.Controllers;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.logging.Logger;
+
+import com.cc103sys.cc103.DB.DBUtil;
+import com.cc103sys.cc103.Models.Classes;
+import com.cc103sys.cc103.Models.Task;
+import com.cc103sys.cc103.Models.UserRank;
+import com.cc103sys.cc103.Utils.Navigator;
+import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
+
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.util.Duration;
+
+public class DashboardController implements TimerService.TimerListener {
+    private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
+    @SuppressWarnings("unused")
+    private static final int BASE_TASK_POINTS = 10;
+    @FXML private ComboBox<Classes> classSelector;
+    @FXML private Label welcomeLabel;
+
+    @FXML private TextField taskField;
+    @FXML private DatePicker taskDate;
+    @FXML private Button addTaskButton;
+    @FXML private HBox addTaskFooter;
+    @FXML private ListView<Task> taskList;
+    @FXML private Label timerLabel;
+    @FXML private Label timerMultiplierLabel;
+    @FXML private ListView<UserRank> leaderboardPreview;
+    @FXML private ComboBox<String> timerPreset;
+    @FXML private Button timerStartButton;
+    @FXML private Button timerPauseButton;
+    @FXML private RadioButton studyModeRadio;
+    @FXML private RadioButton breakModeRadio;
+    @FXML private CheckBox xpActiveCheckbox;
+    @FXML private ProgressBar dailyProgressBar;
+    @FXML private Label dailyGoalSummary;
+    @FXML private Label dailyGoalTip;
+    @FXML private TextField customTimeField;
+
+    private TimerService timerService;
+    private final ObservableList<Task> tasks = FXCollections.observableArrayList();
+    private Task selectedTask;
+
+    @FXML
+    public void initialize() {
+        try {
+            timerService = TimerService.getInstance();
+            timerService.removeTimerListener(this);
+            timerService.addTimerListener(this);
+
+            setupWelcomeMessage();
+            setupTaskListView();
+            setupTimerPresets();
+            setupRoleBasedUI();
+            loadTasks();
+            checkMissedTasks();
+            loadUserClassesForLeaderboard();
+            
+            if (classSelector != null) {
+                classSelector.setOnAction(e -> {
+                    try {
+                        selectedTask = null;
+                        updateTimerAvailability();
+                        loadLeaderboardPreviewForClass();
+                    } catch (Exception e1) {
+                    }
+                
+            if (taskList != null) animate(taskList);
+            if (leaderboardPreview != null) animate(leaderboardPreview);
+
+            if (timerPauseButton != null)
+                timerPauseButton.setDisable(true);});
+            }
+
+            if (timerPauseButton != null) {
+                timerPauseButton.setDisable(true);
+            }
+            if (xpActiveCheckbox != null) {
+                xpActiveCheckbox.setSelected(true);
+            }
+
+            updateTimerAvailability();
+
+            NavbarController.getInstance().setActive("dashboard");
+            
+            // Sync timer display and multiplier
+            updateTimerLabel();
+
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Init error: " + e.getMessage());
+        }
+    }
+    
+    private void animate(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(400), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(400), node);
+    slide.setFromY(10);
+    slide.setToY(0);
+
+    new ParallelTransition(fade, slide).play();
+}
+    
+
+    private void setupRoleBasedUI() {
+        boolean isHost = Session.isHost();
+        if (taskField != null) taskField.setVisible(isHost);
+        if (taskDate != null) taskDate.setVisible(isHost);
+        if (addTaskButton != null) addTaskButton.setVisible(isHost);
+        if (addTaskFooter != null) addTaskFooter.setVisible(isHost);
+    }
+
+    private void setupWelcomeMessage() {
+        String username = Session.getUsername();
+        if (username != null && welcomeLabel != null) {
+            welcomeLabel.setText("Welcome, " + username + "!");
+        }
+    }
+
+    private void setupTaskListView() {
+        if (taskList != null) {
+            taskList.setItems(tasks);
+            taskList.setCellFactory(param -> new ListCell<Task>() {
+                @Override
+                protected void updateItem(Task task, boolean empty) {
+                    super.updateItem(task, empty);
+                    if (empty || task == null) {
+                        setText(null);
+                    } else {
+                        String classLabel = task.getClassName() != null ? "[" + task.getClassName() + "] " : "";
+                        setText(String.format("%s%s | %s | %s", 
+                            classLabel,
+                            task.getTaskName(), 
+                            task.getDate(), 
+                            task.getStatus()));
+                    }
+                }
+            });
+            taskList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                selectedTask = newSelection;
+                updateTimerAvailability();
+            });
+        }
+    }
+
+    private void updateTimerAvailability() {
+        boolean canStartTimer = selectedTask != null && !"Done".equals(selectedTask.getStatus()) && !"completed".equals(selectedTask.getStatus()) && !"missed".equals(selectedTask.getStatus());
+        if (timerStartButton != null) {
+            timerStartButton.setDisable(!canStartTimer);
+        }
+        if (timerPreset != null) {
+            timerPreset.setDisable(!canStartTimer);
+        }
+        if (customTimeField != null) {
+            customTimeField.setDisable(!canStartTimer);
+        }
+    }
+
+    private void updateTaskStatus(int taskId, String status) {
+        String sql = "UPDATE tasks SET status = ? WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, taskId);
+            stmt.executeUpdate();
+            selectedTask.setStatus(status);
+            taskList.refresh();
+            LOGGER.info(() -> "Task " + taskId + " status updated to: " + status);
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to update task status: " + e.getMessage());
+        }
+    }
+
+    private void setupTimerPresets() {
+        if (timerPreset != null) {
+            timerPreset.getItems().addAll(
+                "1 Minute", "5 Minutes", "10 Minutes", "15 Minutes", "25 Minutes", "45 Minutes", "1 Hour", "Custom"
+            );
+            timerPreset.setValue("25 Minutes");
+            timerPreset.setOnAction(e -> handleTimerPresetChange());
+        }
+    }
+
+    private void handleTimerPresetChange() {
+        if ("Custom".equals(timerPreset.getValue()) && customTimeField != null) {
+            customTimeField.setVisible(true);
+            customTimeField.setManaged(true);
+        } else if (customTimeField != null) {
+            customTimeField.setVisible(false);
+            customTimeField.setManaged(false);
+        }
+    }
+
+    private void loadTasks() throws Exception {
+        tasks.clear();
+
+        try {
+            Integer userId = getCurrentUserId();
+            if (userId == null) {
+                LOGGER.warning("Could not determine current user ID");
+                return;
+            }
+
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name "
+                       + "FROM tasks t "
+                       + "LEFT JOIN classes c ON t.class_id = c.id "
+                       + "WHERE t.user_id = ? "
+                       + "ORDER BY t.task_date DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        int classId = rs.getInt("class_id");
+                        String className = rs.getString("class_name");
+                        
+                        tasks.add(new Task(
+                            rs.getInt("id"),
+                            rs.getString("task_name"),
+                            rs.getDate("task_date").toLocalDate(),
+                            rs.getString("status"),
+                            classId > 0 ? classId : null,
+                            className != null && !className.isEmpty() ? className : null
+                        ));
+                    }
+                }
+            }
+            if (dailyGoalSummary != null) {
+                updateDailyGoalProgress();
+            }
+            LOGGER.info(() -> "Loaded " + tasks.size() + " tasks");
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
+        }
+    }
+
+    private void checkMissedTasks() {
+        String sql = "UPDATE tasks SET status = 'missed' WHERE username = ? AND status NOT IN ('Done', 'completed', 'missed') AND task_date < CURDATE()";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            int updated = stmt.executeUpdate();
+            if (updated > 0) {
+                LOGGER.info(() -> "Marked " + updated + " tasks as missed");
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to check missed tasks: " + e.getMessage());
+        }
+    }
+
+    private void updateDailyGoalProgress() {
+        int total = 0;
+        int completed = 0;
+        String sql = "SELECT SUM(CASE WHEN status IN ('Done','completed') THEN 1 ELSE 0 END) AS completed, "
+                   + "COUNT(*) AS total FROM tasks WHERE username = ? AND task_date = CURDATE()";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    completed = rs.getInt("completed");
+                    total = rs.getInt("total");
+                }
+            }
+
+            double progress = total == 0 ? 0.0 : completed / (double) total;
+            if (dailyProgressBar != null) {
+                dailyProgressBar.setProgress(progress);
+            }
+            if (dailyGoalSummary != null) {
+                if (total == 0) {
+                    dailyGoalSummary.setText("No tasks are due today. Add a task to start your daily goal.");
+                } else {
+                    dailyGoalSummary.setText(String.format("%d of %d tasks completed today", completed, total));
+                }
+            }
+            if (dailyGoalTip != null) {
+                dailyGoalTip.setText(total == 0 ? "Try adding a new task and complete it today." : "Keep going — every completed task increases your XP.");
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to update daily goal progress: " + e.getMessage());
+        }
+    }
+
+    private void loadUserClassesForLeaderboard() {
+        ObservableList<Classes> userClasses = FXCollections.observableArrayList();
+        String sql = "SELECT DISTINCT c.id, c.class_name FROM classes c "
+                   + "JOIN user_classes uc ON c.id = uc.class_id "
+                   + "JOIN users u ON uc.user_id = u.id "
+                   + "WHERE u.username = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    userClasses.add(new Classes(rs.getInt("id"), rs.getString("class_name")));
+                }
+            }
+
+            if (classSelector != null) {
+                classSelector.setItems(userClasses);
+                classSelector.setOnAction(e -> {
+                    try {
+                        loadLeaderboardPreviewForClass();
+                    } catch (Exception e1) {
+                    }
+                });
+
+                if (!userClasses.isEmpty()) {
+                    classSelector.setValue(userClasses.get(0));
+                    loadLeaderboardPreviewForClass();
+                }
+            }
+            LOGGER.info(() -> "Loaded " + userClasses.size() + " user classes");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to load user classes: " + e.getMessage());
+        }
+
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleAddTask() throws Exception {
+        String taskName = taskField.getText().trim();
+        LocalDate date = taskDate.getValue();
+
+        if (!validateTaskInput(taskName, date)) {
+            return;
+        }
+
+        // If user is a host and has selected a class, create a class task
+        if (Session.isHost()) {
+            Classes selectedClass = classSelector == null ? null : classSelector.getValue();
+            if (selectedClass != null && isCurrentUserClassOwner(selectedClass.getId())) {
+                try {
+                    int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
+                    if (classTaskId <= 0) {
+                        LOGGER.severe(() -> "Failed to create class task for " + taskName);
+                        return;
+                    }
+
+                    assignClassTaskToMembers(classTaskId, selectedClass.getId());
+                    taskField.clear();
+                    taskDate.setValue(null);
+                    loadTasks();
+                    loadLeaderboardPreviewForClass();
+                    try {
+                        playAddTaskAnimation();
+                    } catch (Exception e) {
+                        LOGGER.warning(() -> "Error playing animation: " + e.getMessage());
+                    }
+                    LOGGER.info(() -> "Class task created and assigned: " + taskName);
+                    return;
+                } catch (SQLException e) {
+                    LOGGER.severe(() -> "Failed to create task: " + e.getMessage());
+                    return;
+                }
+            }
+        }
+
+        // Otherwise, create a personal task for anyone (participants and hosts without selected class)
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            
+            // Get user ID
+            Integer userId = getCurrentUserId();
+            if (userId != null) {
+                stmt.setInt(2, userId);
+            } else {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            }
+            
+            stmt.setString(3, taskName);
+            stmt.setDate(4, Date.valueOf(date));
+            stmt.executeUpdate();
+
+            taskField.clear();
+            taskDate.setValue(null);
+            loadTasks();
+            try {
+                playAddTaskAnimation();
+            } catch (Exception e) {
+                LOGGER.warning(() -> "Error playing animation: " + e.getMessage());
+            }
+            LOGGER.info(() -> "Personal task created: " + taskName);
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to create personal task: " + e.getMessage());
+        }
+    }
+
+    private boolean isCurrentUserClassOwner(int classId) {
+        Integer ownerId = null;
+        Integer currentUserId = getCurrentUserId();
+        if (currentUserId == null) {
+            return false;
+        }
+
+        String sql = "SELECT owner_id FROM classes WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, classId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ownerId = rs.getInt("owner_id");
+                    if (rs.wasNull()) {
+                        return false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to check class owner: " + e.getMessage());
+            return false;
+        }
+
+        return currentUserId.equals(ownerId);
+    }
+
+    private Integer getCurrentUserId() {
+        String sql = "SELECT id FROM users WHERE username = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to get current user id: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private int createClassTask(int classId, String taskName, LocalDate date) throws Exception {
+        Integer ownerId = getCurrentUserId();
+        if (ownerId == null) {
+            throw new SQLException("Unable to determine current user.");
+        }
+
+        String sql = "INSERT INTO class_tasks (class_id, task_name, description, due_date, owner_id) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, classId);
+            stmt.setString(2, taskName);
+            stmt.setString(3, null); // description - null for now
+            stmt.setDate(4, Date.valueOf(date));
+            stmt.setInt(5, ownerId);
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return -1;
+    }
+
+    private void assignClassTaskToMembers(int classTaskId, @SuppressWarnings("unused") int classId) {
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
+                   + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
+                   + "FROM class_tasks ct "
+                   + "JOIN user_classes uc ON ct.class_id = uc.class_id "
+                   + "JOIN users u ON uc.user_id = u.id "
+                   + "WHERE ct.id = ? "
+                   + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, classTaskId);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to assign class task to members: " + e.getMessage());
+        }
+    }
+
+    private void loadLeaderboardPreviewForClass() throws Exception {
+        try {
+            Classes selectedClass = classSelector.getValue();
+            if (selectedClass == null) {
+                LOGGER.warning("No class selected for leaderboard");
+                return;
+            }
+
+            ObservableList<UserRank> data = FXCollections.observableArrayList();
+            String sql = "SELECT u.username, u.points FROM users u "
+                       + "JOIN user_classes uc ON u.id = uc.user_id "
+                       + "WHERE uc.class_id = ? ORDER BY u.points DESC LIMIT 5";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, selectedClass.getId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        data.add(new UserRank(rs.getString("username"), rs.getInt("points")));
+                    }
+                }
+
+                if (leaderboardPreview != null) {
+                    leaderboardPreview.setItems(data);
+                    leaderboardPreview.setCellFactory(param -> new ListCell<UserRank>() {
+                        @Override
+                        protected void updateItem(UserRank item, boolean empty) {
+                            super.updateItem(item, empty);
+                            setText(empty || item == null ? null : 
+                                item.getUsername() + " - " + item.getPoints() + " pts");
+                        }
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to load leaderboard preview: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void openLeaderboardScene() {
+        try {
+            Classes selectedClass = classSelector.getValue();
+            if (selectedClass == null) {
+                LOGGER.warning("No class selected for leaderboard");
+                return;
+            }
+            Session.setCurrentClassId(selectedClass.getId());
+            Navigator.switchScene("Leaderboard");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to open leaderboard: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleStartTimer() {
+        try {
+            if (selectedTask == null) {
+                LOGGER.warning("No task selected for timer");
+                return;
+            }
+
+            if ("Done".equals(selectedTask.getStatus()) || "completed".equals(selectedTask.getStatus()) || "missed".equals(selectedTask.getStatus())) {
+                LOGGER.warning("Cannot start timer for completed or missed task");
+                return;
+            }
+
+            // If timer is paused, resume it
+            if (timerService.isRunning() && timerService.isPaused()) {
+                timerService.resume();
+                return;
+            }
+
+            String selected = timerPreset.getValue();
+            if (selected == null || selected.isBlank()) {
+                LOGGER.warning("No timer preset selected");
+                return;
+            }
+
+            int seconds;
+            if ("Custom".equals(selected)) {
+                if (customTimeField == null || customTimeField.getText().isBlank()) {
+                    LOGGER.warning("Custom time not specified");
+                    return;
+                }
+                try {
+                    int minutes = Integer.parseInt(customTimeField.getText().trim());
+                    if (minutes <= 0 || minutes > 480) { // Max 8 hours
+                        LOGGER.warning(() -> "Invalid custom time: " + minutes);
+                        return;
+                    }
+                    seconds = minutes * 60;
+                } catch (NumberFormatException e) {
+                    LOGGER.warning("Invalid custom time format");
+                    return;
+                }
+            } else {
+                seconds = convertToSeconds(selected);
+            }
+
+            // Mark task as in progress
+            updateTaskStatus(selectedTask.getId(), "in progress");
+
+            // Start timer using TimerService (runs in background)
+            boolean xpEnabled = xpActiveCheckbox != null && xpActiveCheckbox.isSelected();
+            timerService.start(seconds, selectedTask.getId(), xpEnabled);
+            
+            if (timerStartButton != null) {
+                timerStartButton.setText("Restart");
+            }
+            if (timerPauseButton != null) {
+                timerPauseButton.setDisable(false);
+                timerPauseButton.setText("Pause");
+            }
+            LOGGER.info(() -> "Timer started for task: " + selectedTask.getTaskName() + " (" + seconds + " seconds)");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to start timer: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handlePauseTimer() {
+        if (!timerService.isRunning()) {
+            return;
+        }
+        if (timerService.isPaused()) {
+            timerService.resume();
+            if (timerPauseButton != null) {
+                timerPauseButton.setText("Pause");
+            }
+        } else {
+            timerService.pause();
+            if (timerPauseButton != null) {
+                timerPauseButton.setText("Resume");
+            }
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleModeChange(ActionEvent event) {
+        if (studyModeRadio != null && studyModeRadio.isSelected()) {
+            timerPreset.getItems().setAll("25 Minutes", "45 Minutes", "1 Hour");
+        } else if (breakModeRadio != null && breakModeRadio.isSelected()) {
+            timerPreset.getItems().setAll("5 Minutes", "10 Minutes", "15 Minutes");
+        }
+        if (timerPreset != null && !timerPreset.getItems().isEmpty()) {
+            timerPreset.setValue(timerPreset.getItems().get(0));
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void updateXpStatus() {
+        // This is intentionally lightweight; XP activation is controlled by the checkbox state.
+    }
+
+    // OLD TIMER METHODS COMMENTED OUT - Now using TimerService for background timer
+    // private void startCountdown() { }
+    // private void pauseTimer() { }
+    // private void resumeTimer() { }
+    // private void timerCompleted() { }
+    // private void stopTimer() { }
+    @SuppressWarnings("unused")
+    private void animateCard(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    ScaleTransition scale = new ScaleTransition(Duration.millis(500), node);
+    scale.setFromX(0.95);
+    scale.setFromY(0.95);
+    scale.setToX(1);
+    scale.setToY(1);
+
+    new ParallelTransition(fade, scale).play();
+}   
+
+    @SuppressWarnings("unused")
+    private int calculateMultiplier(int minutes) {
+        if (minutes <= 5) return 3; // Shorter sessions get higher reward
+        if (minutes <= 15) return 2;
+        if (minutes <= 30) return 2; // 1.5x rounded up
+        if (minutes <= 60) return 1;
+        return 1;
+    }
+
+    @SuppressWarnings("unused")
+    private void awardTimerXp(int points) {
+        String sql = "UPDATE users SET points = points + ? WHERE username = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, points);
+            stmt.setString(2, Session.getUsername());
+            stmt.executeUpdate();
+            Session.setPoints(Session.getPoints() + points);
+            refreshNavbarPoints();
+            LOGGER.info(() -> "Timer XP awarded: " + points);
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to award timer XP: " + e.getMessage());
+        }
+    }
+
+    private void refreshNavbarPoints() throws Exception {
+        if (NavbarController.getInstance() != null) {
+            NavbarController.getInstance().loadUserInfo();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void stopTimer() {
+        // Old method - commented out as TimerService.stop() is now used
+        // if (timeline != null) { timeline.stop(); }
+    }
+
+    private int convertToSeconds(String value) {
+        if (value.contains("Hour")) return 3600;
+        if (value.contains("45")) return 2700;
+        if (value.contains("25")) return 1500;
+        if (value.contains("15")) return 900;
+        if (value.contains("10")) return 600;
+        if (value.contains("5")) return 300;
+        if (value.contains("1 Minute")) return 60;
+        return 60;
+    }
+
+    private void playAddTaskAnimation() {if (taskList != null) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(200), taskList);
+        st.setFromX(0.98);
+        st.setFromY(0.98);
+        st.setToX(1);
+        st.setToY(1);
+        st.play();
+        }
+    }
+
+    private boolean validateTaskInput(String taskName, LocalDate date) {
+        if (taskName == null || taskName.isBlank()) {
+            LOGGER.warning("Task name is empty");
+            return false;
+        }
+        if (date == null) {
+            LOGGER.warning("Task date is null");
+            return false;
+        }
+        return true;
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void goSettings() {
+        try {
+            Navigator.switchScene("Settings");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void openTimerPopup() {
+        try {
+            LOGGER.info("Opening timer popup");
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to open timer popup: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+        updateTimerLabel();
+    }
+
+    @Override
+    public void onTimerCompleted() {
+        updateTimerLabel();
+    }
+
+    private void updateTimerLabel() {
+        if (timerLabel == null) {
+            return;
+        }
+
+        if (timerService.isRunning()) {
+            int remaining = timerService.getRemainingSeconds();
+            int minutes = remaining / 60;
+            int seconds = remaining % 60;
+            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+            timerLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+        } else {
+            timerLabel.setText("00:00");
+            timerLabel.setStyle("-fx-text-fill: #7f8c8d;");
+        }
+
+        if (timerMultiplierLabel != null) {
+            if (xpActiveCheckbox != null && !xpActiveCheckbox.isSelected()) {
+                timerMultiplierLabel.setText("XP Disabled");
+                timerMultiplierLabel.setStyle("-fx-text-fill: #95a5a6;");
+            } else {
+                int multiplier = timerService.getMultiplier();
+                timerMultiplierLabel.setText("Multiplier x" + multiplier);
+                timerMultiplierLabel.setStyle("-fx-text-fill: #16a085; -fx-font-weight: bold;");
+            }
+        }
+    }
+}

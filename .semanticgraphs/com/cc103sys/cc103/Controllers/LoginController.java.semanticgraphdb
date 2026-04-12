@@ -1,0 +1,185 @@
+
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.javaß	
+.com.cc103sys.cc103.Controllers.LoginControllerCLASSK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (")
+packagecom.cc103sys.cc103.Controllers"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"m
+declarationStringX<mark class="modifier">public </mark><mark class="modifier">class </mark>LoginController"
+accesspublic*LoginController2ò
+<com.cc103sys.cc103.Controllers.LoginController.handleLogin()DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2ó
+;com.cc103sys.cc103.Controllers.LoginController.goRegister()DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java6 6(2§
+Hcom.cc103sys.cc103.Controllers.LoginController?usernameField@14.28:14.41DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ()2§
+Hcom.cc103sys.cc103.Controllers.LoginController?passwordField@15.32:15.45DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java  (-2£
+Gcom.cc103sys.cc103.Controllers.LoginController?messageLabel@16.24:16.36DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ($¨$
+<com.cc103sys.cc103.Controllers.LoginController.handleLogin()METHODK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ("
+isFinalfalse"≤
+declarationStringú<mark class="annotation">@FXML</mark> <br><mark class="modifier">private </mark><mark class="modifier">void</mark> <mark class="method">handleLogin</mark>()"
+isStaticfalse"
+accessprivate"
+
+isAbstractfalse"
+typevoid*handleLogin2Å
+,com.cc103sys.cc103.DB.DBUtil.getConnection()CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% (22ï
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java* *(%2ù
+Hcom.cc103sys.cc103.Controllers.LoginController?usernameField@14.28:14.41CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ('2ù
+Hcom.cc103sys.cc103.Controllers.LoginController?passwordField@15.32:15.45CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ('2¶
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?username@21.15:21.23CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2¶
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?password@22.15:22.23CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java! ()2ú
+Gcom.cc103sys.cc103.Controllers.LoginController?messageLabel@16.24:16.36CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?conn@31.23:31.27CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java %  ()2°
+Lcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?sql@29.15:29.18CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ;  (>2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java" "(2¶
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?username@21.15:21.23CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java" "(&2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java# #(2¶
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?password@22.15:22.23CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java# #(&2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% %(2†
+Kcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?rs@37.22:37.24CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java' '(2¶
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?username@21.15:21.23CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java)$ )(,2ú
+Gcom.cc103sys.cc103.Controllers.LoginController?messageLabel@16.24:16.36CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java- -(2ü
+Jcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?e@48.26:48.27CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java1 1(2≠
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?username@21.15:21.23DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2≠
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?password@22.15:22.23DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2®
+Lcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?sql@29.15:29.18DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2©
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?conn@31.23:31.27DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2©
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java   ("2ß
+Kcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?rs@37.22:37.24DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% %(2¶
+Jcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?e@48.26:48.27DECLARATIONK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java0 0(2`
+voidRETURN_TYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (Ë
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?username@21.15:21.23VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ("
+typeString"
+isFinalfalse"~
+declarationStringi<mark class="modifier"> </mark>String <mark class="class-field">username</mark> = usernameField.getText()*username2p
+javafx.scene.control.StringTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2ù
+Hcom.cc103sys.cc103.Controllers.LoginController?usernameField@14.28:14.41CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ('Ë
+Qcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?password@22.15:22.23VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ("
+typeString"
+isFinalfalse"~
+declarationStringi<mark class="modifier"> </mark>String <mark class="class-field">password</mark> = passwordField.getText()*password2p
+javafx.scene.control.StringTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2ù
+Hcom.cc103sys.cc103.Controllers.LoginController?passwordField@15.32:15.45CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ('Ÿ
+Lcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?sql@29.15:29.18VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ("
+typeString"
+isFinalfalse"ò
+declarationStringÇ<mark class="modifier"> </mark>String <mark class="class-field">sql</mark> = "SELECT * FROM users WHERE username=? AND password=?"*sql2p
+javafx.scene.control.StringTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (ø
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?conn@31.23:31.27VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ("
+type
+Connection"
+isFinalfalse"}
+declarationStringh<mark class="modifier"> </mark>Connection <mark class="class-field">conn</mark> = DBUtil.getConnection()*conn2h
+java.sql.ConnectionTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (2Å
+,com.cc103sys.cc103.DB.DBUtil.getConnection()CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% (2û
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java   (""
+typePreparedStatement"
+isFinalfalse"à
+declarationStrings<mark class="modifier"> </mark>PreparedStatement <mark class="class-field">stmt</mark> = conn.prepareStatement(sql)*stmt2o
+java.sql.PreparedStatementTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java   (2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?conn@31.23:31.27CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java %  ()2°
+Lcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?sql@29.15:29.18CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ;  (>‘
+Kcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?rs@37.22:37.24VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% %("
+type	ResultSet"
+isFinalfalse"w
+declarationStringb<mark class="modifier"> </mark>ResultSet <mark class="class-field">rs</mark> = stmt.executeQuery()*rs2g
+java.sql.ResultSetTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% %(2¢
+Mcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?stmt@32.30:32.34CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java% %(‚
+Jcom.cc103sys.cc103.Controllers.LoginController.handleLogin()?e@48.26:48.27VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java0 0("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2s
+javafx.scene.control.ExceptionTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java0 0(ß
+;com.cc103sys.cc103.Controllers.LoginController.goRegister()METHODK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java6 6("
+isFinalfalse"±
+declarationStringõ<mark class="annotation">@FXML</mark> <br><mark class="modifier">private </mark><mark class="modifier">void</mark> <mark class="method">goRegister</mark>()"
+isStaticfalse"
+accessprivate"
+
+isAbstractfalse"
+typevoid*
+goRegister2ï
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)CALLK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java7 7(2`
+voidRETURN_TYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java6 6(Â
+Hcom.cc103sys.cc103.Controllers.LoginController?usernameField@14.28:14.41VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ()"
+isFinalfalse"
+type	TextField"s
+declarationString^<mark class="modifier">private </mark>TextField <mark class="class-field">usernameField</mark>"
+isStaticfalse"
+accessprivate*usernameField2s
+javafx.scene.control.TextFieldTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (Ò
+Hcom.cc103sys.cc103.Controllers.LoginController?passwordField@15.32:15.45VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java  (-"
+isFinalfalse"
+typePasswordField"w
+declarationStringb<mark class="modifier">private </mark>PasswordField <mark class="class-field">passwordField</mark>"
+isStaticfalse"
+accessprivate*passwordField2w
+"javafx.scene.control.PasswordFieldTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (÷
+Gcom.cc103sys.cc103.Controllers.LoginController?messageLabel@16.24:16.36VARIABLEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java ($"
+isFinalfalse"
+typeLabel"n
+declarationStringY<mark class="modifier">private </mark>Label <mark class="class-field">messageLabel</mark>"
+isStaticfalse"
+accessprivate*messageLabel2o
+javafx.scene.control.LabelTYPEK
+Asrc\main\java\com\cc103sys\cc103\Controllers\LoginController.java (

@@ -1,23 +1,23 @@
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Utils\Session.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\Task.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\RegisterController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\App.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\ClassDetailController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\TaskController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\LeaderboardController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\SettingsController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\TimerController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Utils\ResourceLoader.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\ClassItem.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\LoginController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\ClassesController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\LeaderboardRow.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Utils\CredentialsManager.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\Classes.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\ClassTask.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\DashboardController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Models\UserRank.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Utils\TimerService.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Controllers\NavbarController.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\DB\DBUtil.java
-C:\Users\rhejie carl\OneDrive\Documents\NetBeansProjects\CC103_Client\src\main\java\com\cc103sys\cc103\Utils\Navigator.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\ClassItem.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\ClassTask.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\ClassDetailController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\UserRank.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Utils\Navigator.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\App.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\NavbarController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\TaskController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\DB\DBUtil.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Utils\ResourceLoader.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\ClassesController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Utils\TimerService.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\LeaderboardRow.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\Task.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Utils\Session.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\LeaderboardController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Utils\CredentialsManager.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\DashboardController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\RegisterController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Models\Classes.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\SettingsController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\LoginController.java
+C:\Codes\System\CC103\src\main\java\com\cc103sys\cc103\Controllers\TimerController.java

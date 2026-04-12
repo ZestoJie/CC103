@@ -95,7 +95,7 @@
                                                                 text="Upload"
                                                                 onAction="#handleUploadAttachment"/>
 
-                                                        <Label fx:id="timerDisplayLabel" text="00:00"/>
+                                                                                                                                <Label fx:id="timerDisplayLabel" text="00:00"/>
 
                                                         <ComboBox fx:id="timerDuration"/>
 

@@ -91,18 +91,19 @@ public class DashboardController implements TimerService.TimerListener {
                         updateTimerAvailability();
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
+                        LOGGER.severe(() -> "Error selecting class: " + e1.getMessage());
                     }
-                
+                });
+            }
+
+            // FIX: Moved these OUTSIDE the classSelector listener
             if (taskList != null) animate(taskList);
             if (leaderboardPreview != null) animate(leaderboardPreview);
-
-            if (timerPauseButton != null)
-                timerPauseButton.setDisable(true);});
-            }
 
             if (timerPauseButton != null) {
                 timerPauseButton.setDisable(true);
             }
+            
             if (xpActiveCheckbox != null) {
                 xpActiveCheckbox.setSelected(true);
             }

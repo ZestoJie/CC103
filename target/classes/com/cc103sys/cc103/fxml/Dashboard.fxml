@@ -71,13 +71,13 @@
                                               style="-fx-background-color: transparent; -fx-border-color: transparent;" />
                                             
                                     <!-- Add Task Footer (Host Only) -->
-                                    <HBox fx:id="addTaskFooter" spacing="10" alignment="CENTER_LEFT" style="-fx-padding-top: 15;">
+                                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding-top: 15;">
                                         <children>
                                             <TextField fx:id="taskField" promptText="New Task Name" HBox.hgrow="ALWAYS" 
                                                        style="-fx-padding: 10; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8;" />
                                             <DatePicker fx:id="taskDate" promptText="Due Date" 
                                                         style="-fx-padding: 8; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8;" />
-                                            <Button fx:id="addTaskButton" text="Add" onAction="#handleAddTask" 
+                                            <Button text="Add" onAction="#handleAddTask" 
                                                     style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 20; -fx-font-weight: bold; -fx-cursor: hand;" />
                                         </children>
                                     </HBox>
@@ -101,12 +101,10 @@
                                     </HBox>
                                     
                                     <!-- Display -->
-                                    <VBox alignment="CENTER" spacing="8" style="-fx-padding: 10 0;">
+                                    <HBox alignment="CENTER" style="-fx-padding: 10 0;">
                                         <Label fx:id="timerLabel" text="00:00" 
                                                style="-fx-font-size: 40; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Monospaced';" />
-                                        <Label fx:id="timerMultiplierLabel" text="Multiplier x1"
-                                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #16a085; -fx-font-family: 'Monospaced';" />
-                                    </VBox>
+                                    </HBox>
                                     
                                     <!-- Controls -->
                                     <VBox spacing="10">

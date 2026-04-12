@@ -13,7 +13,7 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
 
         Scene scene = new Scene(ResourceLoader.loadFXML("Login"), 1440, 720);
-        scene.getStylesheets().add(getClass().getResource("/css/task.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
         Navigator.setScene(scene);
 
         stage.setTitle("CC103 Task Manager");

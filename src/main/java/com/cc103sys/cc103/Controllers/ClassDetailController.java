@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
@@ -38,8 +39,6 @@ public class ClassDetailController {
     @FXML private DatePicker taskDueDatePicker;
     @FXML private Button submitTaskButton;
     @FXML private Button cancelEditButton;
-    @FXML private Button editTaskButton;
-    @FXML private Button deleteTaskButton;
 
     private int currentClassId = -1;
     private ClassTask editingTask = null;
@@ -236,7 +235,7 @@ public class ClassDetailController {
         }
     }
 
-    private void assignTaskToClassMembers(ResultSet generatedKeys) {
+    private void assignTaskToClassMembers(ResultSet generatedKeys) throws Exception {
         try {
             if (generatedKeys.next()) {
                 int classTaskId = generatedKeys.getInt(1);
@@ -252,7 +251,7 @@ public class ClassDetailController {
                     assignStmt.executeUpdate();
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to assign task to class members: " + e.getMessage());
         }
     }

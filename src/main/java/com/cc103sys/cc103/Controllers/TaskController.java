@@ -18,7 +18,6 @@ import com.cc103sys.cc103.Utils.Session;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
-import javafx.util.Duration;
 import javafx.scene.Node;
 
 import javafx.animation.Timeline;

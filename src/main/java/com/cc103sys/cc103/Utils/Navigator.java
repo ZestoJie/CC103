@@ -14,32 +14,16 @@ public class Navigator {
 
     public static boolean navigateTo(String viewName) {
         String fxmlFile;
-        switch (viewName.toLowerCase()) {
-            case "login":
-                fxmlFile = "Login";
-                break;
-            case "register":
-                fxmlFile = "Register";
-                break;
-            case "dashboard":
-                fxmlFile = "Dashboard";
-                break;
-            case "classes":
-                fxmlFile = "Classes";
-                break;
-            case "classdetail":
-                fxmlFile = "ClassDetail";
-                break;
-            case "leaderboard":
-                fxmlFile = "Leaderboard";
-                break;
-            case "task":
-            case "tasks":
-                fxmlFile = "TaskScene";
-                break;
-            default:
-                fxmlFile = viewName;
-        }
+        fxmlFile = switch (viewName.toLowerCase()) {
+            case "login" -> "Login";
+            case "register" -> "Register";
+            case "dashboard" -> "Dashboard";
+            case "classes" -> "Classes";
+            case "classdetail" -> "ClassDetail";
+            case "leaderboard" -> "Leaderboard";
+            case "task", "tasks" -> "TaskScene";
+            default -> viewName;
+        };
         return switchScene(fxmlFile);
     }
 
@@ -49,7 +33,6 @@ public class Navigator {
             return true;
         } catch (IOException e) {
             System.err.println("Failed to switch to scene: " + fxml);
-            e.printStackTrace();
             return false;
         }
     }

@@ -3,6 +3,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
@@ -39,20 +40,17 @@ public class NavbarController {
 
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         System.out.println("NAVBAR LOADED");
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();
     }
     private void setupRoleBasedAccess() {
-        // Hide Classes button for participants
-        if (classesBtn != null) {
-            classesBtn.setVisible(Session.isHost());
-            classesBtn.setManaged(Session.isHost());
-        }
+        // Classes button is visible for all users
+        // Only host-specific features are restricted in the Classes scene
     }
-    public void loadUserInfo() {
+    public void loadUserInfo() throws Exception {
         if (usernameLabel != null) {
             usernameLabel.setText(Session.getUsername() != null ? Session.getUsername() : "Unknown User");
         }
@@ -69,7 +67,7 @@ public class NavbarController {
         // Load profile picture
         loadProfilePicture();
     }
-    private void loadProfilePicture() {
+    private void loadProfilePicture() throws Exception {
         try {
             Integer userId = getCurrentUserId();
             if (userId != null) {
@@ -93,7 +91,7 @@ public class NavbarController {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Fall back to default
         }
         

@@ -36,7 +36,6 @@ public class Navigator {
             return true;
         } catch (IOException e) {
             System.err.println("Failed to switch to scene: " + fxml);
-            e.printStackTrace();
             return false;
         }
     }

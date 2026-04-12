@@ -91,6 +91,7 @@ public class TaskController implements TimerService.TimerListener {
     @FXML
     private Button approveSelectedBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button rejectSelectedBtn;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
@@ -431,6 +432,7 @@ slide.play();
         }
     }
 
+    @SuppressWarnings("unused")
     private int getTaskPointsAwarded(int taskId, Connection conn) {
         String sql = "SELECT points_awarded FROM tasks WHERE id = ? AND username = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -1043,4 +1045,12 @@ private boolean isTaskCompleted(Task task) {
 
     return null;
 }
+
+    public Button getApproveSelectedBtn() {
+        return approveSelectedBtn;
+    }
+
+    public void setApproveSelectedBtn(Button approveSelectedBtn) {
+        this.approveSelectedBtn = approveSelectedBtn;
+    }
 }

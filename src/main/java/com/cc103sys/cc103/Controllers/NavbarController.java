@@ -40,8 +40,11 @@ public class NavbarController {
     @FXML
     private Button settingsBtn;
 
+  
+
     @FXML
     public void initialize() {
+        System.out.println("NAVBAR LOADED");
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();

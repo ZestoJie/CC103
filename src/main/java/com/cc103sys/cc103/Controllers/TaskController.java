@@ -14,6 +14,7 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 import javafx.scene.Node;
@@ -34,7 +35,9 @@ public class TaskController {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
     private static final int LATE_TASK_POINTS = 5;
-
+    
+    @FXML
+    private NavbarController navbarController;
     @FXML
     private TextField taskField;
     @FXML
@@ -66,8 +69,10 @@ public void initialize() {
     loadUserClasses();
     loadAllClassTasks();
     loadFilteredTasks();
+    if (allTaskList != null) animateCard(allTaskList);
+if (filteredTaskList != null) animateCard(filteredTaskList);
 
-    NavbarController.getInstance().setActive("tasks");
+    navbarController.setActive("tasks");
 
     // ANIMATION START
     animateUI();
@@ -363,7 +368,21 @@ slide.play();
         String classSuffix = task.getClassName() != null ? " [" + task.getClassName() + "]" : "";
         return String.format("%s - %s%s (%s)", task.getTaskName(), task.getStatus(), classSuffix, task.getDate());
     }
+    
+private void animateCard(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
 
+    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
+    slide.setFromY(15);
+    slide.setToY(0);
+
+    new ParallelTransition(fade, slide).play();
+}
+
+
+    
     private void loadFilteredTasks() {
         filteredTasks.clear();
         Classes selected = classFilterComboBox == null ? null : classFilterComboBox.getValue();

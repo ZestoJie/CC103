@@ -35,6 +35,7 @@ public class Navigator {
             scene.setRoot(ResourceLoader.loadFXML(fxml));
             return true;
         } catch (IOException e) {
+            e.printStackTrace();
             System.err.println("Failed to switch to scene: " + fxml);
             return false;
         }

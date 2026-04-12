@@ -1,5 +1,6 @@
 package com.cc103sys.cc103.Controllers;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,8 +19,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -37,13 +42,50 @@ public class SettingsController {
     @FXML private Button editUsernameButton;
     @FXML private Button editEmailButton;
     @FXML private Button uploadPictureButton;
+    @FXML private ToggleButton enableMusicToggle;
+    @FXML private ToggleButton enableSFXToggle;
 
     private Integer currentUserId;
     private String currentUsername;
     private boolean isEditingFullName = false;
     private boolean isEditingUsername = false;
     private boolean isEditingEmail = false;
+@FXML private StackPane musicSwitch;
+@FXML private Rectangle track;
+@FXML private Circle thumb;
+@FXML private Rectangle musicTrack;
+@FXML private Circle musicThumb;
 
+@FXML private StackPane sfxSwitch;
+@FXML private Rectangle sfxTrack;
+@FXML private Circle sfxThumb;
+private boolean musicOn = false;
+private boolean sfxOn = false;
+
+@FXML
+private void toggleMusic() {
+    musicOn = !musicOn;
+
+    if (musicOn) {
+        musicTrack.setStyle("-fx-fill: rgb(27,49,98);");
+        musicThumb.setTranslateX(12);
+    } else {
+        musicTrack.setStyle("-fx-fill: rgba(148,163,184,0.4);");
+        musicThumb.setTranslateX(-12);
+    }
+}
+@FXML
+private void toggleSfx() {
+    sfxOn = !sfxOn;
+
+    if (sfxOn) {
+        sfxTrack.setStyle("-fx-fill: rgb(27,49,98);");
+        sfxThumb.setTranslateX(12);
+    } else {
+        sfxTrack.setStyle("-fx-fill: rgba(148,163,184,0.4);");
+        sfxThumb.setTranslateX(-12);
+    }
+}
     @FXML
     public void initialize() {
         try {
@@ -55,6 +97,8 @@ public class SettingsController {
 
             loadUserSettings();
             setupFieldStates();
+
+            setupSystemPreferences();
             
             NavbarController.getInstance().setActive("settings");
             LOGGER.info("Settings initialized successfully");
@@ -64,6 +108,58 @@ public class SettingsController {
         }
     }
 
+    private void setupSystemPreferences() {
+    try {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT music_enabled, sfx_enabled FROM users WHERE id = ?")) {
+
+            stmt.setInt(1, currentUserId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    boolean musicEnabled = rs.getBoolean("music_enabled");
+                    boolean sfxEnabled = rs.getBoolean("sfx_enabled");
+
+                    if (enableMusicToggle != null) {
+                        enableMusicToggle.setSelected(musicEnabled);
+                    }
+                    if (enableSFXToggle != null) {
+                        enableSFXToggle.setSelected(sfxEnabled);
+                    }
+                }
+            }
+        }
+
+        if (enableMusicToggle != null) {
+            enableMusicToggle.selectedProperty().addListener((obs, oldVal, isOn) -> {
+                updatePreference("music_enabled", isOn);
+            });
+        }
+
+        if (enableSFXToggle != null) {
+            enableSFXToggle.selectedProperty().addListener((obs, oldVal, isOn) -> {
+                updatePreference("sfx_enabled", isOn);
+            });
+        }
+
+    } catch (Exception e) {
+        LOGGER.severe(() -> "Error loading system preferences: " + e.getMessage());
+    }
+}
+private void updatePreference(String column, boolean value) {
+    try (Connection conn = DBUtil.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(
+                 "UPDATE users SET " + column + " = ? WHERE id = ?")) {
+
+        stmt.setBoolean(1, value);
+        stmt.setInt(2, currentUserId);
+        stmt.executeUpdate();
+
+    } catch (Exception e) {
+        LOGGER.severe(() -> "Error updating preference: " + e.getMessage());
+    }
+}
     private void loadUserSettings() {
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(

@@ -3,157 +3,168 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
-<!-- Root Container: Sidebar + Main Content -->
 <HBox spacing="0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.cc103sys.cc103.Controllers.TaskController" 
       style="-fx-background-color: #f0f2f5;">
+
     <children>
-        <!-- Navbar (Fixed Width) -->
+        <!-- Navbar -->
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
-        
-        <!-- Main Content Area -->
-        <VBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
+
+        <!-- Main -->
+        <VBox spacing="0" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
             <padding>
                 <Insets top="30" right="40" bottom="30" left="40"/>
             </padding>
-            
+
             <children>
-                <!-- Page Header -->
-                <Label text="Task Manager" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
-                    <VBox.margin>
-                        <Insets bottom="25" />
-                    </VBox.margin>
-                </Label>
-                
-                <!-- Scrollable Content -->
-                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
-                            style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+
+                <!-- Title -->
+                <Label text="Task Manager"
+                       style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                <!-- Scroll -->
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
+
                     <content>
-                        <!-- Max Width Container for Desktop Sizing -->
+
                         <HBox alignment="TOP_CENTER">
-                            <VBox spacing="25" maxWidth="900" HBox.hgrow="ALWAYS" fillWidth="true">
-                                
-                                <!-- CARD: Add Task (Host Only) -->
-                                <!-- The Controller hides taskField/taskDate/addTaskBtn if not Host. 
-                                     We style them nicely here. If invisible, they just hide. -->
-                                <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
-                                    <children>
-                                        <Label text="Quick Add Task" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-                                        <HBox spacing="15" alignment="CENTER_LEFT">
-                                            <children>
-                                                <TextField fx:id="taskField" promptText="Enter new task description..." HBox.hgrow="ALWAYS" 
-                                                           style="-fx-padding: 12; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
-                                                <DatePicker fx:id="taskDate" promptText="Due Date" 
-                                                            style="-fx-padding: 8; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
-                                                <Button fx:id="addTaskBtn" text="Add Task" onAction="#handleAddTask" 
-                                                        style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 25; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
-                                
-                                <!-- CARD: Filter Bar -->
-                                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
-                                    <children>
-                                        <Label text="Filter View" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
-                                        <HBox spacing="15" alignment="CENTER_LEFT">
-                                            <children>
-                                                <ComboBox fx:id="classFilterComboBox" promptText="Select a class to filter tasks..." HBox.hgrow="ALWAYS" 
-                                                          style="-fx-padding: 10; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
+                            <VBox spacing="20" maxWidth="900">
 
-                                <!-- THREE-COLUMN LAYOUT: All Tasks | Class Tasks | Task Info -->
-                                <HBox spacing="20" VBox.vgrow="ALWAYS">
-                                    
-                                    <!-- LEFT COLUMN: All Tasks -->
-                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="280">
-                                        <Label text="All My Tasks" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-                                        <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
-                                            <padding>
-                                                <Insets top="10" right="10" bottom="10" left="10" />
-                                            </padding>
-                                            <children>
-                                                <ListView fx:id="allTaskList" VBox.vgrow="ALWAYS" 
-                                                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
-                                            </children>
-                                        </VBox>
-                                    </VBox>
-                                    
-                                    <!-- MIDDLE COLUMN: Class Tasks -->
-                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="280">
-                                        <Label text="Class Tasks" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-                                        <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
-                                            <padding>
-                                                <Insets top="10" right="10" bottom="10" left="10" />
-                                            </padding>
-                                            <children>
-                                                <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS" 
-                                                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
-                                            </children>
-                                        </VBox>
-                                    </VBox>
+                                <!-- TAB PANE -->
+                                <TabPane fx:id="taskTabPane" tabClosingPolicy="UNAVAILABLE">
 
-                                    <!-- RIGHT COLUMN: Task Info/Details -->
-                                    <VBox spacing="15" HBox.hgrow="ALWAYS" prefWidth="320">
-                                        <Label text="Task Info" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-                                        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);" VBox.vgrow="ALWAYS">
-                                            <children>
-                                                <!-- Instructions -->
-                                                <Label text="Instructions" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
-                                                <TextArea fx:id="taskInstructions" promptText="Task instructions..." prefRowCount="4" wrapText="true"
-                                                          style="-fx-control-inner-background: #fdfdfd; -fx-border-color: #dfe6e9; -fx-padding: 6; -fx-font-size: 10;" VBox.vgrow="NEVER" />
-                                                
-                                                <!-- Attachments -->
-                                                <Label text="Attachments" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
-                                                <ListView fx:id="attachmentsList" prefHeight="60" style="-fx-background-color: #fdfdfd; -fx-border-color: #dfe6e9; -fx-font-size: 10;" VBox.vgrow="NEVER" />
-                                                <Button fx:id="uploadAttachmentBtn" text="+ Attachment" onAction="#handleUploadAttachment" 
-                                                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 12; -fx-font-size: 10;" />
-                                                
-                                                <!-- Timer -->
-                                                <Separator style="-fx-padding: 4 0;" />
-                                                <Label text="Timer" style="-fx-font-size: 11; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
-                                                <Label fx:id="timerDisplayLabel" text="00:00" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-padding: 8;" />
-                                                <ComboBox fx:id="timerDuration" promptText="Duration" style="-fx-padding: 6; -fx-border-color: #dfe6e9; -fx-background-color: #fdfdfd; -fx-font-size: 10;" />
-                                                <Button fx:id="startTimerBtn" text="▶ Start" onAction="#handleStartTimer" 
-                                                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 12; -fx-font-weight: bold; -fx-font-size: 10;" />
-                                                
-                                                <!-- Save -->
-                                                <Separator style="-fx-padding: 4 0;" />
-                                                <Button fx:id="saveTaskInfoBtn" text="💾 Save Info" onAction="#handleSaveTaskInfo" 
-                                                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 12; -fx-font-weight: bold; -fx-font-size: 10;" />
-                                            </children>
-                                        </VBox>
-                                    </VBox>
-                                </HBox>
+                                    <!-- ================= TAB 1 ================= -->
+                                    <Tab text="My Tasks">
 
-                                <!-- CARD: Global Actions (Bottom) -->
-                                <!-- These act on the *Selected* item in either list -->
-                                <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
-                                    <children>
-                                        <Label text="Actions for Selected Task" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-                                        <HBox spacing="15">
-                                            <children>
-                                                <Button fx:id="markDoneBtn" text="Mark as Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS" 
-                                                        style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 14; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                                <Button fx:id="deleteTaskBtn" text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS" 
-                                                        style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 14; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
-                                
-                                <!-- Footer Spacer -->
-                                <Region prefHeight="20" />
-                                
+                                        <content>
+
+                                            <VBox spacing="20">
+
+                                                <!-- ADD TASK -->
+                                                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
+                                                    <children>
+
+                                                        <Label text="Quick Add Task"/>
+
+                                                        <HBox spacing="10">
+                                                            <children>
+                                                                <TextField fx:id="taskField" promptText="Task..."/>
+                                                                <ComboBox fx:id="classSelectionComboBox" promptText="Class"/>
+                                                                <DatePicker fx:id="taskDate"/>
+                                                                <Button fx:id="addTaskBtn" text="Add" onAction="#handleAddTask"/>
+                                                            </children>
+                                                        </HBox>
+
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- FILTER -->
+                                                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
+                                                    <children>
+                                                        <Label text="Filter"/>
+                                                        <ComboBox fx:id="classFilterComboBox"/>
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- LISTS -->
+                                                <HBox spacing="15">
+
+                                                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                                        <Label text="All Tasks"/>
+                                                        <ListView fx:id="allTaskList" VBox.vgrow="ALWAYS"/>
+                                                    </VBox>
+
+                                                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                                        <Label text="Class Tasks"/>
+                                                        <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS"/>
+                                                    </VBox>
+
+                                                    <!-- INFO PANEL -->
+                                                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+                                                        <Label text="Task Info"/>
+
+                                                        <TextArea fx:id="taskInstructions" promptText="Instructions..."/>
+
+                                                        <ListView fx:id="attachmentsList"/>
+
+                                                        <Button fx:id="uploadAttachmentBtn"
+                                                                text="Upload"
+                                                                onAction="#handleUploadAttachment"/>
+
+                                                        <Label fx:id="timerDisplayLabel" text="00:00"/>
+
+                                                        <ComboBox fx:id="timerDuration"/>
+
+                                                        <Button fx:id="startTimerBtn"
+                                                                text="Start Timer"
+                                                                onAction="#handleStartTimer"/>
+
+                                                        <Button fx:id="saveTaskInfoBtn"
+                                                                text="Save"
+                                                                onAction="#handleSaveTaskInfo"/>
+
+                                                    </VBox>
+
+                                                </HBox>
+
+                                                <!-- ACTIONS -->
+                                                <HBox spacing="10">
+                                                    <children>
+                                                        <Button fx:id="markDoneBtn"
+                                                                text="Mark Done"
+                                                                onAction="#handleMarkDone"/>
+                                                        <Button fx:id="deleteTaskBtn"
+                                                                text="Delete"
+                                                                onAction="#handleDeleteTask"/>
+                                                    </children>
+                                                </HBox>
+
+                                            </VBox>
+
+                                        </content>
+                                    </Tab>
+
+                                    <!-- ================= TAB 2 ================= -->
+                                    <Tab fx:id="classManagementTab" text="Class Management">
+
+                                        <content>
+
+                                            <VBox spacing="15">
+
+                                                <Label text="Pending Approvals"/>
+
+                                                <ComboBox fx:id="approvalClassFilterComboBox"/>
+
+                                                <ListView fx:id="pendingApprovalsList" VBox.vgrow="ALWAYS"/>
+
+                                                <HBox spacing="10">
+                                                    <children>
+                                                        <Button fx:id="approveSelectedBtn"
+                                                                text="Approve"
+                                                                onAction="#handleApproveSelected"/>
+                                                        <Button fx:id="rejectSelectedBtn"
+                                                                text="Reject"
+                                                                onAction="#handleRejectSelected"/>
+                                                    </children>
+                                                </HBox>
+
+                                            </VBox>
+
+                                        </content>
+                                    </Tab>
+
+                                </TabPane>
+
                             </VBox>
                         </HBox>
+
                     </content>
                 </ScrollPane>
+
             </children>
         </VBox>
     </children>

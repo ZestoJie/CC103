@@ -71,13 +71,13 @@
                                               style="-fx-background-color: transparent; -fx-border-color: transparent;" />
                                             
                                     <!-- Add Task Footer (Host Only) -->
-                                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding-top: 15;">
+                                    <HBox fx:id="addTaskFooter" spacing="10" alignment="CENTER_LEFT" style="-fx-padding-top: 15;">
                                         <children>
                                             <TextField fx:id="taskField" promptText="New Task Name" HBox.hgrow="ALWAYS" 
                                                        style="-fx-padding: 10; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8;" />
                                             <DatePicker fx:id="taskDate" promptText="Due Date" 
                                                         style="-fx-padding: 8; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8;" />
-                                            <Button text="Add" onAction="#handleAddTask" 
+                                            <Button fx:id="addTaskButton" text="Add" onAction="#handleAddTask" 
                                                     style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 20; -fx-font-weight: bold; -fx-cursor: hand;" />
                                         </children>
                                     </HBox>

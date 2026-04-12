@@ -65,6 +65,9 @@ public class DBUtil {
                     + "group_id INT NULL, "
                     + "completed_date DATE NULL, "
                     + "points_awarded INT DEFAULT 0, "
+                    + "pending_points INT DEFAULT 0, "
+                    + "approved_by INT NULL, "
+                    + "approved_date DATE NULL, "
                     + "created_by INT NULL, "
                     + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
                     + ")");
@@ -149,6 +152,18 @@ public class DBUtil {
 
             if (!columnExists(conn, "tasks", "user_id")) {
                 stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN user_id INT NULL");
+            }
+
+            if (!columnExists(conn, "tasks", "approved_by")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN approved_by INT NULL");
+            }
+
+            if (!columnExists(conn, "tasks", "approved_date")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN approved_date DATE NULL");
+            }
+
+            if (!columnExists(conn, "tasks", "pending_points")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN pending_points INT DEFAULT 0");
             }
 
             if (!columnExists(conn, "class_tasks", "owner_id")) {

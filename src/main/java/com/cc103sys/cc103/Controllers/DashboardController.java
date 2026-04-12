@@ -36,6 +36,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
 public class DashboardController implements TimerService.TimerListener {
@@ -47,6 +48,8 @@ public class DashboardController implements TimerService.TimerListener {
 
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
+    @FXML private Button addTaskButton;
+    @FXML private HBox addTaskFooter;
     @FXML private ListView<Task> taskList;
     @FXML private Label timerLabel;
     @FXML private Label timerMultiplierLabel;
@@ -133,6 +136,8 @@ public class DashboardController implements TimerService.TimerListener {
         boolean isHost = Session.isHost();
         if (taskField != null) taskField.setVisible(isHost);
         if (taskDate != null) taskDate.setVisible(isHost);
+        if (addTaskButton != null) addTaskButton.setVisible(isHost);
+        if (addTaskFooter != null) addTaskFooter.setVisible(isHost);
     }
 
     private void setupWelcomeMessage() {

@@ -1,13 +1,17 @@
 .root {
     -fx-font-family: "Segoe UI", "Poppins";
+    font-family: "Segoe UI", "Poppins";
     -fx-background-color: #f5f7fb;
+    background-color: #f5f7fb;
 }
 
 /* CARDS */
 .card {
     -fx-background-color: white;
+    background-color: white;
     -fx-background-radius: 12;
     -fx-padding: 15;
+    padding: 15;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0.2, 0, 4);
 }
 
@@ -20,20 +24,25 @@
 /* TEXT */
 .title {
     -fx-font-size: 18px;
+    font-size: 18px;
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 .subtitle {
     -fx-font-size: 12px;
+    font-size: 12px;
     -fx-text-fill: #6b7280;
 }
 
 /* BUTTON */
 .button {
     -fx-background-color: linear-gradient(to right, #3b82f6, #2563eb);
+    background-color: #3b82f6;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 6 14;
+    padding: 6 14;
 }
 
 .button:hover {
@@ -49,41 +58,50 @@
 /* ICON BUTTON */
 .icon-button {
     -fx-background-color: transparent;
+    background-color: transparent;
 }
 
 .icon-button:hover {
     -fx-background-color: rgba(59,130,246,0.1);
+    background-color: rgba(59,130,246,0.1);
 }
 
 /* INPUTS */
 .text-field, .date-picker, .combo-box {
     -fx-background-radius: 8;
     -fx-border-color: #d1d5db;
+    border-color: #d1d5db;
 }
 
 .text-field:focused, .date-picker:focused {
     -fx-border-color: #3b82f6;
+    border-color: #3b82f6;
 }
 
 /* LIST */
 .list-view {
     -fx-background-radius: 10;
     -fx-border-color: #e5e7eb;
+    border-color: #e5e7eb;
 }
 
 .list-cell:hover {
     -fx-background-color: #eff6ff;
+    background-color: #eff6ff;
 }
 
 .list-cell:selected {
     -fx-background-color: #dbeafe;
+    background-color: #dbeafe;
 }
 
 /* TIMER */
 #timerLabel {
     -fx-text-fill: #2563eb;
     -fx-font-size: 30px;
+    font-size: 30px;
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 /* PROGRESS */

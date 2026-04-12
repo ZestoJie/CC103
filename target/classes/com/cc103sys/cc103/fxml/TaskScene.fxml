@@ -41,7 +41,7 @@
                                     </HBox>
                                 </VBox>
 
-                                <!-- FILTER -->
+                                
                                 <VBox spacing="10" styleClass="card">
                                     <Label text="Filter View" styleClass="subtitle"/>
                                     <ComboBox fx:id="classFilterComboBox" promptText="Select class"/>

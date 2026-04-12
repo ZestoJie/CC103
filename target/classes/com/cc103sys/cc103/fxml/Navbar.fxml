@@ -95,7 +95,7 @@
 
     <Button contentDisplay="LEFT" graphicTextGap="10" maxWidth="Infinity" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;" text="Logout">
         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="20.0" style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
+            <ImageView fx:id="logoutIconImageView" fitHeight="20.0" fitWidth="20.0" style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: white; -fx-border-width: 2;">
                 <image>
                     <Image url="@../../../../images/icon-logout.png" />
                 </image>

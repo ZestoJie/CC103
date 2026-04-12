@@ -109,6 +109,10 @@ public class LeaderboardController {
                 if (!userClasses.isEmpty()) {
                     classComboBox.getSelectionModel().selectFirst();
                     loadLeaderboard();
+                    setupOverallLeaderboard();
+                } else {
+                    if (table != null) table.setVisible(false);
+                    if (overallTable != null) overallTable.setVisible(false);
                 }
             }
 
@@ -125,16 +129,21 @@ public class LeaderboardController {
         }
 
         ObservableList<UserRank> data = FXCollections.observableArrayList();
-        String sql = "SELECT username, points FROM users ORDER BY points DESC";
+        String sql = "SELECT DISTINCT u.username, u.points FROM users u "
+                   + "JOIN user_classes uc ON u.id = uc.user_id "
+                   + "WHERE uc.class_id IN (SELECT class_id FROM user_classes WHERE user_id = (SELECT id FROM users WHERE username = ?)) "
+                   + "ORDER BY u.points DESC";
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                data.add(new UserRank(rs.getString("username"), rs.getInt("points")));
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    data.add(new UserRank(rs.getString("username"), rs.getInt("points")));
+                }
             }
             overallTable.setItems(data);
-            overallTable.setVisible(true);
+            overallTable.setVisible(!data.isEmpty());
             LOGGER.info(() -> "Loaded overall leaderboard: " + data.size() + " users");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to load overall leaderboard: " + e.getMessage());

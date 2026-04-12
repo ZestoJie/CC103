@@ -103,15 +103,8 @@ public class TaskController {
     }
 
     private void setupRoleBasedUI() {
-        boolean isHost = Session.isHost();
-        // Hide add task section for participants
-        if (!isHost) {
-            // Find the parent container of the add task elements and hide it
-            // Since we can't directly access the VBox from FXML, we'll hide the individual elements
-            if (taskField != null) taskField.setVisible(false);
-            if (taskDate != null) taskDate.setVisible(false);
-            if (addTaskBtn != null) addTaskBtn.setVisible(false);
-        }
+        // All users can add personal tasks from the Task page.
+        // Host-only class task creation remains on the Dashboard.
     }
 
     private void setupTaskListView() {
@@ -334,30 +327,51 @@ public class TaskController {
 
     private void loadAllClassTasks() {
         allTasks.clear();
-        String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, c.class_name "
-                   + "FROM tasks t "
-                   + "LEFT JOIN classes c ON t.class_id = c.id "
-                   + "WHERE t.username = ? "
-                   + "ORDER BY t.task_date DESC";
+        
+        try {
+            // First get the current user's ID
+            Integer userId = getCurrentUserId();
+            if (userId == null) {
+                LOGGER.warning(() -> "Could not determine current user ID for user: " + Session.getUsername());
+                return;
+            }
+            
+            LOGGER.info(() -> "Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
+            
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name "
+                       + "FROM tasks t "
+                       + "LEFT JOIN classes c ON t.class_id = c.id "
+                       + "WHERE t.user_id = ? "
+                       + "ORDER BY t.task_date DESC";
 
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, Session.getUsername());
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    allTasks.add(new Task(
-                        rs.getInt("id"),
-                        rs.getString("task_name"),
-                        rs.getDate("task_date").toLocalDate(),
-                        rs.getString("status"),
-                        rs.getObject("class_id") == null ? null : rs.getInt("class_id"),
-                        rs.getString("class_name")
-                    ));
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+                LOGGER.info(() -> "Executing SQL: " + sql.replace("?", userId.toString()));
+                try (ResultSet rs = stmt.executeQuery()) {
+                    int count = 0;
+                    while (rs.next()) {
+                        int classId = rs.getInt("class_id");
+                        String className = rs.getString("class_name");
+                        
+                        String taskName = rs.getString("task_name");
+                        int id = rs.getInt("id");
+                        Task task = new Task(
+                            id,
+                            taskName,
+                            rs.getDate("task_date").toLocalDate(),
+                            rs.getString("status"),
+                            classId > 0 ? classId : null,
+                            className != null && !className.isEmpty() ? className : null
+                        );
+                        allTasks.add(task);
+                        LOGGER.info(() -> "Added task: " + taskName + " (ID: " + id + ", ClassID: " + classId + ")");
+                    }
+                    LOGGER.info(() -> "Total tasks loaded: " + allTasks.size());
                 }
             }
-            LOGGER.info(() -> "Loaded " + allTasks.size() + " tasks");
         } catch (Exception e) {
-            LOGGER.severe(() -> "Failed to load class tasks: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
         }
     }
 
@@ -373,25 +387,33 @@ public class TaskController {
             return;
         }
 
-        String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, c.class_name "
-                   + "FROM tasks t "
-                   + "JOIN classes c ON t.class_id = c.id "
-                   + "WHERE t.username = ? AND t.class_id = ?";
+        try {
+            Integer userId = getCurrentUserId();
+            if (userId == null) {
+                LOGGER.warning("Could not determine current user ID");
+                return;
+            }
 
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, Session.getUsername());
-            stmt.setInt(2, selected.getId());
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    filteredTasks.add(new Task(
-                        rs.getInt("id"),
-                        rs.getString("task_name"),
-                        rs.getDate("task_date").toLocalDate(),
-                        rs.getString("status"),
-                        rs.getInt("class_id"),
-                        rs.getString("class_name")
-                    ));
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, c.class_name "
+                       + "FROM tasks t "
+                       + "JOIN classes c ON t.class_id = c.id "
+                       + "WHERE t.user_id = ? AND t.class_id = ?";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+                stmt.setInt(2, selected.getId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        filteredTasks.add(new Task(
+                            rs.getInt("id"),
+                            rs.getString("task_name"),
+                            rs.getDate("task_date").toLocalDate(),
+                            rs.getString("status"),
+                            rs.getInt("class_id"),
+                            rs.getString("class_name")
+                        ));
+                    }
                 }
             }
             LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected.getClassName()));
@@ -410,20 +432,29 @@ public class TaskController {
             return;
         }
 
-        String sql = "INSERT INTO tasks (username, task_name, task_date, status) VALUES (?, ?, ?, 'Pending')";
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, Session.getUsername());
-            stmt.setString(2, taskName);
-            stmt.setDate(3, Date.valueOf(date));
+            
+            // Get user ID
+            Integer userId = getCurrentUserId();
+            if (userId != null) {
+                stmt.setInt(2, userId);
+            } else {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            }
+            
+            stmt.setString(3, taskName);
+            stmt.setDate(4, java.sql.Date.valueOf(date));
             stmt.executeUpdate();
 
             taskField.clear();
             taskDate.setValue(null);
             loadAllClassTasks();
             loadFilteredTasks();
-            LOGGER.info("Task added successfully");
+            LOGGER.info("Personal task added successfully");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to add task: " + e.getMessage());
         }
@@ -629,5 +660,21 @@ public class TaskController {
 
     public void setTimerDisplayLabel(Label timerDisplayLabel) {
         this.timerDisplayLabel = timerDisplayLabel;
+    }
+
+    private Integer getCurrentUserId() {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT id FROM users WHERE username = ?")) {
+            stmt.setString(1, Session.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warning(() -> "Failed to get current user ID: " + e.getMessage());
+        }
+        return null;
     }
 }

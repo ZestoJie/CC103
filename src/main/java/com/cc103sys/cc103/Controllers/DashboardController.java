@@ -83,7 +83,6 @@ public class DashboardController {
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
                     }
-                    loadTasks();
                 });
             }
 
@@ -126,8 +125,12 @@ public class DashboardController {
                     if (empty || task == null) {
                         setText(null);
                     } else {
-                        setText(String.format("%s | %s | %s", 
-                            task.getTaskName(), task.getDate(), task.getStatus()));
+                        String classLabel = task.getClassName() != null ? "[" + task.getClassName() + "] " : "";
+                        setText(String.format("%s%s | %s | %s", 
+                            classLabel,
+                            task.getTaskName(), 
+                            task.getDate(), 
+                            task.getStatus()));
                     }
                 }
             });
@@ -188,27 +191,37 @@ public class DashboardController {
 
     private void loadTasks() {
         tasks.clear();
-        Classes selectedClass = classSelector == null ? null : classSelector.getValue();
 
-        String sql = "SELECT id, task_name, task_date, status FROM tasks WHERE username = ?";
-        if (selectedClass != null) {
-            sql += " AND class_id = ?";
-        }
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, Session.getUsername());
-            if (selectedClass != null) {
-                stmt.setInt(2, selectedClass.getId());
+        try {
+            Integer userId = getCurrentUserId();
+            if (userId == null) {
+                LOGGER.warning("Could not determine current user ID");
+                return;
             }
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    tasks.add(new Task(
-                        rs.getInt("id"),
-                        rs.getString("task_name"),
-                        rs.getDate("task_date").toLocalDate(),
-                        rs.getString("status")
-                    ));
+
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name "
+                       + "FROM tasks t "
+                       + "LEFT JOIN classes c ON t.class_id = c.id "
+                       + "WHERE t.user_id = ? "
+                       + "ORDER BY t.task_date DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        int classId = rs.getInt("class_id");
+                        String className = rs.getString("class_name");
+                        
+                        tasks.add(new Task(
+                            rs.getInt("id"),
+                            rs.getString("task_name"),
+                            rs.getDate("task_date").toLocalDate(),
+                            rs.getString("status"),
+                            classId > 0 ? classId : null,
+                            className != null && !className.isEmpty() ? className : null
+                        ));
+                    }
                 }
             }
             if (dailyGoalSummary != null) {
@@ -292,15 +305,11 @@ public class DashboardController {
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
                     }
-                    loadTasks();
                 });
 
                 if (!userClasses.isEmpty()) {
                     classSelector.setValue(userClasses.get(0));
                     loadLeaderboardPreviewForClass();
-                    loadTasks();
-                } else {
-                    tasks.clear();
                 }
             }
             LOGGER.info(() -> "Loaded " + userClasses.size() + " user classes");
@@ -313,49 +322,73 @@ public class DashboardController {
     @FXML
     @SuppressWarnings("unused")
     private void handleAddTask() throws Exception {
-        if (!Session.isHost()) {
-            LOGGER.warning("Only Hosts can create class tasks");
-            return;
-        }
-
-        String taskName = taskField.getText();
+        String taskName = taskField.getText().trim();
         LocalDate date = taskDate.getValue();
 
         if (!validateTaskInput(taskName, date)) {
             return;
         }
 
-        Classes selectedClass = classSelector == null ? null : classSelector.getValue();
-        if (selectedClass == null) {
-            LOGGER.warning("No class selected for task");
-            return;
-        }
+        // If user is a host and has selected a class, create a class task
+        if (Session.isHost()) {
+            Classes selectedClass = classSelector == null ? null : classSelector.getValue();
+            if (selectedClass != null && isCurrentUserClassOwner(selectedClass.getId())) {
+                try {
+                    int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
+                    if (classTaskId <= 0) {
+                        LOGGER.severe(() -> "Failed to create class task for " + taskName);
+                        return;
+                    }
 
-        if (!isCurrentUserClassOwner(selectedClass.getId())) {
-            LOGGER.warning("Only class owners can create official class tasks");
-            return;
-        }
-
-        try {
-            int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
-            if (classTaskId <= 0) {
-                LOGGER.severe(() -> "Failed to create class task for " + taskName);
-                return;
+                    assignClassTaskToMembers(classTaskId, selectedClass.getId());
+                    taskField.clear();
+                    taskDate.setValue(null);
+                    loadTasks();
+                    loadLeaderboardPreviewForClass();
+                    try {
+                        playAddTaskAnimation();
+                    } catch (Exception e) {
+                        LOGGER.warning("Error playing animation: " + e.getMessage());
+                    }
+                    LOGGER.info("Class task created and assigned: " + taskName);
+                    return;
+                } catch (SQLException e) {
+                    LOGGER.severe(() -> "Failed to create task: " + e.getMessage());
+                    return;
+                }
             }
+        }
 
-            assignClassTaskToMembers(classTaskId, selectedClass.getId());
+        // Otherwise, create a personal task for anyone (participants and hosts without selected class)
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, Session.getUsername());
+            
+            // Get user ID
+            Integer userId = getCurrentUserId();
+            if (userId != null) {
+                stmt.setInt(2, userId);
+            } else {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            }
+            
+            stmt.setString(3, taskName);
+            stmt.setDate(4, Date.valueOf(date));
+            stmt.executeUpdate();
+
             taskField.clear();
             taskDate.setValue(null);
             loadTasks();
-            loadLeaderboardPreviewForClass();
             try {
                 playAddTaskAnimation();
             } catch (Exception e) {
                 LOGGER.warning(() -> "Error playing animation: " + e.getMessage());
             }
-            LOGGER.info(() -> "Class task created and assigned: " + taskName);
+            LOGGER.info(() -> "Personal task created: " + taskName);
         } catch (SQLException e) {
-            LOGGER.severe(() -> "Failed to create task: " + e.getMessage());
+            LOGGER.severe("Failed to create personal task: " + e.getMessage());
         }
     }
 

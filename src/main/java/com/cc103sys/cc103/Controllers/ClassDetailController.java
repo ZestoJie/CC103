@@ -28,6 +28,7 @@ public class ClassDetailController {
     private static final Logger LOGGER = Logger.getLogger(ClassDetailController.class.getName());
 
     @FXML private Label classTitleLabel;
+    @FXML private Label classCodeLabel;
     @FXML private Label classDescriptionLabel;
     @FXML private ListView<ClassTask> tasksListView;
     @FXML private ListView<String> participantsListView;
@@ -69,13 +70,17 @@ public class ClassDetailController {
             return;
         }
 
-        String sql = "SELECT class_name FROM classes WHERE id = ?";
+        String sql = "SELECT class_name, join_code FROM classes WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, currentClassId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     classTitleLabel.setText(rs.getString("class_name"));
+                    String joinCode = rs.getString("join_code");
+                    if (classCodeLabel != null) {
+                        classCodeLabel.setText(joinCode != null && !joinCode.isBlank() ? "Code: " + joinCode : "Code: Public class");
+                    }
                 }
             }
         } catch (Exception e) {

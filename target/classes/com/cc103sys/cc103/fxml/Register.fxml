@@ -32,7 +32,7 @@
 
             <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" prefWidth="250.0" promptText="Confirm Password" style="-fx-background-color: #eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 
-            <ComboBox fx:id="roleComboBox" prefHeight="40.0" prefWidth="250.0" promptText="Select Role" style="-fx-background-radius: 20; -fx-padding: 10 15;" />
+            <ComboBox fx:id="roleComboBox" prefHeight="45.0" prefWidth="412.0" promptText="Select Role" style="-fx-background-radius: 20; -fx-padding: 10 15;" />
 
             <Label fx:id="messageLabel" style="-fx-text-fill: red; -fx-font-size: 12px;">
                 <VBox.margin>

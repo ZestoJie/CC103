@@ -7,21 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.Node;
-
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,17 +33,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
-public class TaskController {
+public class TaskController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
     private static final int LATE_TASK_POINTS = 5;
     private static final int TIMER_PENALTY_POINTS = 15;
 
     private Task timerTask;
-    private final AtomicInteger secondsRemaining = new AtomicInteger(0);
-    private AtomicInteger initialSeconds = new AtomicInteger(0);
-    private double currentMultiplier = 0;
-    private Timeline timerTimeline;
+    private TimerService timerService;
 
     @FXML
     private TextField taskField;
@@ -81,31 +75,41 @@ public class TaskController {
     private Button startTimerBtn;
     @FXML
     private Label timerDisplayLabel;
-    private Label timerMultiplierLabel;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
     @FXML
-public void initialize() throws Exception {
-    setupRoleBasedUI();
+    public void initialize() throws Exception {
+        timerService = TimerService.getInstance();
+        
+        // Remove any previous scene listeners (but not navbar)
+        timerService.removeTimerListener(this);
+        
+        // Add this instance as a listener
+        timerService.addTimerListener(this);
+
+        // Immediately sync timer display with current state
+        updateTimerDisplay();
+
+        setupRoleBasedUI();
         setupTaskListView();
         setupTimerDropdown();
         loadUserClasses();
         loadAllClassTasks();
         loadFilteredTasks();
-    if (allTaskList != null) animateCard(allTaskList);
-    if (filteredTaskList != null) animateCard(filteredTaskList);
-    // Set navbar active to tasks
+        if (allTaskList != null) animateCard(allTaskList);
+        if (filteredTaskList != null) animateCard(filteredTaskList);
+        // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
         LOGGER.info("Task scene initialized successfully");
 
-    // ANIMATION START
-    animateUI();
+        // ANIMATION START
+        animateUI();
 
-    LOGGER.info("Task scene initialized successfully");
-}
+        LOGGER.info("Task scene initialized successfully");
+    }
 
     private void animateNode(Node node, double delay) {
     FadeTransition fade = new FadeTransition(Duration.millis(500), node);
@@ -328,14 +332,6 @@ slide.play();
             } else {
                 basePoints = BASE_TASK_POINTS + (int) Math.max(0, daysBefore) * 2;
             }
-        }
-
-        // Apply timer multiplier if active
-        if (currentMultiplier > 0) {
-            int multipliedPoints = (int) Math.round(basePoints * currentMultiplier);
-            LOGGER.info(() -> "Applied timer multiplier " + String.format("%.1f", currentMultiplier) +
-                          "x to base points " + basePoints + " = " + multipliedPoints + " points");
-            return multipliedPoints;
         }
 
         return basePoints;
@@ -573,73 +569,16 @@ private void animateCard(Node node) {
             return;
         }
 
-        // Stop any existing timer
-        if (timerTimeline != null) {
-            timerTimeline.stop();
-        }
-
         String durationStr = timerDuration.getValue();
         int minutes = Integer.parseInt(durationStr.replace(" min", ""));
         int totalSeconds = minutes * 60;
 
-        // Calculate initial multiplier based on duration (longer = higher multiplier)
-        // 5 min = 3x, 15 min = 5x, 30 min = 7x, 45 min = 9x, 60 min = 11x
-        currentMultiplier = 3 + (minutes / 15) * 2; // 3, 5, 7, 9, 11
-
-        secondsRemaining.set(totalSeconds);
-        initialSeconds.set(totalSeconds);
         timerTask = selected;
 
-        LOGGER.info(() -> "Timer started for " + minutes + " minutes on task: " + selected.getTaskName() +
-                      " with initial multiplier: " + currentMultiplier + "x");
+        LOGGER.info(() -> "Timer started for " + minutes + " minutes on task: " + selected.getTaskName());
 
-        // Create timeline for countdown
-        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            int remaining = secondsRemaining.decrementAndGet();
-
-            // Update multiplier: starts at max, decreases linearly to 0
-            double progress = (double) remaining / initialSeconds.get();
-            currentMultiplier = Math.max(0, currentMultiplier * progress);
-
-            if (remaining <= 0) {
-                // Timer finished - check if task is complete
-                timerTimeline.stop();
-                handleTimerFinished();
-            }
-        }));
-
-        timerTimeline.setCycleCount(totalSeconds);
-        timerTimeline.play();
-    }
-
-    private void handleTimerFinished() {
-        if (timerTask == null) return;
-
-        // Check if task was completed during timer
-        boolean taskCompleted = isTaskCompleted(timerTask);
-
-        if (!taskCompleted) {
-            // Apply penalty: -15 points but not below 0
-            int currentPoints = Session.getPoints();
-            int newPoints = Math.max(0, currentPoints - TIMER_PENALTY_POINTS);
-            Session.setPoints(newPoints);
-
-            LOGGER.info(() -> "Timer finished - task not completed. Applied " + TIMER_PENALTY_POINTS +
-                          " point penalty. Points: " + currentPoints + " -> " + newPoints);
-        } else {
-            LOGGER.info("Timer finished - task was completed during timer period");
-        }
-
-        // Reset timer state
-        timerTask = null;
-        currentMultiplier = 0;
-        secondsRemaining.set(0);
-        initialSeconds.set(0);
-    }
-
-    private boolean isTaskCompleted(Task task) {
-        // Check if task status is "Completed"
-        return "Completed".equals(task.getStatus());
+        // Use TimerService to start the timer
+        timerService.start(totalSeconds, selected.getId(), true);
     }
 
     @FXML
@@ -676,12 +615,62 @@ private void animateCard(Node node) {
         return selected;
     }
 
-    public AtomicInteger getInitialSeconds() {
-        return initialSeconds;
+    @Override
+    public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+        updateTimerDisplay();
     }
 
-    public void setInitialSeconds(AtomicInteger initialSeconds) {
-        this.initialSeconds = initialSeconds;
+    @Override
+    public void onTimerCompleted() {
+        handleTimerCompleted();
+    }
+
+    private void updateTimerDisplay() {
+        if (timerDisplayLabel == null) {
+            return;
+        }
+
+        int remaining = timerService.getRemainingSeconds();
+        boolean running = timerService.isRunning();
+
+        if (!running) {
+            timerDisplayLabel.setText("00:00");
+            timerDisplayLabel.setStyle("-fx-text-fill: #7f8c8d;");
+            return;
+        }
+
+        int minutes = remaining / 60;
+        int seconds = remaining % 60;
+        timerDisplayLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        timerDisplayLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+    }
+
+    private void handleTimerCompleted() {
+        if (timerTask == null) return;
+
+        // Check if task was completed during timer
+        boolean taskCompleted = isTaskCompleted(timerTask);
+
+        if (!taskCompleted) {
+            // Apply penalty: -15 points but not below 0
+            int currentPoints = Session.getPoints();
+            int newPoints = Math.max(0, currentPoints - TIMER_PENALTY_POINTS);
+            Session.setPoints(newPoints);
+
+            LOGGER.info(() -> "Timer finished - task not completed. Applied " + TIMER_PENALTY_POINTS +
+                          " point penalty. Points: " + currentPoints + " -> " + newPoints);
+        } else {
+            LOGGER.info("Timer finished - task was completed during timer period");
+        }
+
+        // Reset timer state
+        timerTask = null;
+        updateTimerDisplay();
+    }
+
+    private boolean isTaskCompleted(Task task) {
+        // Check if task status is "Completed"
+        return "Completed".equals(task.getStatus());
     }
 
     public ListView<String> getAttachmentsList() {
@@ -706,14 +695,6 @@ private void animateCard(Node node) {
 
     public void setUploadAttachmentBtn(Button uploadAttachmentBtn) {
         this.uploadAttachmentBtn = uploadAttachmentBtn;
-    }
-
-    public Label getTimerMultiplierLabel() {
-        return timerMultiplierLabel;
-    }
-
-    public void setTimerMultiplierLabel(Label timerMultiplierLabel) {
-        this.timerMultiplierLabel = timerMultiplierLabel;
     }
 
     public Button getStartTimerBtn() {

@@ -101,10 +101,12 @@
                                     </HBox>
                                     
                                     <!-- Display -->
-                                    <HBox alignment="CENTER" style="-fx-padding: 10 0;">
+                                    <VBox alignment="CENTER" spacing="8" style="-fx-padding: 10 0;">
                                         <Label fx:id="timerLabel" text="00:00" 
                                                style="-fx-font-size: 40; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Monospaced';" />
-                                    </HBox>
+                                        <Label fx:id="timerMultiplierLabel" text="Multiplier x1"
+                                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #16a085; -fx-font-family: 'Monospaced';" />
+                                    </VBox>
                                     
                                     <!-- Controls -->
                                     <VBox spacing="10">

@@ -3,15 +3,13 @@ package com.cc103sys.cc103.Controllers;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.Utils.Navigator;
+import com.cc103sys.cc103.Utils.TimerService;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.util.Duration;
 
-public class TimerController {
+public class TimerController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TimerController.class.getName());
     private static final String[] TIMER_PRESETS = {
         "1 Minute", "5 Minutes", "10 Minutes", "30 Minutes", "1 Hour"
@@ -20,15 +18,19 @@ public class TimerController {
     @FXML private ComboBox<String> timeSelect;
     @FXML private Label timerLabel;
 
-    private Timeline timeline;
-    private int remainingSeconds;
+    private TimerService timerService;
 
     @FXML
     public void initialize() {
+        timerService = TimerService.getInstance();
+        timerService.addTimerListener(this);
+
         if (timeSelect != null) {
             timeSelect.getItems().addAll(TIMER_PRESETS);
             timeSelect.setValue(TIMER_PRESETS[0]);
         }
+        
+        // Sync display with current timer state
         updateTimerDisplay();
 
         // Set navbar active
@@ -45,43 +47,14 @@ public class TimerController {
                 return;
             }
 
-            stopTimer();
-
-            remainingSeconds = convertToSeconds(selected);
-            startCountdown();
-            LOGGER.info(() -> "Timer started: " + remainingSeconds + " seconds");
+            int seconds = convertToSeconds(selected);
+            LOGGER.info(() -> "Timer started: " + seconds + " seconds");
+            
+            // Use TimerService which runs in the background
+            timerService.start(seconds, null, false);
         } catch (Exception e) {
             LOGGER.severe(() -> "Timer start error: " + e);
         }
-    }
-
-    private void startCountdown() {
-        timeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), event -> {
-                remainingSeconds--;
-                updateTimerDisplay();
-
-                if (remainingSeconds <= 0) {
-                    stopTimer();
-                    onTimerComplete();
-                }
-            })
-        );
-
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
-
-    private void stopTimer() {
-        if (timeline != null) {
-            timeline.stop();
-        }
-    }
-
-    private void updateTimerDisplay() {
-        int minutes = remainingSeconds / 60;
-        int seconds = remainingSeconds % 60;
-        timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
     private int convertToSeconds(String preset) {
@@ -92,9 +65,37 @@ public class TimerController {
         return 60;
     }
 
-    private void onTimerComplete() {
+    @Override
+    public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+        updateTimerDisplay();
+    }
+
+    @Override
+    public void onTimerCompleted() {
+        if (timerLabel != null) {
+            timerLabel.setStyle("-fx-text-fill: #4caf50;");
+        }
         LOGGER.info("Timer completed!");
-        timerLabel.setStyle("-fx-text-fill: #4caf50;");
+    }
+
+    private void updateTimerDisplay() {
+        if (timerLabel == null) {
+            return;
+        }
+
+        int remaining = timerService.getRemainingSeconds();
+        boolean running = timerService.isRunning();
+
+        if (!running) {
+            timerLabel.setText("00:00");
+            timerLabel.setStyle("-fx-text-fill: #7f8c8d;");
+            return;
+        }
+
+        int minutes = remaining / 60;
+        int seconds = remaining % 60;
+        timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        timerLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
     }
 
     @FXML

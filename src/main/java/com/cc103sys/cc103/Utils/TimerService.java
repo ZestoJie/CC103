@@ -34,11 +34,20 @@ public class TimerService {
     public void addTimerListener(TimerListener listener) {
         if (listener != null && !listeners.contains(listener)) {
             listeners.add(listener);
+            LOGGER.fine(() -> "Listener added. Total listeners: " + listeners.size());
         }
     }
 
     public void removeTimerListener(TimerListener listener) {
-        listeners.remove(listener);
+        if (listener != null) {
+            listeners.remove(listener);
+            LOGGER.fine(() -> "Listener removed. Total listeners: " + listeners.size());
+        }
+    }
+
+    public void clearAllListeners() {
+        listeners.clear();
+        LOGGER.fine("All listeners cleared");
     }
 
     public boolean isRunning() {
@@ -55,6 +64,13 @@ public class TimerService {
 
     public int getInitialSeconds() {
         return initialSeconds;
+    }
+
+    public int getMultiplier() {
+        if (initialSeconds <= 0) {
+            return 1;
+        }
+        return calculateMultiplier(initialSeconds / 60);
     }
 
     public Integer getSelectedTaskId() {
@@ -123,6 +139,7 @@ public class TimerService {
     }
 
     private void notifyTimerUpdated() {
+        // Notify all listeners
         for (TimerListener listener : new ArrayList<>(listeners)) {
             try {
                 listener.onTimerUpdated(remainingSeconds, running, paused);
@@ -133,6 +150,7 @@ public class TimerService {
     }
 
     private void notifyTimerCompleted() {
+        // Notify all listeners
         for (TimerListener listener : new ArrayList<>(listeners)) {
             try {
                 listener.onTimerCompleted();
@@ -175,10 +193,10 @@ public class TimerService {
     }
 
     private int calculateMultiplier(int minutes) {
-        if (minutes <= 5) return 3;
-        if (minutes <= 15) return 2;
-        if (minutes <= 30) return 2;
-        if (minutes <= 60) return 1;
+        if (minutes <= 5) return 5;
+        if (minutes <= 15) return 4;
+        if (minutes <= 30) return 3;
+        if (minutes <= 60) return 2;
         return 1;
     }
 

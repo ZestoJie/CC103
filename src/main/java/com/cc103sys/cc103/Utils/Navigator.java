@@ -7,9 +7,12 @@ import javafx.scene.Scene;
 public class Navigator {
 
     private static Scene scene;
+    @SuppressWarnings("unused")
+    private static TimerService timerService;
 
     public static void setScene(Scene sc) {
         scene = sc;
+        timerService = TimerService.getInstance();
     }
 
     public static boolean navigateTo(String viewName) {

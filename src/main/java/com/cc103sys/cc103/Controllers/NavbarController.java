@@ -8,13 +8,15 @@ import java.sql.SQLException;
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class NavbarController {
+public class NavbarController implements TimerService.TimerListener {
     private static NavbarController instance;
     @FXML
     private ImageView profilePictureImageView;
@@ -27,6 +29,10 @@ public class NavbarController {
     @FXML
     private javafx.scene.control.Label levelLabel;
     @FXML
+    private Label timerStatusLabel;
+    @FXML
+    private Label timerValueLabel;
+    @FXML
     private Button dashboardBtn;
     @FXML
     private Button classesBtn;
@@ -37,14 +43,26 @@ public class NavbarController {
     @FXML
     private Button settingsBtn;
 
+    private TimerService timerService;
 
 
     @FXML
     public void initialize() throws Exception {
         System.out.println("NAVBAR LOADED");
+        timerService = TimerService.getInstance();
+        
+        // Remove old navbar listener if it exists
+        if (instance != null) {
+            timerService.removeTimerListener(instance);
+        }
+        
+        // Set new instance and add as listener
         instance = this;
+        timerService.addTimerListener(this);
+        
         setupRoleBasedAccess();
         loadUserInfo();
+        updateTimerDisplay();
     }
     private void setupRoleBasedAccess() {
         // Classes button is visible for all users
@@ -165,14 +183,6 @@ public class NavbarController {
     @FXML
     @SuppressWarnings("unused")
     private void goClasses() {
-        if (!Session.isHost()) {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-            alert.setTitle("Access Denied");
-            alert.setHeaderText("Restricted Access");
-            alert.setContentText("Only hosts can access the Classes section.");
-            alert.showAndWait();
-            return;
-        }
         if (Navigator.switchScene("Classes")) {
             setActive("classes");
         }
@@ -188,6 +198,39 @@ public class NavbarController {
     @SuppressWarnings("unused")
     private void logout(){
         Session.clear();
+        TimerService.getInstance().stop();
         Navigator.switchScene("Login");
+    }
+
+    @Override
+    public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+        updateTimerDisplay();
+    }
+
+    @Override
+    public void onTimerCompleted() {
+        updateTimerDisplay();
+    }
+
+    private void updateTimerDisplay() {
+        if (timerStatusLabel == null || timerValueLabel == null) {
+            return;
+        }
+
+        if (timerService.isRunning()) {
+            int remaining = timerService.getRemainingSeconds();
+            int minutes = remaining / 60;
+            int seconds = remaining % 60;
+
+            timerStatusLabel.setText("Active Timer");
+            timerStatusLabel.setStyle("-fx-text-fill: #facc15;");
+            timerValueLabel.setText(String.format("%02d:%02d", minutes, seconds));
+            timerValueLabel.setStyle("-fx-text-fill: #facc15; -fx-font-weight: bold;");
+        } else {
+            timerStatusLabel.setText("No active timer");
+            timerStatusLabel.setStyle("-fx-text-fill: #cbd5e1;");
+            timerValueLabel.setText("00:00");
+            timerValueLabel.setStyle("-fx-text-fill: #cbd5e1;");
+        }
     }
 }

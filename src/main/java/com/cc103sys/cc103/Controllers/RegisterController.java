@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -24,7 +25,8 @@ public class RegisterController implements Initializable {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private javafx.scene.control.ComboBox<String> roleComboBox;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private ComboBox<String> roleComboBox;
     @FXML private Label messageLabel;
 
     @Override
@@ -45,9 +47,10 @@ public class RegisterController implements Initializable {
         try {
             String username = usernameField.getText();
             String password = passwordField.getText();
-            String role = roleComboBox == null ? "PARTICIPANT" : roleComboBox.getValue();
+            String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText() : null;
+            String role = roleComboBox != null && roleComboBox.getValue() != null ? roleComboBox.getValue().trim() : "PARTICIPANT";
 
-            if(!validateRegisterInput(username, password, role)){
+            if (!validateRegisterInput(username, password, confirmPassword, role)) {
                 return;
             }
 
@@ -74,7 +77,7 @@ public class RegisterController implements Initializable {
         }
     }
 
-    private boolean validateRegisterInput(String username, String password, String role) {
+    private boolean validateRegisterInput(String username, String password, String confirmPassword, String role) {
         if (username == null || username.isBlank()) {
             displayError("Username is required.");
             return false;
@@ -89,6 +92,14 @@ public class RegisterController implements Initializable {
         }
         if (password.length() < MIN_PASSWORD_LENGTH) {
             displayError("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
+            return false;
+        }
+        if (confirmPassword == null || confirmPassword.isBlank()) {
+            displayError("Confirm Password is required.");
+            return false;
+        }
+        if (!password.equals(confirmPassword)) {
+            displayError("Passwords do not match.");
             return false;
         }
         if (role == null || role.isBlank()) {

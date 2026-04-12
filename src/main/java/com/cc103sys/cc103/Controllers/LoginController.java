@@ -6,10 +6,12 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
+import com.cc103sys.cc103.Utils.CredentialsManager;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -19,6 +21,7 @@ public class LoginController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private CheckBox rememberMe;
     @FXML private Label errorLabel;
 
     @FXML
@@ -29,6 +32,25 @@ public class LoginController {
         }
         if (passwordField != null) {
             passwordField.textProperty().addListener((obs, oldText, newText) -> clearError());
+        }
+
+        // Load saved credentials if available
+        loadSavedCredentials();
+    }
+
+    private void loadSavedCredentials() {
+        try {
+            String[] credentials = CredentialsManager.loadCredentials();
+            if (credentials != null && credentials.length == 2) {
+                usernameField.setText(credentials[0]);
+                passwordField.setText(credentials[1]);
+                if (rememberMe != null) {
+                    rememberMe.setSelected(true);
+                }
+                LOGGER.info("Saved credentials loaded");
+            }
+        } catch (Exception e) {
+            LOGGER.warning(() -> "Could not load saved credentials: " + e.getMessage());
         }
     }
 
@@ -45,11 +67,21 @@ public class LoginController {
 
             boolean authenticated = authenticateUser(username, password);
             if (authenticated) {
+                // Handle Remember Me
+                boolean rememberEnabled = rememberMe != null && rememberMe.isSelected();
+                if (rememberEnabled) {
+                    CredentialsManager.saveCredentials(username, password);
+                } else {
+                    CredentialsManager.clearCredentials();
+                }
+
                 Session.setCurrentClassId(-1);
                 Navigator.switchScene("Dashboard");
                 LOGGER.info(() -> "User logged in: " + username);
             } else {
                 showError("Invalid username or password");
+                // Clear saved credentials on failed login
+                CredentialsManager.clearCredentials();
                 LOGGER.warning(() -> "Failed login attempt for user: " + username);
             }
         } catch (Exception e) {

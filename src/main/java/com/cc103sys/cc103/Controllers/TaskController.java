@@ -15,6 +15,12 @@ import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
+import javafx.scene.Node;
+
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.collections.FXCollections;
@@ -83,17 +89,49 @@ public class TaskController {
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
     @FXML
-    public void initialize() throws Exception {
-        setupRoleBasedUI();
+public void initialize() throws Exception {
+    setupRoleBasedUI();
         setupTaskListView();
         setupTimerDropdown();
         loadUserClasses();
         loadAllClassTasks();
         loadFilteredTasks();
-        // Set navbar active to tasks
+    if (allTaskList != null) animateCard(allTaskList);
+    if (filteredTaskList != null) animateCard(filteredTaskList);
+    // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
         LOGGER.info("Task scene initialized successfully");
-    }
+
+    // ANIMATION START
+    animateUI();
+
+    LOGGER.info("Task scene initialized successfully");
+}
+
+    private void animateNode(Node node, double delay) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
+    slide.setFromY(20);
+    slide.setToY(0);
+
+    fade.setDelay(Duration.millis(delay));
+    slide.setDelay(Duration.millis(delay));
+
+    fade.play();
+    slide.play();
+}
+
+    private void animateUI() {
+    animateNode(taskField, 0);
+    animateNode(taskDate, 50);
+    animateNode(addTaskBtn, 100);
+    animateNode(classFilterComboBox, 150);
+    animateNode(allTaskList, 200);
+    animateNode(filteredTaskList, 250);
+}    
 
     private void setupTimerDropdown() {
         if (timerDuration != null) {
@@ -158,6 +196,19 @@ public class TaskController {
                     }
                     setText(null);
                     setGraphic(container);
+                    container.setOpacity(0);
+container.setTranslateY(10);
+
+FadeTransition fade = new FadeTransition(Duration.millis(300), container);
+fade.setFromValue(0);
+fade.setToValue(1);
+
+TranslateTransition slide = new TranslateTransition(Duration.millis(300), container);
+slide.setFromY(10);
+slide.setToY(0);
+
+fade.play();
+slide.play();
                 }
             }
         };
@@ -386,6 +437,20 @@ public class TaskController {
         return String.format("%s - %s%s (%s)", task.getTaskName(), task.getStatus(), classSuffix, task.getDate());
     }
 
+private void animateCard(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
+    slide.setFromY(15);
+    slide.setToY(0);
+
+    new ParallelTransition(fade, slide).play();
+}
+
+
+    
     private void loadFilteredTasks() throws Exception {
         filteredTasks.clear();
         Classes selected = classFilterComboBox == null ? null : classFilterComboBox.getValue();

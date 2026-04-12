@@ -51,8 +51,11 @@ public class LeaderboardController {
 
             setupOverallLeaderboard();
 
-            // Set navbar active
-            NavbarController.getInstance().setActive("leaderboard");
+            try {
+                NavbarController.getInstance().setActive("leaderboard");
+            } catch (Exception e) {
+    
+            }
 
             LOGGER.info("Leaderboard initialized");
         } catch (Exception e) {

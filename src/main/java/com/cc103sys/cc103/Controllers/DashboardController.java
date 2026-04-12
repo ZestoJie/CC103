@@ -1,3 +1,5 @@
+
+
 package com.cc103sys.cc103.Controllers;
 
 import java.sql.Connection;
@@ -17,11 +19,15 @@ import com.cc103sys.cc103.Utils.Session;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -33,6 +39,20 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.util.Duration;
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 
 public class DashboardController {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
@@ -83,7 +103,12 @@ public class DashboardController {
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
                     }
-                });
+                
+            if (taskList != null) animate(taskList);
+            if (leaderboardPreview != null) animate(leaderboardPreview);
+
+            if (timerPauseButton != null)
+                timerPauseButton.setDisable(true);});
             }
 
             if (timerPauseButton != null) {
@@ -95,12 +120,25 @@ public class DashboardController {
 
             updateTimerAvailability();
 
-            NavbarController.getInstance().setActive("dashboard");
-            LOGGER.info("Dashboard initialized successfully");
-        } catch (Exception e) {
-            LOGGER.severe(() -> "Dashboard initialization error: " + e.getMessage());
-        }
+        NavbarController.getInstance().setActive("dashboard");
+
+    } catch (Exception e) {
+        LOGGER.severe("Init error: " + e.getMessage());
     }
+}
+    
+    private void animate(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(400), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(400), node);
+    slide.setFromY(10);
+    slide.setToY(0);
+
+    new ParallelTransition(fade, slide).play();
+}
+    
 
     private void setupRoleBasedUI() {
         boolean isHost = Session.isHost();
@@ -692,12 +730,27 @@ public class DashboardController {
         }
 
         if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
-            int minutes = initialSeconds / 60;
+            awardTimerXp(10);
+        }
+        int minutes = initialSeconds / 60;
             int multiplier = calculateMultiplier(minutes);
             int points = BASE_TASK_POINTS * multiplier;
             awardTimerXp(points);
         }
-    }
+    @SuppressWarnings("unused")
+    private void animateCard(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    ScaleTransition scale = new ScaleTransition(Duration.millis(500), node);
+    scale.setFromX(0.95);
+    scale.setFromY(0.95);
+    scale.setToX(1);
+    scale.setToY(1);
+
+    new ParallelTransition(fade, scale).play();
+}   
 
     private int calculateMultiplier(int minutes) {
         if (minutes <= 5) return 3; // Shorter sessions get higher reward
@@ -753,12 +806,13 @@ public class DashboardController {
         return 60;
     }
 
-    private void playAddTaskAnimation() {
-        if (taskList != null) {
-            FadeTransition fade = new FadeTransition(Duration.seconds(0.5), taskList);
-            fade.setFromValue(0.7);
-            fade.setToValue(1);
-            fade.play();
+    private void playAddTaskAnimation() {if (taskList != null) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(200), taskList);
+        st.setFromX(0.98);
+        st.setFromY(0.98);
+        st.setToX(1);
+        st.setToY(1);
+        st.play();
         }
     }
 

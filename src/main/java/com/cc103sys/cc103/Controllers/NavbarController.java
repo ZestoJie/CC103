@@ -1,41 +1,30 @@
 package com.cc103sys.cc103.Controllers;
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class NavbarController {
-
     private static NavbarController instance;
-
     @FXML
     private ImageView profilePictureImageView;
     @FXML
-    private Label usernameLabel;
+    private javafx.scene.control.Label usernameLabel;
     @FXML
-    private Label userRoleLabel;
+    private javafx.scene.control.Label userRoleLabel;
     @FXML
     private javafx.scene.control.ProgressBar levelProgressBar;
     @FXML
-    private Label levelLabel;
-    @FXML
-    private Label timerStatusLabel;
-    @FXML
-    private Label timerValueLabel;
-
+    private javafx.scene.control.Label levelLabel;
     @FXML
     private Button dashboardBtn;
     @FXML
@@ -47,45 +36,23 @@ public class NavbarController {
     @FXML
     private Button settingsBtn;
 
+
+
     @FXML
-    public void initialize() throws Exception {
+    public void initialize() {
+        System.out.println("NAVBAR LOADED");
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();
-        setupTimerDisplay();
     }
-
-    private void setupTimerDisplay() {
-        TimerService.getInstance().addTimerListener(new TimerService.TimerListener() {
-            @Override
-            public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
-                if (timerStatusLabel != null) {
-                    timerStatusLabel.setText(!running ? "No active timer" : (paused ? "Timer paused" : "Timer running"));
-                }
-                if (timerValueLabel != null) {
-                    int minutes = Math.max(0, remainingSeconds) / 60;
-                    int seconds = Math.max(0, remainingSeconds) % 60;
-                    timerValueLabel.setText(String.format("%02d:%02d", minutes, seconds));
-                }
-            }
-
-            @Override
-            public void onTimerCompleted() {
-                if (timerStatusLabel != null) {
-                    timerStatusLabel.setText("Timer completed");
-                }
-                if (timerValueLabel != null) {
-                    timerValueLabel.setText("00:00");
-                }
-            }
-        });
-    }
-
     private void setupRoleBasedAccess() {
-        // All users can access classes - permissions are controlled within the page
+        // Hide Classes button for participants
+        if (classesBtn != null) {
+            classesBtn.setVisible(Session.isHost());
+            classesBtn.setManaged(Session.isHost());
+        }
     }
-
-    public void loadUserInfo() throws Exception {
+    public void loadUserInfo() {
         if (usernameLabel != null) {
             usernameLabel.setText(Session.getUsername() != null ? Session.getUsername() : "Unknown User");
         }
@@ -102,8 +69,7 @@ public class NavbarController {
         // Load profile picture
         loadProfilePicture();
     }
-
-    private void loadProfilePicture() throws Exception {
+    private void loadProfilePicture() {
         try {
             Integer userId = getCurrentUserId();
             if (userId != null) {
@@ -127,7 +93,7 @@ public class NavbarController {
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             // Fall back to default
         }
         
@@ -141,7 +107,6 @@ public class NavbarController {
             // Ignore
         }
     }
-
     private Integer getCurrentUserId() {
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -158,22 +123,18 @@ public class NavbarController {
         }
         return null;
     }
-
     public static NavbarController getInstance() {
         return instance;
     }
-
     public void setActive(String buttonName) {
         // Reset all buttons to transparent
         String transparentStyle = "-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;";
         String activeStyle = "-fx-background-color: #2c5d7c; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT;";
-
         dashboardBtn.setStyle(transparentStyle);
         classesBtn.setStyle(transparentStyle);
         leaderboardBtn.setStyle(transparentStyle);
         tasksBtn.setStyle(transparentStyle);
         settingsBtn.setStyle(transparentStyle);
-
         switch (buttonName.toLowerCase()) {
             case "dashboard" -> dashboardBtn.setStyle(activeStyle);
             case "classes" -> classesBtn.setStyle(activeStyle);
@@ -182,7 +143,6 @@ public class NavbarController {
             case "settings" -> settingsBtn.setStyle(activeStyle);
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void goDashboard() {
@@ -190,7 +150,6 @@ public class NavbarController {
             setActive("dashboard");
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void goTasks() {
@@ -198,7 +157,6 @@ public class NavbarController {
             setActive("tasks");
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void goLeaderboard() {
@@ -206,15 +164,21 @@ public class NavbarController {
             setActive("leaderboard");
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void goClasses() {
+        if (!Session.isHost()) {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Restricted Access");
+            alert.setContentText("Only hosts can access the Classes section.");
+            alert.showAndWait();
+            return;
+        }
         if (Navigator.switchScene("Classes")) {
             setActive("classes");
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void goSettings() {
@@ -222,7 +186,6 @@ public class NavbarController {
             setActive("settings");
         }
     }
-
     @FXML
     @SuppressWarnings("unused")
     private void logout(){

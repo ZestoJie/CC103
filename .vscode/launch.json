@@ -3,22 +3,11 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launcher",
-            "request": "launch",
-            "mainClass": "com.cc103sys.cc103.Launcher",
-            "projectName": "CC103_Client"
-        },
-        {
-            "type": "java",
-            "name": "Run JavaFX App",
+            "name": "Run CC103 JavaFX App",
             "request": "launch",
             "mainClass": "com.cc103sys.cc103.App",
             "projectName": "CC103_Client",
-            "vmArgs": "--module-path \"C:/Users/rhejie carl/Downloads/openjfx-21.0.10_windows-x64_bin-sdk/javafx-sdk-21.0.10/lib\" --add-modules javafx.controls,javafx.fxml",
-            "classPaths": [
-                "${workspaceFolder}/target/classes",
-                "${workspaceFolder}/lib/*"
-            ]
+            "vmArgs": "--module-path \"${env:USERPROFILE}/.m2/repository/org/openjfx/javafx-base/21.0.10/javafx-base-21.0.10-win.jar;${env:USERPROFILE}/.m2/repository/org/openjfx/javafx-graphics/21.0.10/javafx-graphics-21.0.10-win.jar;${env:USERPROFILE}/.m2/repository/org/openjfx/javafx-controls/21.0.10/javafx-controls-21.0.10-win.jar;${env:USERPROFILE}/.m2/repository/org/openjfx/javafx-fxml/21.0.10/javafx-fxml-21.0.10-win.jar\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }

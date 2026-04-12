@@ -3,60 +3,82 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #ecf0f1;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<!-- Root Container: Sidebar + Main Content -->
+<HBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" 
+      style="-fx-background-color: #f0f2f5;">
     <children>
+        <!-- Navbar (Fixed Width) -->
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
         
-        <VBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #ecf0f1;">
+        <!-- Main Content Area -->
+        <VBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="30" right="40" bottom="30" left="40"/>
             </padding>
+            
             <children>
-                <Label text="Leaderboard" style="-fx-font-size: 24; -fx-font-weight: bold;" />
-
-                <HBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                    <children>
-                        <VBox spacing="12" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                            <children>
-                                <Label text="Class Leaderboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-                                <HBox spacing="10" alignment="CENTER_LEFT">
+                <!-- Page Header -->
+                <Label text="Leaderboard" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                    <VBox.margin>
+                        <Insets bottom="25" />
+                    </VBox.margin>
+                </Label>
+                
+                <!-- Scrollable Content -->
+                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
+                            style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+                    <content>
+                        <!-- Max Width Container for Desktop Sizing -->
+                        <HBox alignment="TOP_CENTER">
+                            <VBox spacing="25" maxWidth="900" HBox.hgrow="ALWAYS" fillWidth="true">
+                                
+                                <!-- CARD 1: Class Leaderboard -->
+                                <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
                                     <children>
-                                        <Label text="Select Class:" style="-fx-font-size: 14;" />
-                                        <ComboBox fx:id="classComboBox" promptText="Select Class" HBox.hgrow="ALWAYS"/>
-                                        <Button text="View" onAction="#loadLeaderboard" />
+                                        <HBox alignment="CENTER_LEFT" spacing="15">
+                                            <children>
+                                                <Label text="Class Rankings" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                                <!-- Class Filter -->
+                                                <ComboBox fx:id="classComboBox" promptText="Select a Class" HBox.hgrow="ALWAYS" 
+                                                          style="-fx-padding: 8; -fx-border-color: #dfe6e9; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #fdfdfd;" />
+                                            </children>
+                                        </HBox>
+                                        
+                                        <TableView fx:id="table" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                                            <columns>
+                                                <TableColumn fx:id="usernameCol" text="Student Name" prefWidth="250" />
+                                                <TableColumn fx:id="pointsCol" text="Total XP (Points)" prefWidth="150" />
+                                                <TableColumn fx:id="levelCol" text="Level" prefWidth="150" />
+                                            </columns>
+                                        </TableView>
                                     </children>
-                                </HBox>
-                                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
-                                    <TableView fx:id="table" visible="false" style="-fx-font-size: 12; -fx-background-color: white;">
-                                        <columns>
-                                            <TableColumn fx:id="usernameCol" text="Username" prefWidth="220" />
-                                            <TableColumn fx:id="pointsCol" text="Points" prefWidth="120" />
-                                            <TableColumn fx:id="levelCol" text="Level" prefWidth="120" />
-                                        </columns>
-                                    </TableView>
-                                </ScrollPane>
-                            </children>
-                        </VBox>
-
-                        <VBox spacing="12" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                            <children>
-                                <Label text="Overall Leaderboard" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-                                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-radius: 5;">
-                                    <TableView fx:id="overallTable" style="-fx-font-size: 12; -fx-background-color: white;">
-                                        <columns>
-                                            <TableColumn fx:id="overallUsernameCol" text="Username" prefWidth="220" />
-                                            <TableColumn fx:id="overallPointsCol" text="Points" prefWidth="120" />
-                                            <TableColumn fx:id="overallLevelCol" text="Level" prefWidth="120" />
-                                        </columns>
-                                    </TableView>
-                                </ScrollPane>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-
-                <Button text="Back to Dashboard" onAction="#goBack" style="-fx-padding: 10px;" />
+                                </VBox>
+                                
+                                <!-- CARD 2: Global Leaderboard -->
+                                <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 6);">
+                                    <children>
+                                        <Label text="Global Rankings" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+                                        
+                                        <TableView fx:id="overallTable" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                                            <columns>
+                                                <TableColumn fx:id="overallUsernameCol" text="Student Name" prefWidth="250" />
+                                                <TableColumn fx:id="overallPointsCol" text="Total XP (Points)" prefWidth="150" />
+                                                <TableColumn fx:id="overallLevelCol" text="Level" prefWidth="150" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </VBox>
+                                
+                                <!-- Footer Spacer -->
+                                <Region prefHeight="20" />
+                                
+                            </VBox>
+                        </HBox>
+                    </content>
+                </ScrollPane>
             </children>
         </VBox>
     </children>

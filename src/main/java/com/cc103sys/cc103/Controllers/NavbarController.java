@@ -9,9 +9,11 @@ import java.sql.SQLException;
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -22,13 +24,17 @@ public class NavbarController {
     @FXML
     private ImageView profilePictureImageView;
     @FXML
-    private javafx.scene.control.Label usernameLabel;
+    private Label usernameLabel;
     @FXML
-    private javafx.scene.control.Label userRoleLabel;
+    private Label userRoleLabel;
     @FXML
     private javafx.scene.control.ProgressBar levelProgressBar;
     @FXML
-    private javafx.scene.control.Label levelLabel;
+    private Label levelLabel;
+    @FXML
+    private Label timerStatusLabel;
+    @FXML
+    private Label timerValueLabel;
 
     @FXML
     private Button dashboardBtn;
@@ -46,6 +52,33 @@ public class NavbarController {
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();
+        setupTimerDisplay();
+    }
+
+    private void setupTimerDisplay() {
+        TimerService.getInstance().addTimerListener(new TimerService.TimerListener() {
+            @Override
+            public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+                if (timerStatusLabel != null) {
+                    timerStatusLabel.setText(!running ? "No active timer" : (paused ? "Timer paused" : "Timer running"));
+                }
+                if (timerValueLabel != null) {
+                    int minutes = Math.max(0, remainingSeconds) / 60;
+                    int seconds = Math.max(0, remainingSeconds) % 60;
+                    timerValueLabel.setText(String.format("%02d:%02d", minutes, seconds));
+                }
+            }
+
+            @Override
+            public void onTimerCompleted() {
+                if (timerStatusLabel != null) {
+                    timerStatusLabel.setText("Timer completed");
+                }
+                if (timerValueLabel != null) {
+                    timerValueLabel.setText("00:00");
+                }
+            }
+        });
     }
 
     private void setupRoleBasedAccess() {

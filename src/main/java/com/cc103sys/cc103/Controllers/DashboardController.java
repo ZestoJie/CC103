@@ -14,10 +14,9 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,7 +35,6 @@ import javafx.util.Duration;
 
 public class DashboardController {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
-    private static final int BASE_TASK_POINTS = 10;
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
 
@@ -56,11 +54,29 @@ public class DashboardController {
     @FXML private Label dailyGoalTip;
     @FXML private TextField customTimeField;
 
-    private Timeline timeline;
-    private int remainingSeconds;
-    private int initialSeconds;
-    private boolean timerRunning;
-    private boolean timerPaused;
+    private final TimerService timerService = TimerService.getInstance();
+    private final TimerService.TimerListener timerListener = new TimerService.TimerListener() {
+        @Override
+        public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
+            if (timerLabel != null) {
+                int minutes = Math.max(0, remainingSeconds) / 60;
+                int seconds = Math.max(0, remainingSeconds) % 60;
+                timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+            }
+            if (timerPauseButton != null) {
+                timerPauseButton.setDisable(!running);
+                timerPauseButton.setText(paused ? "Resume" : "Pause");
+            }
+            if (timerStartButton != null) {
+                timerStartButton.setText(running ? "Restart" : "Start");
+            }
+        }
+
+        @Override
+        public void onTimerCompleted() {
+            timerCompleted();
+        }
+    };
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private Task selectedTask;
 
@@ -94,11 +110,44 @@ public class DashboardController {
             }
 
             updateTimerAvailability();
+            registerTimerListener();
+            syncTimerUI();
 
             NavbarController.getInstance().setActive("dashboard");
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
             LOGGER.severe(() -> "Dashboard initialization error: " + e.getMessage());
+        }
+    }
+
+    private void registerTimerListener() {
+        timerService.removeTimerListener(timerListener);
+        timerService.addTimerListener(timerListener);
+    }
+
+    private void syncTimerUI() {
+        if (timerService.isRunning()) {
+            if (timerStartButton != null) {
+                timerStartButton.setText("Restart");
+            }
+            if (timerPauseButton != null) {
+                timerPauseButton.setDisable(false);
+                timerPauseButton.setText(timerService.isPaused() ? "Resume" : "Pause");
+            }
+        } else {
+            if (timerStartButton != null) {
+                timerStartButton.setText("Start");
+            }
+            if (timerPauseButton != null) {
+                timerPauseButton.setDisable(true);
+                timerPauseButton.setText("Pause");
+            }
+        }
+        if (timerLabel != null) {
+            int remaining = timerService.getRemainingSeconds();
+            int minutes = Math.max(0, remaining) / 60;
+            int seconds = Math.max(0, remaining) % 60;
+            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
         }
     }
 
@@ -547,8 +596,8 @@ public class DashboardController {
                 return;
             }
 
-            if (timerRunning && timerPaused) {
-                resumeTimer();
+            if (timerService.isRunning() && timerService.isPaused()) {
+                timerService.resume();
                 return;
             }
 
@@ -558,6 +607,7 @@ public class DashboardController {
                 return;
             }
 
+            int seconds;
             if ("Custom".equals(selected)) {
                 if (customTimeField == null || customTimeField.getText().isBlank()) {
                     LOGGER.warning("Custom time not specified");
@@ -565,36 +615,22 @@ public class DashboardController {
                 }
                 try {
                     int minutes = Integer.parseInt(customTimeField.getText().trim());
-                    if (minutes <= 0 || minutes > 480) { // Max 8 hours
+                    if (minutes <= 0 || minutes > 480) {
                         LOGGER.warning(() -> "Invalid custom time: " + minutes);
                         return;
                     }
-                    remainingSeconds = minutes * 60;
+                    seconds = minutes * 60;
                 } catch (NumberFormatException e) {
                     LOGGER.warning("Invalid custom time format");
                     return;
                 }
             } else {
-                remainingSeconds = convertToSeconds(selected);
+                seconds = convertToSeconds(selected);
             }
 
-            initialSeconds = remainingSeconds;
-
-            // Mark task as in progress
             updateTaskStatus(selectedTask.getId(), "in progress");
-
-            stopTimer();
-            timerRunning = true;
-            timerPaused = false;
-            if (timerPauseButton != null) {
-                timerPauseButton.setDisable(false);
-                timerPauseButton.setText("Pause");
-            }
-            if (timerStartButton != null) {
-                timerStartButton.setText("Restart");
-            }
-            startCountdown();
-            LOGGER.info(() -> "Timer started for task: " + selectedTask.getTaskName() + " (" + remainingSeconds + " seconds)");
+            timerService.start(seconds, selectedTask.getId(), xpActiveCheckbox != null && xpActiveCheckbox.isSelected());
+            LOGGER.info(() -> "Timer started for task: " + selectedTask.getTaskName() + " (" + seconds + " seconds)");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to start timer: " + e.getMessage());
         }
@@ -603,13 +639,13 @@ public class DashboardController {
     @FXML
     @SuppressWarnings("unused")
     private void handlePauseTimer() {
-        if (!timerRunning) {
+        if (!timerService.isRunning()) {
             return;
         }
-        if (timerPaused) {
-            resumeTimer();
+        if (timerService.isPaused()) {
+            timerService.resume();
         } else {
-            pauseTimer();
+            timerService.pause();
         }
     }
 
@@ -632,49 +668,7 @@ public class DashboardController {
         // This is intentionally lightweight; XP activation is controlled by the checkbox state.
     }
 
-    private void startCountdown() {
-        if (timerLabel != null) {
-            updateTimerLabel();
-        }
-        timeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), event -> {
-                remainingSeconds--;
-                updateTimerLabel();
-                if (remainingSeconds <= 0) {
-                    timerCompleted();
-                }
-            })
-        );
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
-
-    private void pauseTimer() {
-        if (timeline != null) {
-            timeline.pause();
-            timerPaused = true;
-            if (timerPauseButton != null) {
-                timerPauseButton.setText("Resume");
-            }
-            LOGGER.info("Timer paused");
-        }
-    }
-
-    private void resumeTimer() {
-        if (timeline != null) {
-            timeline.play();
-            timerPaused = false;
-            if (timerPauseButton != null) {
-                timerPauseButton.setText("Pause");
-            }
-            LOGGER.info("Timer resumed");
-        }
-    }
-
     private void timerCompleted() {
-        stopTimer();
-        timerRunning = false;
-        timerPaused = false;
         if (timerPauseButton != null) {
             timerPauseButton.setDisable(true);
             timerPauseButton.setText("Pause");
@@ -685,60 +679,13 @@ public class DashboardController {
         if (timerLabel != null) {
             timerLabel.setText("Done!");
         }
-
-        // Mark task as completed if timer was running for a task
-        if (selectedTask != null) {
-            updateTaskStatus(selectedTask.getId(), "completed");
-        }
-
-        if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
-            int minutes = initialSeconds / 60;
-            int multiplier = calculateMultiplier(minutes);
-            int points = BASE_TASK_POINTS * multiplier;
-            awardTimerXp(points);
-        }
-    }
-
-    private int calculateMultiplier(int minutes) {
-        if (minutes <= 5) return 3; // Shorter sessions get higher reward
-        if (minutes <= 15) return 2;
-        if (minutes <= 30) return 2; // 1.5x rounded up
-        if (minutes <= 60) return 1;
-        return 1;
-    }
-
-    private void awardTimerXp(int points) {
-        String sql = "UPDATE users SET points = points + ? WHERE username = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, points);
-            stmt.setString(2, Session.getUsername());
-            stmt.executeUpdate();
-            Session.setPoints(Session.getPoints() + points);
-            refreshNavbarPoints();
-            LOGGER.info(() -> "Timer XP awarded: " + points);
+        try {
+            loadTasks();
         } catch (Exception e) {
-            LOGGER.severe(() -> "Failed to award timer XP: " + e.getMessage());
+            e.printStackTrace();
         }
-    }
-
-    private void refreshNavbarPoints() throws Exception {
-        if (NavbarController.getInstance() != null) {
-            NavbarController.getInstance().loadUserInfo();
-        }
-    }
-
-    private void stopTimer() {
-        if (timeline != null) {
-            timeline.stop();
-        }
-    }
-
-    private void updateTimerLabel() {
-        int minutes = Math.max(0, remainingSeconds) / 60;
-        int seconds = Math.max(0, remainingSeconds) % 60;
-        if (timerLabel != null) {
-            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        if (dailyGoalSummary != null) {
+            updateDailyGoalProgress();
         }
     }
 

@@ -12,6 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <javafx.version>21.0.10</javafx.version>
+        <javafx.platform>win</javafx.platform>
     </properties>
 
     <dependencies>
@@ -19,11 +20,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
@@ -48,21 +51,6 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.cc103sys.cc103.App</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-Dprism.order=sw</argument>
-                        <argument>-p</argument>
-                        <argument>${project.build.directory}/modules</argument>
-                        <argument>-m</argument>
-                        <argument>javafx.controls/com.cc103sys.cc103.App</argument>
-                    </arguments>
                 </configuration>
             </plugin>
             <plugin>

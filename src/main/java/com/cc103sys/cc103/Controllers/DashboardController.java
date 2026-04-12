@@ -1,3 +1,5 @@
+
+
 package com.cc103sys.cc103.Controllers;
 
 import java.sql.Connection;
@@ -18,11 +20,15 @@ import com.cc103sys.cc103.Utils.Session;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -69,38 +75,39 @@ public class DashboardController {
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
 
     @FXML
-    public void initialize() {
-        try {
-            setupWelcomeMessage();
-            setupTaskListView();
-            setupTimerPresets();
-            setupRoleBasedUI();
-            loadTasks();
-            loadUserClassesForLeaderboard();
-            
-            if (classSelector != null) {
-                classSelector.setOnAction(e -> {
-                    try {
-                        loadLeaderboardPreviewForClass();
-                    } catch (Exception e1) {
-                    }
-                    loadTasks();
-                });
-            }
+public void initialize() {
+    try {
+        setupWelcomeMessage();
+        setupTaskListView();
+        setupTimerPresets();
+        setupRoleBasedUI();
+        loadTasks();
+        loadUserClassesForLeaderboard();
 
-            if (timerPauseButton != null) {
-                timerPauseButton.setDisable(true);
-            }
-            if (xpActiveCheckbox != null) {
-                xpActiveCheckbox.setSelected(true);
-            }
+        if (taskList != null) animate(taskList);
+        if (leaderboardPreview != null) animate(leaderboardPreview);
 
-            NavbarController.getInstance().setActive("dashboard");
-            LOGGER.info("Dashboard initialized successfully");
-        } catch (Exception e) {
-            LOGGER.severe("Dashboard initialization error: " + e.getMessage());
-        }
+        if (timerPauseButton != null)
+            timerPauseButton.setDisable(true);
+
+        NavbarController.getInstance().setActive("dashboard");
+
+    } catch (Exception e) {
+        LOGGER.severe("Init error: " + e.getMessage());
     }
+}
+    
+    private void animate(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(400), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(400), node);
+    slide.setFromY(10);
+    slide.setToY(0);
+
+    new ParallelTransition(fade, slide).play();
+}
 
     private void setupRoleBasedUI() {
         boolean isHost = Session.isHost();
@@ -650,6 +657,19 @@ public class DashboardController {
             awardTimerXp(10);
         }
     }
+    private void animateCard(Node node) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    ScaleTransition scale = new ScaleTransition(Duration.millis(500), node);
+    scale.setFromX(0.95);
+    scale.setFromY(0.95);
+    scale.setToX(1);
+    scale.setToY(1);
+
+    new ParallelTransition(fade, scale).play();
+}
 
     private void awardTimerXp(int points) {
         String sql = "UPDATE users SET points = points + ? WHERE username = ?";
@@ -697,13 +717,15 @@ public class DashboardController {
     }
 
     private void playAddTaskAnimation() {
-        if (taskList != null) {
-            FadeTransition fade = new FadeTransition(Duration.seconds(0.5), taskList);
-            fade.setFromValue(0.7);
-            fade.setToValue(1);
-            fade.play();
-        }
+    if (taskList != null) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(200), taskList);
+        st.setFromX(0.98);
+        st.setFromY(0.98);
+        st.setToX(1);
+        st.setToY(1);
+        st.play();
     }
+}
 
     private boolean validateTaskInput(String taskName, LocalDate date) {
         if (taskName == null || taskName.isBlank()) {

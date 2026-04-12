@@ -8,6 +8,7 @@ com\cc103sys\cc103\Controllers\RegisterController.class
 com\cc103sys\cc103\Controllers\DashboardController$1.class
 com\cc103sys\cc103\Controllers\ClassesController$ClassListCell.class
 com\cc103sys\cc103\Controllers\ClassesController$OwnedClassListCell.class
+com\cc103sys\cc103\Controllers\SettingsController.class
 com\cc103sys\cc103\App.class
 com\cc103sys\cc103\Controllers\ClassDetailController$TaskListCell.class
 com\cc103sys\cc103\Controllers\NavbarController.class

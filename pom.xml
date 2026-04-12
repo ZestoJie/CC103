@@ -12,6 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <javafx.version>21.0.10</javafx.version>
+        <javafx.platform>win</javafx.platform>
     </properties>
 
     <dependencies>
@@ -19,11 +20,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
@@ -48,6 +51,7 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.cc103sys.cc103.Launcher</mainClass>
+                    <javafxPlatform>${javafx.platform}</javafxPlatform>
                 </configuration>
             </plugin>
             <plugin>

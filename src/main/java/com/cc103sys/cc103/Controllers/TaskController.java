@@ -13,6 +13,11 @@ import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
+import javafx.scene.Node;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -55,16 +60,45 @@ public class TaskController {
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
 
     @FXML
-    public void initialize() {
-        setupRoleBasedUI();
-        setupTaskListView();
-        loadUserClasses();
-        loadAllClassTasks();
-        loadFilteredTasks();
-        // Set navbar active to tasks
-        NavbarController.getInstance().setActive("tasks");
-        LOGGER.info("Task scene initialized successfully");
-    }
+public void initialize() {
+    setupRoleBasedUI();
+    setupTaskListView();
+    loadUserClasses();
+    loadAllClassTasks();
+    loadFilteredTasks();
+
+    NavbarController.getInstance().setActive("tasks");
+
+    // ANIMATION START
+    animateUI();
+
+    LOGGER.info("Task scene initialized successfully");
+}
+
+    private void animateNode(Node node, double delay) {
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
+    slide.setFromY(20);
+    slide.setToY(0);
+
+    fade.setDelay(Duration.millis(delay));
+    slide.setDelay(Duration.millis(delay));
+
+    fade.play();
+    slide.play();
+}
+
+    private void animateUI() {
+    animateNode(taskField, 0);
+    animateNode(taskDate, 50);
+    animateNode(addTaskBtn, 100);
+    animateNode(classFilterComboBox, 150);
+    animateNode(allTaskList, 200);
+    animateNode(filteredTaskList, 250);
+}    
 
     private void setupRoleBasedUI() {
         boolean isHost = Session.isHost();
@@ -128,6 +162,19 @@ public class TaskController {
                     }
                     setText(null);
                     setGraphic(container);
+                    container.setOpacity(0);
+container.setTranslateY(10);
+
+FadeTransition fade = new FadeTransition(Duration.millis(300), container);
+fade.setFromValue(0);
+fade.setToValue(1);
+
+TranslateTransition slide = new TranslateTransition(Duration.millis(300), container);
+slide.setFromY(10);
+slide.setToY(0);
+
+fade.play();
+slide.play();
                 }
             }
         };

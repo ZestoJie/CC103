@@ -8,28 +8,31 @@
 <HBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cc103sys.cc103.Controllers.DashboardController"
-      style="-fx-background-color: #f5f7fb;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+      stylesheets="@dashboard.css"
+      styleClass="root"
+      VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
 
     <children>
 
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
-        <VBox spacing="20" style="-fx-background-color: #f5f7fb;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
+            <!-- TOP BAR -->
             <HBox alignment="CENTER_LEFT">
                 <children>
 
                     <Label fx:id="welcomeLabel"
                            text="Welcome back, User!"
-                           style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                           styleClass="title"/>
 
                     <Region HBox.hgrow="ALWAYS"/>
 
                     <Button onAction="#goSettings"
-                            style="-fx-background-color: transparent;">
+                            styleClass="icon-button">
                         <graphic>
                             <ImageView fitHeight="20" fitWidth="20">
                                 <image>
@@ -44,17 +47,14 @@
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">
 
+                <!-- LEFT SIDE -->
                 <VBox spacing="20" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
 
-                    <VBox spacing="10" VBox.vgrow="ALWAYS"
-                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+                    <!-- TASK PANEL -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS" styleClass="card">
 
-                        <Label text="TaskScene"
-                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-
-                        <Label text="Upcoming Deadlines"
-                               style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" />
+                        <Label text="TaskScene" styleClass="title"/>
+                        <Label text="Upcoming Deadlines" styleClass="subtitle"/>
 
                         <HBox spacing="10">
                             <TextField fx:id="taskField" promptText="Enter Task"/>
@@ -66,19 +66,15 @@
 
                         <Label fx:id="noTaskLabel"
                                text="No activities to accomplish"
-                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12;"
+                               styleClass="subtitle"
                                visible="false"/>
                     </VBox>
 
-                    <VBox spacing="10" VBox.vgrow="ALWAYS"
-                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+                    <!-- LEADERBOARD -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS" styleClass="card">
                         <HBox>
-                            <Label text="Mini Leaderboard"
-                                   style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-
+                            <Label text="Mini Leaderboard" styleClass="title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-
                             <ComboBox fx:id="classSelector" promptText="Class"/>
                         </HBox>
 
@@ -90,32 +86,31 @@
 
                 </VBox>
 
+                <!-- RIGHT SIDE -->
                 <VBox spacing="20" HBox.hgrow="ALWAYS">
 
+                    <!-- TIMER -->
                     <VBox spacing="10" VBox.vgrow="ALWAYS"
                           onMouseClicked="#openTimerPopup"
-                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+                          styleClass="card">
 
-                        <Label text="Timer Panel"
-                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="Timer Panel" styleClass="title"/>
 
                         <Label fx:id="timerLabel"
-                               text="00:00"
-                               style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+                               text="00:00"/>
 
                         <Button text="Start" onAction="#handleStartTimer"/>
                     </VBox>
 
-                    <VBox spacing="10" VBox.vgrow="ALWAYS"
-                          style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);">
+                    <!-- PROGRESS -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS" styleClass="card">
 
-                        <Label text="Daily Goal Progress"
-                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="Daily Goal Progress" styleClass="title"/>
 
-                        <Label text="Chart will display here"
-                               style="-fx-text-fill: #9ca3af;" />
+                        <ProgressBar fx:id="dailyProgressBar" progress="0"/>
+
+                        <Label fx:id="dailyGoalSummary" styleClass="subtitle"/>
+                        <Label fx:id="dailyGoalTip" styleClass="subtitle"/>
                     </VBox>
 
                 </VBox>

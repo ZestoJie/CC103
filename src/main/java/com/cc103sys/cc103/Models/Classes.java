@@ -2,8 +2,8 @@ package com.cc103sys.cc103.Models;
 
 public class Classes {
 
-    private int id;
-    private String className;
+    private final int id;
+    private final String className;
     private Integer ownerId;
 
     public Classes(int id, String className) {

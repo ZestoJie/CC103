@@ -59,6 +59,7 @@
                                                         <DatePicker fx:id="taskDate" style="-fx-padding: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff;" />
                                                         <Button fx:id="addTaskBtn" onAction="#handleAddTask" style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 20; -fx-font-weight: 600; -fx-cursor: hand;" text="Add" />
                                                     </HBox>
+                                                    <TextArea fx:id="taskDescriptionArea" prefRowCount="3" promptText="Task description (optional)..." style="-fx-padding: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff;" wrapText="true" />
                                                 </children>
                                             </VBox>
 

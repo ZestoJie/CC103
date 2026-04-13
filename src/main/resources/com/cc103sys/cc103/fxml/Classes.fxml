@@ -9,6 +9,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -32,20 +33,17 @@
                     <HBox alignment="CENTER_LEFT" spacing="20">
                         <children>
                             <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Classes" />
+                            <Button fx:id="tabAllClassesBtn" onAction="#switchToAllClassesView" style="-fx-background-color: white; -fx-text-fill: #718096; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: hand;" text="All Classes" />
+                            <Button fx:id="tabDetailBtn" disable="true" onAction="#switchToDetailView" style="-fx-background-color: white; -fx-text-fill: #cbd5e0; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: default;" text="Class Details" />
                             
-                            <!-- Create Class Button (Host Only) -->
-                            <Button fx:id="addClassButton" onAction="#toggleCreateSection" style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10px 20px; -fx-font-weight: 600; -fx-font-size: 13; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(49, 130, 206, 0.3), 6, 0, 0, 0);" text="Create New Class">
+                                  <!-- Create Class Button (Host Only) -->
+                            <Button fx:id="addClassButton" onAction="#toggleCreateSection" style="-fx-background-color: #f0d045; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-font-size: 13; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(49, 130, 206, 0.3), 6, 0, 0, 0);" text="Create New Class">
                             </Button>
                         </children>
                     </HBox>
 
                     <!-- Custom Tab Navigation (Replaces TabPane) -->
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <children>
-                            <Button fx:id="tabAllClassesBtn" onAction="#switchToAllClassesView" style="-fx-background-color: white; -fx-text-fill: #718096; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: hand;" text="All Classes" />
-                            <Button fx:id="tabDetailBtn" disable="true" onAction="#switchToDetailView" style="-fx-background-color: white; -fx-text-fill: #cbd5e0; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: default;" text="Class Details" />
-                        </children>
-                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10" />
                 </VBox>
 
                 <!-- SCROLLABLE CONTENT AREA -->
@@ -59,7 +57,7 @@
                                 <VBox fx:id="allClassesView" spacing="25">
                                     
                                     <!-- Create Class Panel (Hidden by default) -->
-                                    <VBox fx:id="createClassSection" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
+                                    <VBox fx:id="createClassSection" prefHeight="246.0" prefWidth="522.0" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Create New Class" />
@@ -81,17 +79,17 @@
                                                 <TextField fx:id="privateClassCodeField" promptText="Leave blank to auto-generate" style="-fx-padding: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff;" />
                                             </VBox>
 
-                                            <Button onAction="#createClass" style="-fx-background-color: #38a169; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" text="Create Class" HBox.hgrow="ALWAYS" />
+                                            <Button onAction="#createClass" style="-fx-background-color: linear-gradient(#0a1f2e, #163a52); -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: bold; -fx-cursor: hand;" text="Create Class" HBox.hgrow="ALWAYS" />
                                         </children>
                                     </VBox>
                                     
                                     <!-- Join Private Class Card -->
-                                    <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
+                                    <VBox spacing="15" style="-fx-background-color: linear-gradient(#0a1f2e, #163a52); -fx-padding: 25; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
                                         <children>
-                                            <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Join Private Class" />
+                                            <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #ffffff;" text="Join Private Class" />
                                             <HBox spacing="10">
                                                 <TextField fx:id="codeField" promptText="Enter Code (e.g. ABC123)" style="-fx-padding: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff;" HBox.hgrow="ALWAYS" />
-                                                <Button onAction="#joinPrivateClass" style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 25; -fx-font-weight: 600; -fx-cursor: hand;" text="Join" />
+                                                <Button onAction="#joinPrivateClass" prefHeight="42.0" prefWidth="96.0" style="-fx-background-color: #ffcc00; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 0 25; -fx-font-weight: bold; -fx-cursor: hand;" text="Join" />
                                             </HBox>
                                         </children>
                                     </VBox>
@@ -101,9 +99,13 @@
                                         
                                         <!-- Left: Available Classes -->
                                         <VBox spacing="15" HBox.hgrow="ALWAYS">
-                                            <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Available Public Classes" />
+                                            <Label contentDisplay="TOP" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Available Public Classes" />
                                             <VBox minHeight="400" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
-                                                <ListView fx:id="classList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS" />
+                                    <BorderPane VBox.vgrow="ALWAYS">
+                                       <center>
+                                                      <ListView fx:id="classList" prefHeight="400.0" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-radius: 50;" />
+                                       </center>
+                                    </BorderPane>
                                             </VBox>
                                         </VBox>
                                         
@@ -111,7 +113,11 @@
                                         <VBox spacing="15" HBox.hgrow="ALWAYS">
                                             <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="My Classes" />
                                             <VBox minHeight="400" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
-                                                <ListView fx:id="myClassList" prefHeight="400" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS" />
+                                    <BorderPane VBox.vgrow="ALWAYS">
+                                       <center>
+                                                      <ListView fx:id="myClassList" prefHeight="400.0" style="-fx-background-color: Transparent; -fx-border-color: transparent; -fx-border-radius: 50;" />
+                                       </center>
+                                    </BorderPane>
                                             </VBox>
                                         </VBox>
                                     </HBox>
@@ -142,7 +148,7 @@
                                         <VBox spacing="15" HBox.hgrow="ALWAYS">
                                             <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Class Tasks" />
                                             <VBox minHeight="500" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 0, 2);">
-                                                <ListView fx:id="detailTasksListView" prefHeight="500" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS" />
+                                                <ListView fx:id="detailTasksListView" prefHeight="500" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS" />
                                             </VBox>
                                         </VBox>
                                         
@@ -154,7 +160,7 @@
                                                 <children>
                                                     <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Manage Selection" />
                                                     <VBox spacing="10">
-                                                        <Button fx:id="detailEditTaskButton" onAction="#handleDetailEditTask" style="-fx-background-color: #ed8936; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10; -fx-font-weight: 600; -fx-cursor: hand;" text="Edit Task" />
+                                                        <Button fx:id="detailEditTaskButton" onAction="#handleDetailEditTask" style="-fx-background-color: #f0d04f5; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10; -fx-font-weight: 600; -fx-cursor: hand;" text="Edit Task" />
                                                         <Button fx:id="detailDeleteTaskButton" onAction="#handleDetailDeleteTask" style="-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10; -fx-font-weight: 600; -fx-cursor: hand;" text="Delete Task" />
                                                     </VBox>
                                                 </children>

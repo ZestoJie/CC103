@@ -40,6 +40,7 @@ public class DBUtil {
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "class_id INT NOT NULL, "
                     + "task_name VARCHAR(255) NOT NULL, "
+                    + "description TEXT NULL, "
                     + "due_date DATE NOT NULL, "
                     + "owner_id INT NOT NULL, "
                     + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
@@ -116,6 +117,14 @@ public class DBUtil {
 
             if (!columnExists(conn, "users", "sfx_enabled")) {
                 stmt.executeUpdate("ALTER TABLE users ADD COLUMN sfx_enabled TINYINT(1) DEFAULT 1");
+            }
+
+            if (!columnExists(conn, "tasks", "description")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN description TEXT NULL");
+            }
+
+            if (!columnExists(conn, "tasks", "attachment_path")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN attachment_path VARCHAR(500) NULL");
             }
 
             if (!columnExists(conn, "classes", "is_public")) {

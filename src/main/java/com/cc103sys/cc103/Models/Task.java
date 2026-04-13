@@ -20,6 +20,8 @@ public class Task {
     private LocalDate approvedDate;
     private Integer createdBy;
     private LocalDate completedDate;
+    private String description;
+    private String attachmentPath;
 
     public Task(int id, String taskName, LocalDate date, String status) {
         this(id, taskName, date, status, null, null, false);
@@ -48,6 +50,8 @@ public class Task {
         this.completedDate = null;
         this.approvedBy = null;
         this.approvedDate = null;
+        this.description = null;
+        this.attachmentPath = null;
     }
 
     public int getId() { return id; }
@@ -104,5 +108,21 @@ public class Task {
 
     public void setCompletedDate(LocalDate completedDate) {
         this.completedDate = completedDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAttachmentPath() {
+        return attachmentPath;
+    }
+
+    public void setAttachmentPath(String attachmentPath) {
+        this.attachmentPath = attachmentPath;
     }
 }

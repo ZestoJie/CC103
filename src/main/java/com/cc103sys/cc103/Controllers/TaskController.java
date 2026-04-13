@@ -15,10 +15,6 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.TimerService;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
-import javafx.scene.Node;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -30,9 +26,12 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+import javafx.stage.FileChooser;
 
 public class TaskController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
@@ -74,6 +73,7 @@ public class TaskController implements TimerService.TimerListener {
     @FXML private TextArea taskInstructions;
     @FXML private ListView<String> attachmentsList;
     @FXML private ComboBox<String> timerDuration;
+    @FXML private TextArea taskDescriptionArea;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
@@ -137,6 +137,7 @@ public class TaskController implements TimerService.TimerListener {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void switchToApprovalsView() {
         if (myTasksView != null) {
             myTasksView.setVisible(false);
@@ -147,6 +148,9 @@ public class TaskController implements TimerService.TimerListener {
             approvalsView.setManaged(true);
         }
         updateTabStyles(false);
+        if (Session.isHost()) {
+            loadPendingApprovals();
+        }
     }
 
     private void updateTabStyles(boolean isMyTasksActive) {
@@ -244,6 +248,13 @@ public class TaskController implements TimerService.TimerListener {
                         completeTask(task);
                     }
                 });
+                taskLabel.setOnMouseClicked(e -> {
+                    Task task = getItem();
+                    if (task != null) {
+                        showTaskDetails(task);
+                    }
+                });
+                taskLabel.setStyle("-fx-cursor: hand;");
             }
 
             @Override
@@ -301,6 +312,13 @@ public class TaskController implements TimerService.TimerListener {
 
             {
                 container.setStyle("-fx-padding: 10; -fx-background-color: #fef3c7; -fx-border-color: #f59e0b; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;");
+                taskLabel.setOnMouseClicked(e -> {
+                    Task task = getItem();
+                    if (task != null) {
+                        showPendingApprovalDetails(task);
+                    }
+                });
+                taskLabel.setStyle("-fx-cursor: hand;");
             }
 
             @Override
@@ -330,7 +348,8 @@ public class TaskController implements TimerService.TimerListener {
         if (Session.isHost()) {
             updateTaskStatus(task, "Done");
         } else {
-            updateTaskStatus(task, "pending_approval");
+            // For students, prompt for attachment
+            showAttachmentDialog(task);
         }
     }
 
@@ -383,12 +402,13 @@ public class TaskController implements TimerService.TimerListener {
 
             } else if ("pending_approval".equalsIgnoreCase(newStatus)) {
                 int points = calculateTaskCompletionPoints(task.getDate());
-                String updateSql = "UPDATE tasks SET status = 'pending_approval', completed_date = ?, pending_points = ? WHERE id = ? AND username = ?";
+                String updateSql = "UPDATE tasks SET status = 'pending_approval', completed_date = ?, pending_points = ?, attachment_path = ? WHERE id = ? AND username = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
                     stmt.setDate(1, Date.valueOf(LocalDate.now()));
                     stmt.setInt(2, points);
-                    stmt.setInt(3, task.getId());
-                    stmt.setString(4, Session.getUsername());
+                    stmt.setString(3, task.getAttachmentPath());
+                    stmt.setInt(4, task.getId());
+                    stmt.setString(5, Session.getUsername());
                     stmt.executeUpdate();
                 }
 
@@ -505,7 +525,7 @@ public class TaskController implements TimerService.TimerListener {
             return;
         }
         
-        String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name, t.is_personal "
+        String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name, t.is_personal, t.description, t.attachment_path "
                    + "FROM tasks t "
                    + "LEFT JOIN classes c ON t.class_id = c.id "
                    + "LEFT JOIN user_classes uc ON c.id = uc.class_id AND uc.user_id = ? "
@@ -522,7 +542,7 @@ public class TaskController implements TimerService.TimerListener {
                     String className = rs.getString("class_name");
                     boolean isPersonal = rs.getBoolean("is_personal");
                     
-                    allTasks.add(new Task(
+                    Task task = new Task(
                         rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("task_name"),
@@ -531,7 +551,10 @@ public class TaskController implements TimerService.TimerListener {
                         classId > 0 ? classId : null,
                         className != null && !className.isEmpty() ? className : null,
                         isPersonal
-                    ));
+                    );
+                    task.setDescription(rs.getString("description"));
+                    task.setAttachmentPath(rs.getString("attachment_path"));
+                    allTasks.add(task);
                 }
             }
         } catch (SQLException e) {
@@ -562,7 +585,7 @@ public class TaskController implements TimerService.TimerListener {
                 return;
             }
 
-            String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, c.class_name "
+            String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, c.class_name, t.description, t.attachment_path "
                        + "FROM tasks t "
                        + "JOIN classes c ON t.class_id = c.id "
                        + "WHERE t.user_id = ? AND t.class_id = ?";
@@ -573,7 +596,7 @@ public class TaskController implements TimerService.TimerListener {
                 stmt.setInt(2, selected.getId());
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        filteredTasks.add(new Task(
+                        Task task = new Task(
                             rs.getInt("id"),
                             rs.getString("username"),
                             rs.getString("task_name"),
@@ -582,7 +605,10 @@ public class TaskController implements TimerService.TimerListener {
                             rs.getInt("class_id"),
                             rs.getString("class_name"),
                             false
-                        ));
+                        );
+                        task.setDescription(rs.getString("description"));
+                        task.setAttachmentPath(rs.getString("attachment_path"));
+                        filteredTasks.add(task);
                     }
                 }
             }
@@ -597,6 +623,7 @@ public class TaskController implements TimerService.TimerListener {
         String taskName = taskField.getText().trim();
         LocalDate date = taskDate.getValue();
         Classes selectedClass = classSelectionComboBox != null ? classSelectionComboBox.getValue() : null;
+        String description = taskDescriptionArea != null ? taskDescriptionArea.getText().trim() : "";
 
         if (taskName.isEmpty() || date == null) {
             return;
@@ -607,12 +634,13 @@ public class TaskController implements TimerService.TimerListener {
                 Integer ownerId = getCurrentUserId();
                 if (ownerId == null) return;
 
-                String classTaskSql = "INSERT INTO class_tasks (class_id, task_name, due_date, owner_id) VALUES (?, ?, ?, ?)";
+                String classTaskSql = "INSERT INTO class_tasks (class_id, task_name, description, due_date, owner_id) VALUES (?, ?, ?, ?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(classTaskSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     stmt.setInt(1, selectedClass.getId());
                     stmt.setString(2, taskName);
-                    stmt.setDate(3, Date.valueOf(date));
-                    stmt.setInt(4, ownerId);
+                    stmt.setString(3, description);
+                    stmt.setDate(4, Date.valueOf(date));
+                    stmt.setInt(5, ownerId);
                     stmt.executeUpdate();
 
                     try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -624,7 +652,7 @@ public class TaskController implements TimerService.TimerListener {
                 }
                 LOGGER.info("Class task created and assigned to members successfully");
             } else {
-                String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
+                String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal, description) VALUES (?, ?, ?, ?, 'Pending', 1, ?)";
 
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setString(1, Session.getUsername());
@@ -636,6 +664,7 @@ public class TaskController implements TimerService.TimerListener {
                     }
                     stmt.setString(3, taskName);
                     stmt.setDate(4, java.sql.Date.valueOf(date));
+                    stmt.setString(5, description);
                     stmt.executeUpdate();
                 }
                 LOGGER.info("Personal task added successfully");
@@ -643,6 +672,9 @@ public class TaskController implements TimerService.TimerListener {
 
             taskField.clear();
             taskDate.setValue(null);
+            if (taskDescriptionArea != null) {
+                taskDescriptionArea.clear();
+            }
             if (classSelectionComboBox != null) {
                 classSelectionComboBox.getSelectionModel().clearSelection();
             }
@@ -654,8 +686,8 @@ public class TaskController implements TimerService.TimerListener {
     }
 
     private void assignTaskToClassMembers(int classTaskId) {
-        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
-                   + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by, description) "
+                   + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id, ct.description "
                    + "FROM class_tasks ct "
                    + "JOIN user_classes uc ON ct.class_id = uc.class_id "
                    + "JOIN users u ON uc.user_id = u.id "
@@ -840,36 +872,33 @@ public class TaskController implements TimerService.TimerListener {
     private void loadPendingApprovals() {
         pendingApprovals.clear();
         
-        String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, t.pending_points, " +
+        String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, t.pending_points, t.description, t.attachment_path, " +
                     "COALESCE(c.class_name, '') as class_name " +
                     "FROM tasks t " +
                     "LEFT JOIN classes c ON t.class_id = c.id " +
-                    "WHERE t.status = 'pending_approval' AND c.owner_id = ? " +
-                    "ORDER BY t.task_date DESC";
+                    "WHERE t.status = 'pending_approval'";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            Integer userId = getCurrentUserId();
-            if (userId != null) {
-                stmt.setInt(1, userId);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        Task task = new Task(
-                            rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("task_name"),
-                            rs.getDate("task_date").toLocalDate(),
-                            rs.getString("status"),
-                            rs.getInt("class_id"),
-                            rs.getString("class_name"),
-                            false
-                        );
-                        task.setPendingPoints(rs.getInt("pending_points"));
-                        pendingApprovals.add(task);
-                    }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Task task = new Task(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("task_name"),
+                        rs.getDate("task_date").toLocalDate(),
+                        rs.getString("status"),
+                        rs.getInt("class_id"),
+                        rs.getString("class_name"),
+                        false
+                    );
+                    task.setPendingPoints(rs.getInt("pending_points"));
+                    task.setDescription(rs.getString("description"));
+                    task.setAttachmentPath(rs.getString("attachment_path"));
+                    pendingApprovals.add(task);
                 }
-                LOGGER.info(() -> "Loaded " + pendingApprovals.size() + " pending approvals");
             }
+            LOGGER.info(() -> "Loaded " + pendingApprovals.size() + " pending approvals");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to load pending approvals: " + e.getMessage());
         }
@@ -895,8 +924,18 @@ public class TaskController implements TimerService.TimerListener {
         }
     }
 
-    private void rejectTask(Task task) {
-        updateTaskStatus(task, "Pending");
+    private void showAttachmentDialog(Task task) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Attachment");
+        java.io.File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            // For simplicity, store the file path. In a real app, you'd upload to server.
+            task.setAttachmentPath(selectedFile.getAbsolutePath());
+            updateTaskStatus(task, "pending_approval");
+        } else {
+            // Allow submission without attachment
+            updateTaskStatus(task, "pending_approval");
+        }
     }
 
     private Task fetchTaskById(int taskId) {
@@ -927,5 +966,132 @@ public class TaskController implements TimerService.TimerListener {
         }
 
         return null;
+    }
+
+    public Button getMarkDoneBtn() {
+        return markDoneBtn;
+    }
+
+    public void setMarkDoneBtn(Button markDoneBtn) {
+        this.markDoneBtn = markDoneBtn;
+    }
+
+    public Button getSaveTaskInfoBtn() {
+        return saveTaskInfoBtn;
+    }
+
+    public void setSaveTaskInfoBtn(Button saveTaskInfoBtn) {
+        this.saveTaskInfoBtn = saveTaskInfoBtn;
+    }
+
+    public Button getStartTimerBtn() {
+        return startTimerBtn;
+    }
+
+    public void setStartTimerBtn(Button startTimerBtn) {
+        this.startTimerBtn = startTimerBtn;
+    }
+
+    public Button getUploadAttachmentBtn() {
+        return uploadAttachmentBtn;
+    }
+
+    public void setUploadAttachmentBtn(Button uploadAttachmentBtn) {
+        this.uploadAttachmentBtn = uploadAttachmentBtn;
+    }
+
+    public Button getApproveSelectedBtn() {
+        return approveSelectedBtn;
+    }
+
+    public void setApproveSelectedBtn(Button approveSelectedBtn) {
+        this.approveSelectedBtn = approveSelectedBtn;
+    }
+
+    public Button getRejectSelectedBtn() {
+        return rejectSelectedBtn;
+    }
+
+    public void setRejectSelectedBtn(Button rejectSelectedBtn) {
+        this.rejectSelectedBtn = rejectSelectedBtn;
+    }
+
+    private void showTaskDetails(Task task) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Task Details");
+        dialog.setHeaderText(task.getTaskName());
+
+        TextArea contentArea = new TextArea();
+        contentArea.setEditable(false);
+        contentArea.setWrapText(true);
+        contentArea.setPrefRowCount(8);
+        updateContentArea(contentArea, task);
+        dialog.getDialogPane().setContent(contentArea);
+
+        ButtonType attachButton = new ButtonType("Attach File");
+        ButtonType submitButton = new ButtonType("Submit");
+        ButtonType unsubmitButton = new ButtonType("Unsubmit");
+        ButtonType closeButton = new ButtonType("Close", ButtonType.CANCEL.getButtonData());
+
+        dialog.getDialogPane().getButtonTypes().addAll(attachButton, submitButton, unsubmitButton, closeButton);
+
+        dialog.setResultConverter(buttonType -> {
+            if (buttonType == attachButton) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Select Attachment");
+                java.io.File selectedFile = fileChooser.showOpenDialog(null);
+                if (selectedFile != null) {
+                    task.setAttachmentPath(selectedFile.getAbsolutePath());
+                    LOGGER.info(() -> "Attachment selected: " + selectedFile.getAbsolutePath());
+                    updateContentArea(contentArea, task);
+                }
+                return null; // Keep dialog open
+            } else if (buttonType == submitButton) {
+                updateTaskStatus(task, "pending_approval");
+                reloadTaskLists();
+                return buttonType; // Close dialog
+            } else if (buttonType == unsubmitButton) {
+                updateTaskStatus(task, "Pending");
+                reloadTaskLists();
+                return buttonType; // Close dialog
+            }
+            return buttonType; // Close on other buttons
+        });
+
+        dialog.showAndWait();
+    }
+
+    private void updateContentArea(TextArea contentArea, Task task) {
+        String content = "Deadline: " + task.getDate() + "\n" +
+                        "Status: " + task.getStatus() + "\n" +
+                        "Description: " + (task.getDescription() != null ? task.getDescription() : "No description") + "\n" +
+                        "Attachment: " + (task.getAttachmentPath() != null ? new java.io.File(task.getAttachmentPath()).getName() : "No attachment");
+        contentArea.setText(content);
+    }
+
+    private void showPendingApprovalDetails(Task task) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Pending Approval Details");
+        alert.setHeaderText(task.getTaskName());
+
+        String content = "Submitted by: " + task.getUsername() + "\n" +
+                        "Deadline: " + task.getDate() + "\n" +
+                        "Description: " + (task.getDescription() != null ? task.getDescription() : "No description") + "\n" +
+                        "Attachment: " + (task.getAttachmentPath() != null ? task.getAttachmentPath() : "No attachment");
+
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void rejectTask(Task task) {
+        updateTaskStatus(task, "Pending");
+    }
+
+    public ListView<String> getAttachmentsList() {
+        return attachmentsList;
+    }
+
+    public void setAttachmentsList(ListView<String> attachmentsList) {
+        this.attachmentsList = attachmentsList;
     }
 }

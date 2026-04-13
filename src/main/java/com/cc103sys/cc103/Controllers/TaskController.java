@@ -28,8 +28,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -45,54 +43,37 @@ public class TaskController implements TimerService.TimerListener {
     private Task timerTask;
     private TimerService timerService;
 
-    @FXML
-    private TextField taskField;
-    @FXML
-    private DatePicker taskDate;
-    @FXML
-    private ComboBox<Classes> classFilterComboBox;
-    @FXML
-    private ComboBox<Classes> classSelectionComboBox; // New: For hosts to select class when adding tasks
-    @FXML
-    private ListView<Task> allTaskList;
-    @FXML
-    private ListView<Task> filteredTaskList;
-    @FXML
-    @SuppressWarnings("unused")
-    private Button addTaskBtn;
-    @FXML
-    @SuppressWarnings("unused")
-    private Button markDoneBtn;
-    @FXML
-    @SuppressWarnings("unused")
-    private Button deleteTaskBtn;
-    @FXML
-    private TextArea taskInstructions;
-    @FXML
-    private ListView<String> attachmentsList;
-    @FXML
-    private ComboBox<String> timerDuration;
-    @FXML
-    private Button uploadAttachmentBtn;
-    @FXML
-    private Button saveTaskInfoBtn;
-    @FXML
-    private Button startTimerBtn;
-    @FXML
-    private Label timerDisplayLabel;
-    @FXML
-    private TabPane taskTabPane;
-    @FXML
-    private Tab classManagementTab;
-    @FXML
-    private ComboBox<Classes> approvalClassFilterComboBox;
-    @FXML
-    private ListView<Task> pendingApprovalsList;
-    @FXML
-    private Button approveSelectedBtn;
-    @FXML
-    @SuppressWarnings("unused")
-    private Button rejectSelectedBtn;
+    // UI Elements
+    @FXML private TextField taskField;
+    @FXML private DatePicker taskDate;
+    @FXML private ComboBox<Classes> classFilterComboBox;
+    @FXML private ComboBox<Classes> classSelectionComboBox;
+    @FXML private ListView<Task> allTaskList;
+    @FXML private ListView<Task> filteredTaskList;
+    
+    @FXML private Button addTaskBtn;
+    @FXML private Button markDoneBtn;
+    @FXML private Button deleteTaskBtn;
+    @FXML private Button uploadAttachmentBtn;
+    @FXML private Button saveTaskInfoBtn;
+    @FXML private Button startTimerBtn;
+    @FXML private Label timerDisplayLabel;
+
+    // Custom Tab Elements
+    @FXML private Button tabMyTasksBtn;
+    @FXML private Button tabApprovalsBtn;
+    @FXML private VBox myTasksView;
+    @FXML private VBox approvalsView;
+
+    // Approval Elements
+    @FXML private ComboBox<Classes> approvalClassFilterComboBox;
+    @FXML private ListView<Task> pendingApprovalsList;
+    @FXML private Button approveSelectedBtn;
+    @FXML private Button rejectSelectedBtn;
+
+    @FXML private TextArea taskInstructions;
+    @FXML private ListView<String> attachmentsList;
+    @FXML private ComboBox<String> timerDuration;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
@@ -103,19 +84,19 @@ public class TaskController implements TimerService.TimerListener {
     public void initialize() {
         timerService = TimerService.getInstance();
         
-        // Remove any previous scene listeners (but not navbar)
         timerService.removeTimerListener(this);
-        
-        // Add this instance as a listener
         timerService.addTimerListener(this);
 
-        // Immediately sync timer display with current state
         updateTimerDisplay();
 
         setupRoleBasedUI();
         setupTaskListView();
         setupTimerDropdown();
         loadUserClasses();
+        
+        // Initialize Tabs Logic
+        switchToMyTasksView();
+
         try {
             loadAllClassTasks();
         } catch (Exception e) {
@@ -126,6 +107,7 @@ public class TaskController implements TimerService.TimerListener {
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to load filtered tasks: " + e.getMessage());
         }
+
         if (Session.isHost()) {
             loadPendingApprovals();
             if (approvalClassFilterComboBox != null) {
@@ -133,42 +115,53 @@ public class TaskController implements TimerService.TimerListener {
                 approvalClassFilterComboBox.setOnAction(e -> loadPendingApprovals());
             }
         }
-        if (allTaskList != null) animateCard(allTaskList);
-        if (filteredTaskList != null) animateCard(filteredTaskList);
-        // Set navbar active to tasks
+        
+        // Navbar Active State
         NavbarController.getInstance().setActive("tasks");
-        LOGGER.info("Task scene initialized successfully");
-
-        // ANIMATION START
-        animateUI();
-
         LOGGER.info("Task scene initialized successfully");
     }
 
-    private void animateNode(Node node, double delay) {
-    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
-    fade.setFromValue(0);
-    fade.setToValue(1);
+    // --- Custom Tab Switching Logic ---
 
-    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
-    slide.setFromY(20);
-    slide.setToY(0);
+    @FXML
+    private void switchToMyTasksView() {
+        if (myTasksView != null) {
+            myTasksView.setVisible(true);
+            myTasksView.setManaged(true);
+        }
+        if (approvalsView != null) {
+            approvalsView.setVisible(false);
+            approvalsView.setManaged(false);
+        }
+        updateTabStyles(true);
+    }
 
-    fade.setDelay(Duration.millis(delay));
-    slide.setDelay(Duration.millis(delay));
+    @FXML
+    private void switchToApprovalsView() {
+        if (myTasksView != null) {
+            myTasksView.setVisible(false);
+            myTasksView.setManaged(false);
+        }
+        if (approvalsView != null) {
+            approvalsView.setVisible(true);
+            approvalsView.setManaged(true);
+        }
+        updateTabStyles(false);
+    }
 
-    fade.play();
-    slide.play();
-}
+    private void updateTabStyles(boolean isMyTasksActive) {
+        String activeStyle = "-fx-background-color: #3182ce; -fx-text-fill: white; -fx-border-color: #3182ce; -fx-background-radius: 20; -fx-border-radius: 20; -fx-cursor: hand;";
+        String inactiveStyle = "-fx-background-color: white; -fx-text-fill: #718096; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-cursor: hand;";
 
-    private void animateUI() {
-    animateNode(taskField, 0);
-    animateNode(taskDate, 50);
-    animateNode(addTaskBtn, 100);
-    animateNode(classFilterComboBox, 150);
-    animateNode(allTaskList, 200);
-    animateNode(filteredTaskList, 250);
-}    
+        if (tabMyTasksBtn != null) {
+            tabMyTasksBtn.setStyle(isMyTasksActive ? activeStyle : inactiveStyle);
+        }
+        if (tabApprovalsBtn != null) {
+            tabApprovalsBtn.setStyle(isMyTasksActive ? inactiveStyle : activeStyle);
+        }
+    }
+
+    // --- Existing Logic (Kept intact) ---
 
     private void setupTimerDropdown() {
         if (timerDuration != null) {
@@ -180,17 +173,15 @@ public class TaskController implements TimerService.TimerListener {
 
     private void setupRoleBasedUI() {
         boolean isHost = Session.isHost();
-        // Hide add task functionality for participants
-        if (taskField != null) taskField.setVisible(isHost);
-        if (taskDate != null) taskDate.setVisible(isHost);
-        taskField.setVisible(isHost);
-taskField.setManaged(isHost);
-
-taskDate.setVisible(isHost);
-taskDate.setManaged(isHost);
-
-addTaskBtn.setVisible(isHost);
-addTaskBtn.setManaged(isHost);
+        
+        if (taskField != null) {
+            taskField.setVisible(isHost);
+            taskField.setManaged(isHost);
+        }
+        if (taskDate != null) {
+            taskDate.setVisible(isHost);
+            taskDate.setManaged(isHost);
+        }
         if (classSelectionComboBox != null) {
             classSelectionComboBox.setVisible(isHost);
             classSelectionComboBox.setManaged(isHost);
@@ -198,15 +189,22 @@ addTaskBtn.setManaged(isHost);
                 classSelectionComboBox.setItems(userClasses);
             }
         }
-        if (addTaskBtn != null) addTaskBtn.setVisible(isHost);
-        // Hide delete functionality for participants
-        if (deleteTaskBtn != null) deleteTaskBtn.setVisible(isHost);
+        if (addTaskBtn != null) {
+            addTaskBtn.setVisible(isHost);
+            addTaskBtn.setManaged(isHost);
+        }
+        if (deleteTaskBtn != null) {
+            deleteTaskBtn.setVisible(isHost);
+            deleteTaskBtn.setManaged(isHost);
+        }
         
-        // Hide Class Management tab for participants
-        if (classManagementTab != null) {
-            classManagementTab.setDisable(!isHost);
+        // Tab Visibility
+        if (tabApprovalsBtn != null) {
+            tabApprovalsBtn.setVisible(isHost);
+            tabApprovalsBtn.setManaged(isHost);
             if (!isHost) {
-                taskTabPane.getTabs().remove(classManagementTab);
+                // Force switch to My Tasks if not host
+                switchToMyTasksView();
             }
         }
     }
@@ -271,13 +269,13 @@ addTaskBtn.setManaged(isHost);
                         }
                         case "pending_approval" -> {
                             if (Session.isHost()) {
-                                taskLabel.setStyle("-fx-text-fill: #f59e0b;"); // Orange for pending
+                                taskLabel.setStyle("-fx-text-fill: #f59e0b;");
                                 actionButton.setText("Approve");
-                                actionButton.setStyle("-fx-background-color: #10b981; -fx-text-fill: white;"); // Green approve button
+                                actionButton.setStyle("-fx-background-color: #10b981; -fx-text-fill: white;");
                                 actionButton.setVisible(true);
                             } else {
-                                taskLabel.setStyle("-fx-text-fill: #f59e0b; -fx-opacity: 0.8;"); // Orange for pending
-                                actionButton.setVisible(false); // Hide button for participants
+                                taskLabel.setStyle("-fx-text-fill: #f59e0b; -fx-opacity: 0.8;");
+                                actionButton.setVisible(false);
                             }
                         }
                         default -> {
@@ -289,19 +287,6 @@ addTaskBtn.setManaged(isHost);
                     }
                     setText(null);
                     setGraphic(container);
-                    container.setOpacity(0);
-container.setTranslateY(10);
-
-FadeTransition fade = new FadeTransition(Duration.millis(300), container);
-fade.setFromValue(0);
-fade.setToValue(1);
-
-TranslateTransition slide = new TranslateTransition(Duration.millis(300), container);
-slide.setFromY(10);
-slide.setToY(0);
-
-fade.play();
-slide.play();
                 }
             }
         };
@@ -343,10 +328,8 @@ slide.play();
 
     private void completeTask(Task task) {
         if (Session.isHost()) {
-            // Hosts can directly complete tasks
             updateTaskStatus(task, "Done");
         } else {
-            // Participants need approval
             updateTaskStatus(task, "pending_approval");
         }
     }
@@ -374,13 +357,10 @@ slide.play();
 
         try (Connection conn = DBUtil.getConnection()) {
             if ("Done".equalsIgnoreCase(newStatus)) {
-                // Award points - use pending_points if approving, otherwise calculate new points
                 int points;
                 if ("pending_approval".equalsIgnoreCase(task.getStatus()) && task.getPendingPoints() > 0) {
-                    // Approving a participant submission - use stored pending points
                     points = task.getPendingPoints();
                 } else {
-                    // Host completing task directly - calculate points
                     points = calculateTaskCompletionPoints(task.getDate());
                 }
                 
@@ -402,7 +382,6 @@ slide.play();
                 }
 
             } else if ("pending_approval".equalsIgnoreCase(newStatus)) {
-                // Store points in pending_points for participant approval
                 int points = calculateTaskCompletionPoints(task.getDate());
                 String updateSql = "UPDATE tasks SET status = 'pending_approval', completed_date = ?, pending_points = ? WHERE id = ? AND username = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
@@ -414,7 +393,6 @@ slide.play();
                 }
 
             } else if ("Pending".equalsIgnoreCase(newStatus)) {
-                // Undo completion - clear pending points and completion date
                 String updateSql = "UPDATE tasks SET status = 'Pending', completed_date = NULL, pending_points = 0 WHERE id = ? AND username = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
                     stmt.setInt(1, task.getId());
@@ -430,23 +408,6 @@ slide.play();
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to update task status: " + e.getMessage());
         }
-    }
-
-    @SuppressWarnings("unused")
-    private int getTaskPointsAwarded(int taskId, Connection conn) {
-        String sql = "SELECT points_awarded FROM tasks WHERE id = ? AND username = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, taskId);
-            stmt.setString(2, Session.getUsername());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("points_awarded");
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.severe(() -> "Failed to fetch task awarded points: " + e.getMessage());
-        }
-        return 0;
     }
 
     private int fetchCurrentUserPoints(Connection conn) {
@@ -522,7 +483,7 @@ slide.play();
                     try {
                         loadFilteredTasks();
                     } catch (Exception e1) {
-
+                        // ignore
                     }
                 });
                 if (!userClasses.isEmpty()) {
@@ -538,52 +499,39 @@ slide.play();
 
     private void loadAllClassTasks() throws Exception {
         allTasks.clear();
+        Integer userId = getCurrentUserId();
+        if (userId == null) {
+            LOGGER.warning(() -> "Could not determine current user ID for user: " + Session.getUsername());
+            return;
+        }
         
-        try {
-            // First get the current user's ID
-            Integer userId = getCurrentUserId();
-            if (userId == null) {
-                LOGGER.warning(() -> "Could not determine current user ID for user: " + Session.getUsername());
-                return;
-            }
-            
-            LOGGER.info(() -> "Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
-            
-            // Load both personal tasks and class tasks for classes the user is in
-            String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name, t.is_personal "
-                       + "FROM tasks t "
-                       + "LEFT JOIN classes c ON t.class_id = c.id "
-                       + "LEFT JOIN user_classes uc ON c.id = uc.class_id AND uc.user_id = ? "
-                       + "WHERE (t.user_id = ? OR (t.class_id IS NOT NULL AND uc.user_id IS NOT NULL)) "
-                       + "ORDER BY t.task_date DESC";
+        String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name, t.is_personal "
+                   + "FROM tasks t "
+                   + "LEFT JOIN classes c ON t.class_id = c.id "
+                   + "LEFT JOIN user_classes uc ON c.id = uc.class_id AND uc.user_id = ? "
+                   + "WHERE (t.user_id = ? OR (t.class_id IS NOT NULL AND uc.user_id IS NOT NULL)) "
+                   + "ORDER BY t.task_date DESC";
 
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, userId); // for user_classes join
-                stmt.setInt(2, userId); // for personal tasks
-                LOGGER.info(() -> "Executing SQL: " + sql.replace("?", userId.toString()));
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        int classId = rs.getInt("class_id");
-                        String className = rs.getString("class_name");
-                        boolean isPersonal = rs.getBoolean("is_personal");
-                        
-                        String taskName = rs.getString("task_name");
-                        int id = rs.getInt("id");
-                        Task task = new Task(
-                            id,
-                            rs.getString("username"),
-                            taskName,
-                            rs.getDate("task_date").toLocalDate(),
-                            rs.getString("status"),
-                            classId > 0 ? classId : null,
-                            className != null && !className.isEmpty() ? className : null,
-                            isPersonal
-                        );
-                        allTasks.add(task);
-                        LOGGER.info(() -> "Added task: " + taskName + " (ID: " + id + ", ClassID: " + classId + ", Personal: " + isPersonal + ")");
-                    }
-                    LOGGER.info(() -> "Total tasks loaded: " + allTasks.size());
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int classId = rs.getInt("class_id");
+                    String className = rs.getString("class_name");
+                    boolean isPersonal = rs.getBoolean("is_personal");
+                    
+                    allTasks.add(new Task(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("task_name"),
+                        rs.getDate("task_date").toLocalDate(),
+                        rs.getString("status"),
+                        classId > 0 ? classId : null,
+                        className != null && !className.isEmpty() ? className : null,
+                        isPersonal
+                    ));
                 }
             }
         } catch (SQLException e) {
@@ -599,20 +547,6 @@ slide.play();
         String classSuffix = task.getClassName() != null ? " [" + task.getClassName() + "]" : "";
         return String.format("%s - %s%s (%s)", task.getTaskName(), status, classSuffix, task.getDate());
     }
-
-private void animateCard(Node node) {
-    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
-    fade.setFromValue(0);
-    fade.setToValue(1);
-
-    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
-    slide.setFromY(15);
-    slide.setToY(0);
-
-    new ParallelTransition(fade, slide).play();
-}
-
-
     
     private void loadFilteredTasks() throws Exception {
         filteredTasks.clear();
@@ -652,7 +586,6 @@ private void animateCard(Node node) {
                     }
                 }
             }
-            LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected.getClassName()));
         } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to load filtered tasks: " + e.getMessage());
         }
@@ -671,7 +604,6 @@ private void animateCard(Node node) {
 
         try (Connection conn = DBUtil.getConnection()) {
             if (selectedClass != null) {
-                // Create class task - insert into class_tasks table
                 Integer ownerId = getCurrentUserId();
                 if (ownerId == null) return;
 
@@ -692,20 +624,16 @@ private void animateCard(Node node) {
                 }
                 LOGGER.info("Class task created and assigned to members successfully");
             } else {
-                // Create personal task
                 String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
 
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setString(1, Session.getUsername());
-
-                    // Get user ID
                     Integer userId = getCurrentUserId();
                     if (userId != null) {
                         stmt.setInt(2, userId);
                     } else {
                         stmt.setNull(2, java.sql.Types.INTEGER);
                     }
-
                     stmt.setString(3, taskName);
                     stmt.setDate(4, java.sql.Date.valueOf(date));
                     stmt.executeUpdate();
@@ -798,7 +726,6 @@ private void animateCard(Node node) {
 
         LOGGER.info(() -> "Timer started for " + minutes + " minutes on task: " + selected.getTaskName());
 
-        // Use TimerService to start the timer
         timerService.start(totalSeconds, selected.getId(), true);
     }
 
@@ -869,11 +796,9 @@ private void animateCard(Node node) {
     private void handleTimerCompleted() {
         if (timerTask == null) return;
 
-        // Check if task was completed during timer
         boolean taskCompleted = isTaskCompleted(timerTask);
 
         if (!taskCompleted) {
-            // Apply penalty: -15 points but not below 0
             int currentPoints = Session.getPoints();
             int newPoints = Math.max(0, currentPoints - TIMER_PENALTY_POINTS);
             Session.setPoints(newPoints);
@@ -884,56 +809,16 @@ private void animateCard(Node node) {
             LOGGER.info("Timer finished - task was completed during timer period");
         }
 
-        // Reset timer state
         timerTask = null;
         updateTimerDisplay();
     }
-private boolean isTaskCompleted(Task task) {
-    Task refreshed = fetchTaskById(task.getId());
-    if (refreshed == null) return false;
+    
+    private boolean isTaskCompleted(Task task) {
+        Task refreshed = fetchTaskById(task.getId());
+        if (refreshed == null) return false;
 
-    String status = refreshed.getStatus().toLowerCase();
-    return "done".equals(status) || "pending_approval".equals(status);
-}
-
-    public ListView<String> getAttachmentsList() {
-        return attachmentsList;
-    }
-
-    public void setAttachmentsList(ListView<String> attachmentsList) {
-        this.attachmentsList = attachmentsList;
-    }
-
-    public Button getSaveTaskInfoBtn() {
-        return saveTaskInfoBtn;
-    }
-
-    public void setSaveTaskInfoBtn(Button saveTaskInfoBtn) {
-        this.saveTaskInfoBtn = saveTaskInfoBtn;
-    }
-
-    public Button getUploadAttachmentBtn() {
-        return uploadAttachmentBtn;
-    }
-
-    public void setUploadAttachmentBtn(Button uploadAttachmentBtn) {
-        this.uploadAttachmentBtn = uploadAttachmentBtn;
-    }
-
-    public Button getStartTimerBtn() {
-        return startTimerBtn;
-    }
-
-    public void setStartTimerBtn(Button startTimerBtn) {
-        this.startTimerBtn = startTimerBtn;
-    }
-
-    public Label getTimerDisplayLabel() {
-        return timerDisplayLabel;
-    }
-
-    public void setTimerDisplayLabel(Label timerDisplayLabel) {
-        this.timerDisplayLabel = timerDisplayLabel;
+        String status = refreshed.getStatus().toLowerCase();
+        return "done".equals(status) || "pending_approval".equals(status);
     }
 
     private Integer getCurrentUserId() {
@@ -955,7 +840,6 @@ private boolean isTaskCompleted(Task task) {
     private void loadPendingApprovals() {
         pendingApprovals.clear();
         
-        // Load all pending approvals for classes owned by the current host
         String sql = "SELECT t.id, t.username, t.task_name, t.task_date, t.status, t.class_id, t.pending_points, " +
                     "COALESCE(c.class_name, '') as class_name " +
                     "FROM tasks t " +
@@ -997,7 +881,7 @@ private boolean isTaskCompleted(Task task) {
         Task selected = pendingApprovalsList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             approveTask(selected);
-            loadPendingApprovals(); // Refresh the list
+            loadPendingApprovals();
         }
     }
 
@@ -1007,50 +891,41 @@ private boolean isTaskCompleted(Task task) {
         Task selected = pendingApprovalsList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             rejectTask(selected);
-            loadPendingApprovals(); // Refresh the list
+            loadPendingApprovals();
         }
     }
 
     private void rejectTask(Task task) {
-        // Reset task to pending status
         updateTaskStatus(task, "Pending");
     }
 
     private Task fetchTaskById(int taskId) {
-    String sql = "SELECT * FROM tasks WHERE id = ?";
+        String sql = "SELECT * FROM tasks WHERE id = ?";
 
-    try (Connection conn = DBUtil.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setInt(1, taskId);
+            stmt.setInt(1, taskId);
 
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return new Task(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("task_name"),
-                        rs.getDate("task_date").toLocalDate(),
-                        rs.getString("status"),
-                        rs.getInt("class_id"),
-                        null,
-                        rs.getBoolean("is_personal")
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Task(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("task_name"),
+                            rs.getDate("task_date").toLocalDate(),
+                            rs.getString("status"),
+                            rs.getInt("class_id"),
+                            null,
+                            rs.getBoolean("is_personal")
+                    );
+                }
             }
+
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to fetch task by ID: " + e.getMessage());
         }
 
-    } catch (Exception e) {
-        LOGGER.severe(() -> "Failed to fetch task by ID: " + e.getMessage());
-    }
-
-    return null;
-}
-
-    public Button getApproveSelectedBtn() {
-        return approveSelectedBtn;
-    }
-
-    public void setApproveSelectedBtn(Button approveSelectedBtn) {
-        this.approveSelectedBtn = approveSelectedBtn;
+        return null;
     }
 }

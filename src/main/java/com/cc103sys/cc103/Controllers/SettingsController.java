@@ -8,59 +8,46 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Session;
 
-import javafx.animation.Interpolator;
-import javafx.animation.TranslateTransition;
-import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class SettingsController {
     private static final Logger LOGGER = Logger.getLogger(SettingsController.class.getName());
     private static final String PROFILE_PICTURES_DIR = "profile_pictures";
 
-    @FXML
-    private HBox settingsRoot;
-    @FXML
-    private ImageView profilePictureImageView;
-    @FXML
-    private TextField fullNameField;
-    @FXML
-    private TextField usernameField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Button editUsernameButton;
-    @FXML
-    private Button editEmailButton;
-    @FXML
-    private Button uploadPictureButton;
-    @FXML
-    private Button changePasswordButton;
-    @FXML
-    private Button editFullNameButton;
-    @FXML
-    private CheckBox enableSFXToggle;
+    @FXML private ImageView profilePictureImageView;
+    @FXML private TextField fullNameField;
+    @FXML private TextField usernameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+
+    @FXML private Button editFullNameButton;
+    @FXML private Button editUsernameButton;
+    @FXML private Button editEmailButton;
+    @FXML private Button uploadPictureButton;
+    @FXML private ToggleButton enableMusicToggle;
+    @FXML private ToggleButton enableSFXToggle;
+
+    @FXML @SuppressWarnings("unused") private Rectangle musicTrack;
+    @FXML @SuppressWarnings("unused") private Circle musicThumb;
+    @FXML @SuppressWarnings("unused") private Rectangle sfxTrack;
+    @FXML @SuppressWarnings("unused") private Circle sfxThumb;
     private Integer currentUserId;
     private String currentUsername;
     private boolean isEditingFullName = false;
@@ -68,7 +55,19 @@ public class SettingsController {
     private boolean isEditingEmail = false;
 
     @FXML
-    public void initialize() {
+    @SuppressWarnings("unused")
+    private void toggleMusic() {
+        // Handle music toggle
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void toggleSfx() {
+        // Handle SFX toggle
+    }
+
+    @FXML
+    public void initialize() throws Exception {
         try {
             // Create profile pictures directory if it doesn't exist
             Files.createDirectories(Paths.get(PROFILE_PICTURES_DIR));
@@ -78,21 +77,74 @@ public class SettingsController {
 
             loadUserSettings();
             setupFieldStates();
+            setupSystemPreferences();
 
             NavbarController.getInstance().setActive("settings");
             LOGGER.info("Settings initialized successfully");
         } catch (IOException e) {
-            LOGGER.severe(() -> "Error initializing settings: " + e.getMessage());
+            LOGGER.severe("Error initializing settings: " + e.getMessage());
             showAlert("Error", "Failed to initialize settings", e.getMessage());
         }
-        fadeAnimation();
+    }
+
+    private void setupSystemPreferences() throws Exception {
+        try {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT music_enabled, sfx_enabled FROM users WHERE id = ?")) {
+
+                stmt.setInt(1, currentUserId);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        boolean musicEnabled = rs.getBoolean("music_enabled");
+                        boolean sfxEnabled = rs.getBoolean("sfx_enabled");
+
+                        if (enableMusicToggle != null) {
+                            enableMusicToggle.setSelected(musicEnabled);
+                        }
+                        if (enableSFXToggle != null) {
+                            enableSFXToggle.setSelected(sfxEnabled);
+                        }
+                    }
+                }
+            }
+
+            if (enableMusicToggle != null) {
+                enableMusicToggle.selectedProperty().addListener((obs, oldVal, isOn) -> {
+                    updatePreference("music_enabled", isOn);
+                });
+            }
+
+            if (enableSFXToggle != null) {
+                enableSFXToggle.selectedProperty().addListener((obs, oldVal, isOn) -> {
+                    updatePreference("sfx_enabled", isOn);
+                });
+            }
+
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.severe("Error loading system preferences: " + e.getMessage());
+        }
+    }
+
+    private void updatePreference(String column, boolean value) {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE users SET " + column + " = ? WHERE id = ?")) {
+
+            stmt.setBoolean(1, value);
+            stmt.setInt(2, currentUserId);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            LOGGER.severe("Error updating preference: " + e.getMessage());
+        }
     }
 
     private void loadUserSettings() {
         try (Connection conn = DBUtil.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT full_name, email, profile_picture_path FROM users WHERE id = ?")) {
-
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT full_name, email, profile_picture_path FROM users WHERE id = ?")) {
             stmt.setInt(1, currentUserId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -122,7 +174,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe(() -> "Error loading user settings: " + e.getMessage());
+            LOGGER.severe("Error loading user settings: " + e.getMessage());
         }
     }
 
@@ -133,8 +185,7 @@ public class SettingsController {
                 Image image = new Image(imageFile.toURI().toString());
                 if (profilePictureImageView != null) {
                     profilePictureImageView.setImage(image);
-                    profilePictureImageView.setStyle(
-                            "-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #ddd; -fx-border-width: 2;");
+                    profilePictureImageView.setStyle("-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #ddd; -fx-border-width: 2;");
                 }
             }
         } catch (Exception e) {
@@ -148,8 +199,7 @@ public class SettingsController {
             if (profilePictureImageView != null) {
                 Image defaultImage = new Image(getClass().getResourceAsStream("/images/logowhite.png"));
                 profilePictureImageView.setImage(defaultImage);
-                profilePictureImageView.setStyle(
-                        "-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #ddd; -fx-border-width: 2;");
+                profilePictureImageView.setStyle("-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #ddd; -fx-border-width: 2;");
             }
         } catch (Exception e) {
             LOGGER.warning(() -> "Error loading default profile picture: " + e.getMessage());
@@ -186,6 +236,7 @@ public class SettingsController {
     // ============================================
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleEditFullName() {
         if (!isEditingFullName) {
             fullNameField.setEditable(true);
@@ -209,7 +260,6 @@ public class SettingsController {
                 stmt.executeUpdate();
 
                 editFullNameButton.setText("Edit");
-                setButtonActive(editFullNameButton, false);
                 fullNameField.setEditable(false);
                 isEditingFullName = false;
 
@@ -219,7 +269,6 @@ public class SettingsController {
                 if (NavbarController.getInstance() != null) {
                     NavbarController.getInstance().loadUserInfo();
                 }
-
             } catch (Exception e) {
                 showAlert("Error", "Failed to Update", e.getMessage());
             }
@@ -234,7 +283,6 @@ public class SettingsController {
                 usernameField.setEditable(true);
                 usernameField.requestFocus();
                 editUsernameButton.setText("Save");
-                setButtonActive(editUsernameButton, true);
                 isEditingUsername = true;
             }
         } else {
@@ -245,9 +293,8 @@ public class SettingsController {
                 return;
             }
             try (Connection conn = DBUtil.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(
-                            "UPDATE users SET username = ? WHERE id = ?")) {
-
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE users SET username = ? WHERE id = ?;")) {
                 stmt.setString(1, newUsername);
                 stmt.setInt(2, currentUserId);
                 int result = stmt.executeUpdate();
@@ -258,7 +305,6 @@ public class SettingsController {
                     currentUsername = newUsername;
                     usernameField.setEditable(false);
                     editUsernameButton.setText("Edit");
-                    setButtonActive(editUsernameButton, false);
                     isEditingUsername = false;
 
                     // Update navbar
@@ -280,7 +326,6 @@ public class SettingsController {
                 emailField.setEditable(true);
                 emailField.requestFocus();
                 editEmailButton.setText("Save");
-                setButtonActive(editEmailButton, true);
                 isEditingEmail = true;
             }
         } else {
@@ -291,9 +336,8 @@ public class SettingsController {
                 return;
             }
             try (Connection conn = DBUtil.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(
-                            "UPDATE users SET email = ? WHERE id = ?")) {
-
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE users SET email = ? WHERE id = ?")) {
                 stmt.setString(1, newEmail);
                 stmt.setInt(2, currentUserId);
                 stmt.executeUpdate();
@@ -301,7 +345,6 @@ public class SettingsController {
                 showAlert("Success", "Email Updated", "Your email has been updated successfully.");
                 emailField.setEditable(false);
                 editEmailButton.setText("Edit");
-                setButtonActive(editEmailButton, false);
                 isEditingEmail = false;
             } catch (Exception e) {
                 showAlert("Error", "Failed to Update", e.getMessage());
@@ -337,12 +380,14 @@ public class SettingsController {
             content.getChildren().addAll(
                     oldPasswordLabel, oldPasswordField,
                     newPasswordLabel, newPasswordField,
-                    confirmPasswordLabel, confirmPasswordField);
+                    confirmPasswordLabel, confirmPasswordField
+            );
 
             dialog.getDialogPane().setContent(content);
             dialog.getDialogPane().getButtonTypes().addAll(
                     javafx.scene.control.ButtonType.OK,
-                    javafx.scene.control.ButtonType.CANCEL);
+                    javafx.scene.control.ButtonType.CANCEL
+            );
 
             if (dialog.showAndWait().isPresent() && dialog.getResult() != null) {
                 String oldPassword = oldPasswordField.getText();
@@ -366,9 +411,8 @@ public class SettingsController {
 
                 // Verify old password and update
                 try (Connection conn = DBUtil.getConnection();
-                        PreparedStatement verify = conn.prepareStatement(
-                                "SELECT password FROM users WHERE id = ? AND username = ?")) {
-
+                     PreparedStatement verify = conn.prepareStatement(
+                             "SELECT password FROM users WHERE id = ? AND username = ?")) {
                     verify.setInt(1, currentUserId);
                     verify.setString(2, currentUsername);
                     try (ResultSet rs = verify.executeQuery()) {
@@ -387,8 +431,7 @@ public class SettingsController {
                                 update.setInt(2, currentUserId);
                                 update.executeUpdate();
 
-                                showAlert("Success", "Password Changed",
-                                        "Your password has been updated successfully.");
+                                showAlert("Success", "Password Changed", "Your password has been updated successfully.");
                             }
                         }
                     }
@@ -411,7 +454,8 @@ public class SettingsController {
                     new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png"),
                     new FileChooser.ExtensionFilter("JPG", "*.jpg", "*.jpeg"),
                     new FileChooser.ExtensionFilter("PNG", "*.png"),
-                    new FileChooser.ExtensionFilter("All Files", "*.*"));
+                    new FileChooser.ExtensionFilter("All Files", "*.*")
+            );
 
             Stage stage = (Stage) uploadPictureButton.getScene().getWindow();
             File selectedFile = fileChooser.showOpenDialog(stage);
@@ -424,8 +468,8 @@ public class SettingsController {
                 }
 
                 // Copy file to profile_pictures directory
-                String filename = currentUserId + "_" + System.currentTimeMillis() +
-                        selectedFile.getName().substring(selectedFile.getName().lastIndexOf('.'));
+                String filename = currentUserId + "_" + System.currentTimeMillis() + 
+                                 selectedFile.getName().substring(selectedFile.getName().lastIndexOf('.'));
                 Path sourcePath = selectedFile.toPath();
                 Path destPath = Paths.get(PROFILE_PICTURES_DIR, filename);
 
@@ -433,17 +477,15 @@ public class SettingsController {
 
                 // Update database with new profile picture path
                 try (Connection conn = DBUtil.getConnection();
-                        PreparedStatement stmt = conn.prepareStatement(
-                                "UPDATE users SET profile_picture_path = ? WHERE id = ?")) {
-
+                     PreparedStatement stmt = conn.prepareStatement(
+                             "UPDATE users SET profile_picture_path = ? WHERE id = ?")) {
                     stmt.setString(1, destPath.toString());
                     stmt.setInt(2, currentUserId);
                     stmt.executeUpdate();
 
                     // Load the new picture
                     loadProfilePicture(destPath.toString());
-                    showAlert("Success", "Profile Picture Updated",
-                            "Your profile picture has been updated successfully.");
+                    showAlert("Success", "Profile Picture Updated", "Your profile picture has been updated successfully.");
 
                     // Update navbar
                     if (NavbarController.getInstance() != null) {
@@ -456,14 +498,12 @@ public class SettingsController {
         } catch (IOException e) {
             showAlert("Error", "Error Selecting File", e.getMessage());
         }
-        fadeAnimation();
     }
 
     private Integer getCurrentUserId() {
         try (Connection conn = DBUtil.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT id FROM users WHERE username = ?")) {
-
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT id FROM users WHERE username = ?")) {
             stmt.setString(1, Session.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -471,7 +511,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe(() -> "Error getting user ID: " + e.getMessage());
+            LOGGER.severe("Error getting user ID: " + e.getMessage());
         }
         return null;
     }
@@ -483,13 +523,4 @@ public class SettingsController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
-    private void fadeAnimation() {
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(500),
-                settingsRoot != null ? settingsRoot : profilePictureImageView);
-        fadeIn.setFromValue(0.0);
-        fadeIn.setToValue(1.0);
-        fadeIn.play();
-    }
-
 }

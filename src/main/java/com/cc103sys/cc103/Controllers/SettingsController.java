@@ -50,13 +50,9 @@ public class SettingsController {
     private boolean isEditingFullName = false;
     private boolean isEditingUsername = false;
     private boolean isEditingEmail = false;
-@FXML private StackPane musicSwitch;
-@FXML private Rectangle track;
-@FXML private Circle thumb;
 @FXML private Rectangle musicTrack;
 @FXML private Circle musicThumb;
 
-@FXML private StackPane sfxSwitch;
 @FXML private Rectangle sfxTrack;
 @FXML private Circle sfxThumb;
 private boolean musicOn = false;

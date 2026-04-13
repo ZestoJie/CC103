@@ -24,7 +24,7 @@
                 </image>
             </ImageView>
 
-            <Label style="-fx-font-size: 22px;                           -fx-font-weight: bold;                           -fx-text-fill: #1f2d3a;                           -fx-font-family: 'Segoe UI Semibold';" text="KyusiyuVenture" />
+            <Label style="-fx-font-size: 22px;                           -fx-font-weight: bold;                           -fx-text-fill: #131f2c;                           -fx-font-family: 'Segoe UI Semibold';" text="KyusiyuVenture" />
 
             <TextField fx:id="usernameField" prefHeight="40.0" prefWidth="250.0" promptText="Username" style="-fx-background-color: eef1f4; -fx-background-radius: 20; -fx-padding: 10 15;" />
 

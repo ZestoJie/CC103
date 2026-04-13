@@ -125,20 +125,25 @@
                                     <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
                                         <children>
                                             <Label text="Background Music" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
-<StackPane fx:id="musicSwitch" onMouseClicked="#toggleMusic" prefWidth="48" prefHeight="24">
+<ToggleButton onAction="#toggleMusic"
+              styleClass="switch">
 
-    <Rectangle fx:id="musicTrack"
-               width="48"
-               height="24"
-               arcWidth="999"
-               arcHeight="999"
-               style="-fx-fill: rgba(148,163,184,0.4);" />
+    <graphic>
+        <StackPane prefWidth="48" prefHeight="24">
+            
+            <Rectangle fx:id="musicTrack" width="48"
+                       height="24"
+                       arcWidth="999"
+                       arcHeight="999"
+                       style="-fx-fill: rgba(148,163,184,0.4);" />
 
-    <Circle fx:id="musicThumb"
-            radius="10"
-            translateX="-12"
-            style="-fx-fill: white;" />
-</StackPane>
+            <Circle fx:id="musicThumb" styleClass="thumb"
+                    radius="10"
+                    translateX="-12"/>
+        </StackPane>
+    </graphic>
+
+</ToggleButton>
                                         </children>
                                     </HBox>
                                     
@@ -148,20 +153,25 @@
                                     <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
                                         <children>
                                             <Label text="Sound Effects (SFX)" style="-fx-font-size: 15; -fx-text-fill: #555;" HBox.hgrow="ALWAYS" />
-                                            <StackPane fx:id="sfxSwitch" onMouseClicked="#toggleSfx" prefWidth="48" prefHeight="24">
+                                            <ToggleButton onAction="#toggleSfx"
+              styleClass="switch">
 
-    <Rectangle fx:id="sfxTrack"
-               width="48"
-               height="24"
-               arcWidth="999"
-               arcHeight="999"
-               style="-fx-fill: rgba(148,163,184,0.4);" />
+    <graphic>
+        <StackPane prefWidth="48" prefHeight="24">
+            
+            <Rectangle fx:id="sfxTrack" width="48"
+                       height="24"
+                       arcWidth="999"
+                       arcHeight="999"
+                       style="-fx-fill: rgba(148,163,184,0.4);" />
 
-    <Circle fx:id="sfxThumb"
-            radius="10"
-            translateX="-12"
-            style="-fx-fill: white;" />
-</StackPane>
+            <Circle fx:id="sfxThumb" styleClass="thumb"
+                    radius="10"
+                    translateX="-12"/>
+        </StackPane>
+    </graphic>
+
+</ToggleButton>
                                         </children>
                                     </HBox>
                                 </children>

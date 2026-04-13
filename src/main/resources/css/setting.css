@@ -1,18 +1,18 @@
 .switch {
     /* OFF state */
-    -fx-background-color: rgba(148, 163, 184, 0.4);
+    -fx-background-color: rgba(197, 207, 223, 0.4);
     -fx-background-radius: 999;
     -fx-padding: 0;
 }
 
 /* ON state (blue) */
 .switch:selected {
-    -fx-background-color: rgb(27, 49, 98);
+    -fx-background-color: rgb(95, 127, 197);
 }
 
 /* Knob (replacement for ::before) */
 .switch .thumb {
-    -fx-background-color: rgb(244, 234, 234);
+    -fx-background-color: rgb(106, 101, 101);
     -fx-background-radius: 999;
 
     -fx-pref-width: 22px;
@@ -30,7 +30,7 @@
 
 /* Hover (OFF) */
 .switch:hover .thumb {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 12, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(27, 26, 26, 0.1), 12, 0, 0, 0);
 }
 
 /* Hover (ON) */

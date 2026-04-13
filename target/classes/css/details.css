@@ -1,0 +1,169 @@
+/* =========================
+   GLOBAL BACKGROUND
+========================= */
+.root {
+    -fx-font-family: "Segoe UI", "Poppins", "Arial";
+    -fx-background-color: #f4f6fb;
+}
+
+/* =========================
+   CARDS (all VBox cards)
+========================= */
+.card, .vbox {
+    -fx-background-radius: 16;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);
+    -fx-padding: 15;
+}
+
+/* Hover lift effect (fake animation) */
+.vbox:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 20, 0, 0, 8);
+}
+
+/* =========================
+   LABELS
+========================= */
+.label {
+    -fx-text-fill: #2d3748;
+}
+
+.label-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.label-sub {
+    -fx-text-fill: #718096;
+}
+
+/* =========================
+   BUTTON BASE STYLE
+========================= */
+.button {
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 10 14;
+    -fx-background-color: #3182ce;
+    -fx-text-fill: white;
+}
+
+/* Hover animation */
+.button:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-background-color: #2563eb;
+}
+
+/* Pressed effect */
+.button:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* =========================
+   SPECIAL BUTTONS
+========================= */
+
+/* Edit */
+.button-edit {
+    -fx-background-color: #ed8936;
+}
+.button-edit:hover {
+    -fx-background-color: #dd6b20;
+}
+
+/* Delete */
+.button-delete {
+    -fx-background-color: #e53e3e;
+}
+.button-delete:hover {
+    -fx-background-color: #c53030;
+}
+
+/* Cancel */
+.button-cancel {
+    -fx-background-color: #edf2f7;
+    -fx-text-fill: #4a5568;
+}
+.button-cancel:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+/* =========================
+   TEXT FIELD / TEXT AREA
+========================= */
+.text-field, .text-area, .date-picker {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-padding: 10;
+}
+
+/* Focus glow */
+.text-field:focused, .text-area:focused, .date-picker:focused {
+    -fx-border-color: #3182ce;
+    -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.4), 8, 0, 0, 2);
+}
+
+/* =========================
+   LIST VIEW (TASKS)
+========================= */
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.list-cell {
+    -fx-padding: 12;
+    -fx-background-radius: 10;
+    -fx-background-color: transparent;
+}
+
+/* Hover animation */
+.list-cell:hover {
+    -fx-background-color: #edf2f7;
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
+}
+
+/* Selected item */
+.list-cell:filled:selected {
+    -fx-background-color: #3182ce;
+    -fx-text-fill: white;
+}
+
+/* =========================
+   SIDEBAR / NAV HOVER (if navbar uses buttons)
+========================= */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #718096;
+}
+
+.nav-button:hover {
+    -fx-text-fill: #3182ce;
+    -fx-scale-x: 1.05;
+}
+
+/* =========================
+   SCROLLPANE CLEAN LOOK
+========================= */
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-opacity: 0.4;
+}
+
+/* =========================
+   PARTICIPANTS LIST
+========================= */
+.participants {
+    -fx-background-color: #f7fafc;
+    -fx-background-radius: 10;
+}

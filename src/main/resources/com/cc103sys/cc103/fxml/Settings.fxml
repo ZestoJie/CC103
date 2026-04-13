@@ -49,8 +49,12 @@
                                             <children>
                                                 <VBox alignment="CENTER" spacing="10" style="-fx-background-color: #eef2f7; -fx-background-radius: 100; -fx-padding: 5;">
                                                     <children>
-                                                        <ImageView fx:id="profilePictureImageView" fitHeight="140" fitWidth="140" pickOnBounds="true" preserveRatio="true" 
-                                                                   style="-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #fff; -fx-border-width: 4;" />
+                                                        <ImageView fx:id="profilePictureImageView" fitHeight="140" fitWidth="140" pickOnBounds="true" preserveRatio="true" smooth="true"
+                                                                   style="-fx-border-radius: 70; -fx-background-radius: 70; -fx-border-color: #fff; -fx-border-width: 4;">
+                                                            <clip>
+                                                                <Circle radius="70" centerX="70" centerY="70" />
+                                                            </clip>
+                                                        </ImageView>
                                                     </children>
                                                 </VBox>
                                                 

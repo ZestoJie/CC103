@@ -1,0 +1,89 @@
+
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java˛
+"com.cc103sys.cc103.Utils.NavigatorCLASS?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java ("#
+packagecom.cc103sys.cc103.Utils"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"g
+declarationStringR<mark class="modifier">public </mark><mark class="modifier">class </mark>Navigator"
+accesspublic*	Navigator2è
+?com.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)DECLARATION?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (2ê
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)DECLARATION?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java ("2Ç
+2com.cc103sys.cc103.Utils.Navigator?scene@6.25:6.30DECLARATION?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (ï
+?com.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)METHOD?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java ("
+isFinalfalse"±
+declarationStringõ<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">setScene</mark>(Scene sc)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*setScene2{
+2com.cc103sys.cc103.Utils.Navigator?scene@6.25:6.30CALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java	 	(2ã
+Bcom.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)!scCALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java	 	(2ê
+Bcom.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)!sc	PARAMETER?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java& ((2T
+voidRETURN_TYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (±
+Bcom.cc103sys.cc103.Utils.Navigator.setScene(javafx.scene.Scene)!sc	PARAMETER?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java& (("
+typeScene"
+isFinalfalse"
+declarationStringScene sc*sc2[
+javafx.scene.SceneTYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java  (%ﬁ
+@com.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)METHOD?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (""
+isFinalfalse"∑
+declarationString°<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">switchScene</mark>(String fxml)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*switchScene2ã
+Bcom.cc103sys.cc103.Utils.ResourceLoader.loadFXML(java.lang.String)CALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java) (12n
+%java.lang.Throwable.printStackTrace()CALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (2{
+2com.cc103sys.cc103.Utils.Navigator?scene@6.25:6.30CALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (2é
+Ecom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)!fxmlCALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java2 (62ó
+Ncom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)?e@15.27:15.28CALL?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (2ì
+Ecom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)!fxml	PARAMETER?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java* (.2û
+Ncom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)?e@15.27:15.28DECLARATION?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (2T
+voidRETURN_TYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (∏
+Ecom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)!fxml	PARAMETER?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java* (."
+typeString"
+isFinalfalse" 
+declarationStringString fxml*fxml2Y
+java.lang.StringTYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java# ()√
+Ncom.cc103sys.cc103.Utils.Navigator.switchScene(java.lang.String)?e@15.27:15.28VARIABLE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java ("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2\
+java.lang.ExceptionTYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (∏
+2com.cc103sys.cc103.Utils.Navigator?scene@6.25:6.30VARIABLE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java ("
+isFinalfalse"
+typeScene"å
+declarationStringw<mark class="modifier">private </mark><mark class="modifier">static </mark>Scene <mark class="class-field">scene</mark>"
+isStatictrue"
+accessprivate*scene2[
+javafx.scene.SceneTYPE?
+5src\main\java\com\cc103sys\cc103\Utils\Navigator.java (

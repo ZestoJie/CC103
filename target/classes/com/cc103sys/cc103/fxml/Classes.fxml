@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.*?>
+
+<HBox spacing="20" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+    <children>
+
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+
+        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fafc;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <children>
+                <Label text="Classes" styleClass="heading-1" />
+
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+                    <children>
+                        <!-- LEFT COLUMN - AVAILABLE CLASSES AND CREATE CARD -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Available Classes" styleClass="heading-2" />
+                                
+                                <VBox fx:id="createClassSection" spacing="14" styleClass="card">
+                                    <children>
+                                        <Label text="Create Class" styleClass="heading-3" />
+                                        <Label text="Class Name" styleClass="caption" />
+                                        <TextField fx:id="classNameField" promptText="My New Class" />
+                                        <Label text="Class Visibility" styleClass="caption" />
+                                        <ToggleButton fx:id="publicClassToggle" text="Private" />
+                                        <Button onAction="#createClass" text="Create Class" />
+                                        <Label fx:id="generatedCodeLabel" visible="false" text="Class Code: " styleClass="body" />
+                                        <Button fx:id="copyCodeButton" visible="false" text="Copy Code" onAction="#copyCode" />
+                                        <Label text="Public classes appear in list; private classes require code." styleClass="subtitle" wrapText="true" />
+                                    </children>
+                                </VBox>
+                                
+                                <VBox spacing="14" styleClass="card">
+                                    <children>
+                                        <Label text="Join Private Class" styleClass="heading-3" />
+                                        <Label text="Enter Class Code" styleClass="caption" />
+                                        <TextField fx:id="codeField" promptText="e.g., ABC123" />
+                                        <Button onAction="#joinPrivateClass" text="Join Class" />
+                                    </children>
+                                </VBox>
+                                
+                                <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                                    <content>
+                                        <VBox spacing="10" styleClass="card">
+                                            <children>
+                                                <Label text="Public Classes" styleClass="heading-3" />
+                                                <ListView fx:id="classList" prefHeight="360" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+
+                        <!-- RIGHT COLUMN - MY CLASSES -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="My Classes" styleClass="heading-2" />
+                                <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                                    <content>
+                                        <VBox spacing="10" styleClass="card">
+                                            <children>
+                                                <ListView fx:id="myClassList" prefHeight="560" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</HBox>

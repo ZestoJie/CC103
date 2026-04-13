@@ -20,6 +20,9 @@ public class ResourceLoader {
         if ("TaskScene".equals(name)) {
             cssPath = "/css/task.css";
         }
+        if ("Settings".equals(name)) {
+            cssPath = "/css/setting.css";
+        }
 
         root.getStylesheets().add(ResourceLoader.class.getResource(cssPath).toExternalForm());
 

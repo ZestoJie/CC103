@@ -30,11 +30,13 @@ public class Navigator {
         return switchScene(fxmlFile);
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public static boolean switchScene(String fxml) {
         try {
             scene.setRoot(ResourceLoader.loadFXML(fxml));
             return true;
         } catch (IOException e) {
+            e.printStackTrace();
             System.err.println("Failed to switch to scene: " + fxml);
             e.printStackTrace();
             return false;

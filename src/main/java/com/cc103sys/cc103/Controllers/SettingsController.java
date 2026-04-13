@@ -40,6 +40,7 @@ public class SettingsController {
     @FXML private Button editFullNameButton;
     @FXML private Button editUsernameButton;
     @FXML private Button editEmailButton;
+    @FXML private Button changePasswordButton;
     @FXML private Button uploadPictureButton;
     @FXML private ToggleButton enableMusicToggle;
     @FXML private ToggleButton enableSFXToggle;
@@ -57,13 +58,17 @@ public class SettingsController {
     @FXML
     @SuppressWarnings("unused")
     private void toggleMusic() {
-        // Handle music toggle
+        boolean newValue = enableMusicToggle.isSelected();
+        updatePreference("music_enabled", newValue);
+        animateToggle(musicTrack, musicThumb, newValue);
     }
 
     @FXML
     @SuppressWarnings("unused")
     private void toggleSfx() {
-        // Handle SFX toggle
+        boolean newValue = enableSFXToggle.isSelected();
+        updatePreference("sfx_enabled", newValue);
+        animateToggle(sfxTrack, sfxThumb, newValue);
     }
 
     @FXML
@@ -82,7 +87,7 @@ public class SettingsController {
             NavbarController.getInstance().setActive("settings");
             LOGGER.info("Settings initialized successfully");
         } catch (IOException e) {
-            LOGGER.severe("Error initializing settings: " + e.getMessage());
+            LOGGER.severe(() -> "Error initializing settings: " + e.getMessage());
             showAlert("Error", "Failed to initialize settings", e.getMessage());
         }
     }
@@ -102,9 +107,11 @@ public class SettingsController {
 
                         if (enableMusicToggle != null) {
                             enableMusicToggle.setSelected(musicEnabled);
+                            animateToggle(musicTrack, musicThumb, musicEnabled);
                         }
                         if (enableSFXToggle != null) {
                             enableSFXToggle.setSelected(sfxEnabled);
+                            animateToggle(sfxTrack, sfxThumb, sfxEnabled);
                         }
                     }
                 }
@@ -123,7 +130,7 @@ public class SettingsController {
             }
 
         } catch (SQLException | RuntimeException e) {
-            LOGGER.severe("Error loading system preferences: " + e.getMessage());
+            LOGGER.severe(() -> "Error loading system preferences: " + e.getMessage());
         }
     }
 
@@ -137,7 +144,7 @@ public class SettingsController {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            LOGGER.severe("Error updating preference: " + e.getMessage());
+            LOGGER.severe(() -> "Error updating preference: " + e.getMessage());
         }
     }
 
@@ -174,7 +181,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Error loading user settings: " + e.getMessage());
+            LOGGER.severe(() -> "Error loading user settings: " + e.getMessage());
         }
     }
 
@@ -261,6 +268,7 @@ public class SettingsController {
 
                 editFullNameButton.setText("Edit");
                 fullNameField.setEditable(false);
+                setButtonActive(editFullNameButton, false);
                 isEditingFullName = false;
 
                 showAlert("Success", "Full Name Updated",
@@ -283,11 +291,13 @@ public class SettingsController {
                 usernameField.setEditable(true);
                 usernameField.requestFocus();
                 editUsernameButton.setText("Save");
+                setButtonActive(editUsernameButton, true);
                 isEditingUsername = true;
             }
         } else {
             // Save the changes
             String newUsername = usernameField.getText();
+            setButtonActive(editUsernameButton, false);
             if (newUsername.isEmpty()) {
                 showAlert("Error", "Invalid Input", "Username cannot be empty.");
                 return;
@@ -305,6 +315,7 @@ public class SettingsController {
                     currentUsername = newUsername;
                     usernameField.setEditable(false);
                     editUsernameButton.setText("Edit");
+                    setButtonActive(editUsernameButton, false);
                     isEditingUsername = false;
 
                     // Update navbar
@@ -326,10 +337,10 @@ public class SettingsController {
                 emailField.setEditable(true);
                 emailField.requestFocus();
                 editEmailButton.setText("Save");
+                setButtonActive(editEmailButton, true);
                 isEditingEmail = true;
             }
         } else {
-            // Save the changes
             String newEmail = emailField.getText();
             if (newEmail.isEmpty()) {
                 showAlert("Error", "Invalid Input", "Email cannot be empty.");
@@ -346,6 +357,7 @@ public class SettingsController {
                 emailField.setEditable(false);
                 editEmailButton.setText("Edit");
                 isEditingEmail = false;
+                setButtonActive(editEmailButton, false);
             } catch (Exception e) {
                 showAlert("Error", "Failed to Update", e.getMessage());
             }
@@ -357,6 +369,7 @@ public class SettingsController {
     private void handleChangePassword() {
         try {
             // Create a dialog for password change
+            setButtonActive(changePasswordButton, true);
             javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
             dialog.setTitle("Change Password");
             dialog.setHeaderText("Enter your new password");
@@ -396,6 +409,7 @@ public class SettingsController {
 
                 if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
                     showAlert("Error", "Invalid Input", "All fields are required.");
+                    setButtonActive(changePasswordButton, false);
                     return;
                 }
 
@@ -511,7 +525,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Error getting user ID: " + e.getMessage());
+            LOGGER.severe(() -> "Error getting user ID: " + e.getMessage());
         }
         return null;
     }
@@ -522,5 +536,25 @@ public class SettingsController {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void animateToggle( Rectangle track, Circle thumb, boolean isOn) {
+        if (track != null && thumb != null) {
+            if (isOn) {
+                track.setStyle("-fx-fill: rgb(95, 127, 197);");
+                thumb.setTranslateX(12);
+            } else {
+                track.setStyle("-fx-fill: rgba(197, 207, 223, 0.4);");
+                thumb.setTranslateX(-12);
+            }
+        }
+    }
+
+    public Button getChangePasswordButton() {
+        return changePasswordButton;
+    }
+
+    public void setChangePasswordButton(Button changePasswordButton) {
+        this.changePasswordButton = changePasswordButton;
     }
 }

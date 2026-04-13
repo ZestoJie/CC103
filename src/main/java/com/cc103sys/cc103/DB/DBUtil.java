@@ -110,6 +110,14 @@ public class DBUtil {
                 stmt.executeUpdate("ALTER TABLE users ADD COLUMN full_name VARCHAR(255) NULL");
             }
 
+            if (!columnExists(conn, "users", "music_enabled")) {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN music_enabled TINYINT(1) DEFAULT 1");
+            }
+
+            if (!columnExists(conn, "users", "sfx_enabled")) {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN sfx_enabled TINYINT(1) DEFAULT 1");
+            }
+
             if (!columnExists(conn, "classes", "is_public")) {
                 stmt.executeUpdate("ALTER TABLE classes ADD COLUMN is_public TINYINT(1) DEFAULT 1");
             }

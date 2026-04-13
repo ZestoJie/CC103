@@ -1,5 +1,8 @@
 
+
+
 package com.cc103sys.cc103.Controllers;
+
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -37,7 +40,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
 
 public class DashboardController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
@@ -45,6 +50,7 @@ public class DashboardController implements TimerService.TimerListener {
     private static final int BASE_TASK_POINTS = 10;
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
+
 
     @FXML private TextField taskField;
     @FXML private DatePicker taskDate;
@@ -64,10 +70,17 @@ public class DashboardController implements TimerService.TimerListener {
     @FXML private Label dailyGoalSummary;
     @FXML private Label dailyGoalTip;
     @FXML private TextField customTimeField;
+    @FXML private HBox rootPane;
+    @FXML private VBox timerCard;
+    @FXML private VBox leaderboardCard;
+    @FXML private VBox progressCard;
+    
+
 
     private TimerService timerService;
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private Task selectedTask;
+
 
     @FXML
     public void initialize() {
@@ -76,6 +89,7 @@ public class DashboardController implements TimerService.TimerListener {
             timerService.removeTimerListener(this);
             timerService.addTimerListener(this);
 
+
             setupWelcomeMessage();
             setupTaskListView();
             setupTimerPresets();
@@ -83,7 +97,9 @@ public class DashboardController implements TimerService.TimerListener {
             loadTasks();
             checkMissedTasks();
             loadUserClassesForLeaderboard();
-            
+            animateRoot();
+            animateCards();
+           
             if (classSelector != null) {
                 classSelector.setOnAction(e -> {
                     try {
@@ -92,13 +108,15 @@ public class DashboardController implements TimerService.TimerListener {
                         loadLeaderboardPreviewForClass();
                     } catch (Exception e1) {
                     }
-                
+               
             if (taskList != null) animate(taskList);
             if (leaderboardPreview != null) animate(leaderboardPreview);
+
 
             if (timerPauseButton != null)
                 timerPauseButton.setDisable(true);});
             }
+
 
             if (timerPauseButton != null) {
                 timerPauseButton.setDisable(true);
@@ -107,30 +125,88 @@ public class DashboardController implements TimerService.TimerListener {
                 xpActiveCheckbox.setSelected(true);
             }
 
+
             updateTimerAvailability();
 
+
             NavbarController.getInstance().setActive("dashboard");
-            
+           
             // Sync timer display and multiplier
             updateTimerLabel();
+
 
         } catch (Exception e) {
             LOGGER.severe(() -> "Init error: " + e.getMessage());
         }
     }
-    
+
+    private void animateRoot() {
+    if (rootPane == null) return;
+
+    FadeTransition fade = new FadeTransition(Duration.millis(600), rootPane);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+    fade.play();
+}
+   
+private void animateCards() {
+    animateCard(timerCard, 0);
+    animateCard(leaderboardCard, 100);
+    animateCard(progressCard, 200);
+}
+
+private void animateCard(Node node, int delay) {
+    if (node == null) return;
+
+    node.setOpacity(0);
+    node.setTranslateY(20);
+
+    FadeTransition fade = new FadeTransition(Duration.millis(500), node);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+
+    TranslateTransition slide = new TranslateTransition(Duration.millis(500), node);
+    slide.setFromY(20);
+    slide.setToY(0);
+
+    ParallelTransition pt = new ParallelTransition(fade, slide);
+    pt.setDelay(Duration.millis(delay));
+    pt.play();
+
+    addHoverAnimation(node);
+}
+
+private void addHoverAnimation(Node node) {
+    node.setOnMouseEntered(e -> {
+        ScaleTransition st = new ScaleTransition(Duration.millis(150), node);
+        st.setToX(1.03);
+        st.setToY(1.03);
+        st.play();
+    });
+
+    node.setOnMouseExited(e -> {
+        ScaleTransition st = new ScaleTransition(Duration.millis(150), node);
+        st.setToX(1);
+        st.setToY(1);
+        st.play();
+    });
+}
+
     private void animate(Node node) {
     FadeTransition fade = new FadeTransition(Duration.millis(400), node);
     fade.setFromValue(0);
     fade.setToValue(1);
 
+
     TranslateTransition slide = new TranslateTransition(Duration.millis(400), node);
     slide.setFromY(10);
     slide.setToY(0);
 
+
     new ParallelTransition(fade, slide).play();
 }
-    
+   
+
 
     private void setupRoleBasedUI() {
         boolean isHost = Session.isHost();
@@ -140,12 +216,14 @@ public class DashboardController implements TimerService.TimerListener {
         if (addTaskFooter != null) addTaskFooter.setVisible(isHost);
     }
 
+
     private void setupWelcomeMessage() {
         String username = Session.getUsername();
         if (username != null && welcomeLabel != null) {
             welcomeLabel.setText("Welcome, " + username + "!");
         }
     }
+
 
     private void setupTaskListView() {
         if (taskList != null) {
@@ -158,10 +236,10 @@ public class DashboardController implements TimerService.TimerListener {
                         setText(null);
                     } else {
                         String classLabel = task.getClassName() != null ? "[" + task.getClassName() + "] " : "";
-                        setText(String.format("%s%s | %s | %s", 
+                        setText(String.format("%s%s | %s | %s",
                             classLabel,
-                            task.getTaskName(), 
-                            task.getDate(), 
+                            task.getTaskName(),
+                            task.getDate(),
                             task.getStatus()));
                     }
                 }
@@ -172,6 +250,7 @@ public class DashboardController implements TimerService.TimerListener {
             });
         }
     }
+
 
     private void updateTimerAvailability() {
         boolean canStartTimer = selectedTask != null && !"Done".equals(selectedTask.getStatus()) && !"completed".equals(selectedTask.getStatus()) && !"missed".equals(selectedTask.getStatus());
@@ -185,6 +264,7 @@ public class DashboardController implements TimerService.TimerListener {
             customTimeField.setDisable(!canStartTimer);
         }
     }
+
 
     private void updateTaskStatus(int taskId, String status) {
         String sql = "UPDATE tasks SET status = ? WHERE id = ?";
@@ -201,6 +281,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void setupTimerPresets() {
         if (timerPreset != null) {
             timerPreset.getItems().addAll(
@@ -210,6 +291,7 @@ public class DashboardController implements TimerService.TimerListener {
             timerPreset.setOnAction(e -> handleTimerPresetChange());
         }
     }
+
 
     private void handleTimerPresetChange() {
         if ("Custom".equals(timerPreset.getValue()) && customTimeField != null) {
@@ -221,8 +303,10 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void loadTasks() throws Exception {
         tasks.clear();
+
 
         try {
             Integer userId = getCurrentUserId();
@@ -231,11 +315,13 @@ public class DashboardController implements TimerService.TimerListener {
                 return;
             }
 
+
             String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name "
                        + "FROM tasks t "
                        + "LEFT JOIN classes c ON t.class_id = c.id "
                        + "WHERE t.user_id = ? "
                        + "ORDER BY t.task_date DESC";
+
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -244,7 +330,7 @@ public class DashboardController implements TimerService.TimerListener {
                     while (rs.next()) {
                         int classId = rs.getInt("class_id");
                         String className = rs.getString("class_name");
-                        
+                       
                         tasks.add(new Task(
                             rs.getInt("id"),
                             rs.getString("task_name"),
@@ -265,6 +351,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void checkMissedTasks() {
         String sql = "UPDATE tasks SET status = 'missed' WHERE username = ? AND status NOT IN ('Done', 'completed', 'missed') AND task_date < CURDATE()";
         try (Connection conn = DBUtil.getConnection();
@@ -279,11 +366,13 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void updateDailyGoalProgress() {
         int total = 0;
         int completed = 0;
         String sql = "SELECT SUM(CASE WHEN status IN ('Done','completed') THEN 1 ELSE 0 END) AS completed, "
                    + "COUNT(*) AS total FROM tasks WHERE username = ? AND task_date = CURDATE()";
+
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -294,6 +383,7 @@ public class DashboardController implements TimerService.TimerListener {
                     total = rs.getInt("total");
                 }
             }
+
 
             double progress = total == 0 ? 0.0 : completed / (double) total;
             if (dailyProgressBar != null) {
@@ -314,12 +404,14 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void loadUserClassesForLeaderboard() {
         ObservableList<Classes> userClasses = FXCollections.observableArrayList();
         String sql = "SELECT DISTINCT c.id, c.class_name FROM classes c "
                    + "JOIN user_classes uc ON c.id = uc.class_id "
                    + "JOIN users u ON uc.user_id = u.id "
                    + "WHERE u.username = ?";
+
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -330,6 +422,7 @@ public class DashboardController implements TimerService.TimerListener {
                 }
             }
 
+
             if (classSelector != null) {
                 classSelector.setItems(userClasses);
                 classSelector.setOnAction(e -> {
@@ -338,6 +431,7 @@ public class DashboardController implements TimerService.TimerListener {
                     } catch (Exception e1) {
                     }
                 });
+
 
                 if (!userClasses.isEmpty()) {
                     classSelector.setValue(userClasses.get(0));
@@ -349,7 +443,9 @@ public class DashboardController implements TimerService.TimerListener {
             LOGGER.severe(() -> "Failed to load user classes: " + e.getMessage());
         }
 
+
     }
+
 
     @FXML
     @SuppressWarnings("unused")
@@ -357,9 +453,11 @@ public class DashboardController implements TimerService.TimerListener {
         String taskName = taskField.getText().trim();
         LocalDate date = taskDate.getValue();
 
+
         if (!validateTaskInput(taskName, date)) {
             return;
         }
+
 
         // If user is a host and has selected a class, create a class task
         if (Session.isHost()) {
@@ -371,6 +469,7 @@ public class DashboardController implements TimerService.TimerListener {
                         LOGGER.severe(() -> "Failed to create class task for " + taskName);
                         return;
                     }
+
 
                     assignClassTaskToMembers(classTaskId, selectedClass.getId());
                     taskField.clear();
@@ -391,13 +490,15 @@ public class DashboardController implements TimerService.TimerListener {
             }
         }
 
+
         // Otherwise, create a personal task for anyone (participants and hosts without selected class)
         String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
+
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, Session.getUsername());
-            
+           
             // Get user ID
             Integer userId = getCurrentUserId();
             if (userId != null) {
@@ -405,10 +506,11 @@ public class DashboardController implements TimerService.TimerListener {
             } else {
                 stmt.setNull(2, java.sql.Types.INTEGER);
             }
-            
+           
             stmt.setString(3, taskName);
             stmt.setDate(4, Date.valueOf(date));
             stmt.executeUpdate();
+
 
             taskField.clear();
             taskDate.setValue(null);
@@ -424,12 +526,14 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private boolean isCurrentUserClassOwner(int classId) {
         Integer ownerId = null;
         Integer currentUserId = getCurrentUserId();
         if (currentUserId == null) {
             return false;
         }
+
 
         String sql = "SELECT owner_id FROM classes WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -448,8 +552,10 @@ public class DashboardController implements TimerService.TimerListener {
             return false;
         }
 
+
         return currentUserId.equals(ownerId);
     }
+
 
     private Integer getCurrentUserId() {
         String sql = "SELECT id FROM users WHERE username = ?";
@@ -467,11 +573,13 @@ public class DashboardController implements TimerService.TimerListener {
         return null;
     }
 
+
     private int createClassTask(int classId, String taskName, LocalDate date) throws Exception {
         Integer ownerId = getCurrentUserId();
         if (ownerId == null) {
             throw new SQLException("Unable to determine current user.");
         }
+
 
         String sql = "INSERT INTO class_tasks (class_id, task_name, description, due_date, owner_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -483,6 +591,7 @@ public class DashboardController implements TimerService.TimerListener {
             stmt.setInt(5, ownerId);
             stmt.executeUpdate();
 
+
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -491,6 +600,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
         return -1;
     }
+
 
     private void assignClassTaskToMembers(int classTaskId, @SuppressWarnings("unused") int classId) {
         String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
@@ -501,6 +611,7 @@ public class DashboardController implements TimerService.TimerListener {
                    + "WHERE ct.id = ? "
                    + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
 
+
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, classTaskId);
@@ -510,6 +621,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void loadLeaderboardPreviewForClass() throws Exception {
         try {
             Classes selectedClass = classSelector.getValue();
@@ -518,10 +630,12 @@ public class DashboardController implements TimerService.TimerListener {
                 return;
             }
 
+
             ObservableList<UserRank> data = FXCollections.observableArrayList();
             String sql = "SELECT u.username, u.points FROM users u "
                        + "JOIN user_classes uc ON u.id = uc.user_id "
                        + "WHERE uc.class_id = ? ORDER BY u.points DESC LIMIT 5";
+
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -532,13 +646,14 @@ public class DashboardController implements TimerService.TimerListener {
                     }
                 }
 
+
                 if (leaderboardPreview != null) {
                     leaderboardPreview.setItems(data);
                     leaderboardPreview.setCellFactory(param -> new ListCell<UserRank>() {
                         @Override
                         protected void updateItem(UserRank item, boolean empty) {
                             super.updateItem(item, empty);
-                            setText(empty || item == null ? null : 
+                            setText(empty || item == null ? null :
                                 item.getUsername() + " - " + item.getPoints() + " pts");
                         }
                     });
@@ -548,6 +663,7 @@ public class DashboardController implements TimerService.TimerListener {
             LOGGER.severe(() -> "Failed to load leaderboard preview: " + e.getMessage());
         }
     }
+
 
     @FXML
     @SuppressWarnings("unused")
@@ -565,6 +681,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     @FXML
     @SuppressWarnings("unused")
     private void handleStartTimer() {
@@ -574,10 +691,12 @@ public class DashboardController implements TimerService.TimerListener {
                 return;
             }
 
+
             if ("Done".equals(selectedTask.getStatus()) || "completed".equals(selectedTask.getStatus()) || "missed".equals(selectedTask.getStatus())) {
                 LOGGER.warning("Cannot start timer for completed or missed task");
                 return;
             }
+
 
             // If timer is paused, resume it
             if (timerService.isRunning() && timerService.isPaused()) {
@@ -585,11 +704,13 @@ public class DashboardController implements TimerService.TimerListener {
                 return;
             }
 
+
             String selected = timerPreset.getValue();
             if (selected == null || selected.isBlank()) {
                 LOGGER.warning("No timer preset selected");
                 return;
             }
+
 
             int seconds;
             if ("Custom".equals(selected)) {
@@ -612,13 +733,15 @@ public class DashboardController implements TimerService.TimerListener {
                 seconds = convertToSeconds(selected);
             }
 
+
             // Mark task as in progress
             updateTaskStatus(selectedTask.getId(), "in progress");
+
 
             // Start timer using TimerService (runs in background)
             boolean xpEnabled = xpActiveCheckbox != null && xpActiveCheckbox.isSelected();
             timerService.start(seconds, selectedTask.getId(), xpEnabled);
-            
+           
             if (timerStartButton != null) {
                 timerStartButton.setText("Restart");
             }
@@ -631,6 +754,7 @@ public class DashboardController implements TimerService.TimerListener {
             LOGGER.severe(() -> "Failed to start timer: " + e.getMessage());
         }
     }
+
 
     @FXML
     @SuppressWarnings("unused")
@@ -651,6 +775,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     @FXML
     @SuppressWarnings("unused")
     private void handleModeChange(ActionEvent event) {
@@ -664,11 +789,13 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     @FXML
     @SuppressWarnings("unused")
     private void updateXpStatus() {
         // This is intentionally lightweight; XP activation is controlled by the checkbox state.
     }
+
 
     // OLD TIMER METHODS COMMENTED OUT - Now using TimerService for background timer
     // private void startCountdown() { }
@@ -682,14 +809,17 @@ public class DashboardController implements TimerService.TimerListener {
     fade.setFromValue(0);
     fade.setToValue(1);
 
+
     ScaleTransition scale = new ScaleTransition(Duration.millis(500), node);
     scale.setFromX(0.95);
     scale.setFromY(0.95);
     scale.setToX(1);
     scale.setToY(1);
 
+
     new ParallelTransition(fade, scale).play();
-}   
+}  
+
 
     @SuppressWarnings("unused")
     private int calculateMultiplier(int minutes) {
@@ -699,6 +829,7 @@ public class DashboardController implements TimerService.TimerListener {
         if (minutes <= 60) return 1;
         return 1;
     }
+
 
     @SuppressWarnings("unused")
     private void awardTimerXp(int points) {
@@ -716,17 +847,20 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     private void refreshNavbarPoints() throws Exception {
         if (NavbarController.getInstance() != null) {
             NavbarController.getInstance().loadUserInfo();
         }
     }
 
+
     @SuppressWarnings("unused")
     private void stopTimer() {
         // Old method - commented out as TimerService.stop() is now used
         // if (timeline != null) { timeline.stop(); }
     }
+
 
     private int convertToSeconds(String value) {
         if (value.contains("Hour")) return 3600;
@@ -739,6 +873,7 @@ public class DashboardController implements TimerService.TimerListener {
         return 60;
     }
 
+
     private void playAddTaskAnimation() {if (taskList != null) {
         ScaleTransition st = new ScaleTransition(Duration.millis(200), taskList);
         st.setFromX(0.98);
@@ -748,6 +883,7 @@ public class DashboardController implements TimerService.TimerListener {
         st.play();
         }
     }
+
 
     private boolean validateTaskInput(String taskName, LocalDate date) {
         if (taskName == null || taskName.isBlank()) {
@@ -761,6 +897,7 @@ public class DashboardController implements TimerService.TimerListener {
         return true;
     }
 
+
     @FXML
     @SuppressWarnings("unused")
     private void goSettings() {
@@ -770,6 +907,7 @@ public class DashboardController implements TimerService.TimerListener {
             LOGGER.severe(() -> "Failed to navigate to Settings: " + e.getMessage());
         }
     }
+
 
     @FXML
     @SuppressWarnings("unused")
@@ -781,20 +919,24 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
+
     @Override
     public void onTimerUpdated(int remainingSeconds, boolean running, boolean paused) {
         updateTimerLabel();
     }
+
 
     @Override
     public void onTimerCompleted() {
         updateTimerLabel();
     }
 
+
     private void updateTimerLabel() {
         if (timerLabel == null) {
             return;
         }
+
 
         if (timerService.isRunning()) {
             int remaining = timerService.getRemainingSeconds();
@@ -806,6 +948,7 @@ public class DashboardController implements TimerService.TimerListener {
             timerLabel.setText("00:00");
             timerLabel.setStyle("-fx-text-fill: #7f8c8d;");
         }
+
 
         if (timerMultiplierLabel != null) {
             if (xpActiveCheckbox != null && !xpActiveCheckbox.isSelected()) {

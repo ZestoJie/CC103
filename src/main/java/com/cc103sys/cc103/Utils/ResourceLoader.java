@@ -13,8 +13,10 @@ public class ResourceLoader {
         FXMLLoader loader = new FXMLLoader(ResourceLoader.class.getResource(FXML_PATH + name + ".fxml"));
         Parent root = loader.load();
 
-        // Load specific CSS based on scene
         String cssPath = "/css/style.css"; // default
+        if ("Dashboard".equals(name)) {
+            cssPath = "/css/style.css";
+        }
         if ("TaskScene".equals(name)) {
             cssPath = "/css/task.css";
         }

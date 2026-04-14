@@ -45,6 +45,10 @@ public class Task {
     }
 
     public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, Integer classTaskId, String className, boolean isPersonal, String username) {
+        this.id = id;
+        this.taskName = taskName;
+        this.date = date;
+        this.status = status;
         this.description = description;
         this.classId = classId;
         this.classTaskId = classTaskId;

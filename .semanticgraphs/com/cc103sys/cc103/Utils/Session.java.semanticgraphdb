@@ -1,0 +1,84 @@
+
+3src\main\java\com\cc103sys\cc103\Utils\Session.java’
+ com.cc103sys.cc103.Utils.SessionCLASS=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java ("#
+packagecom.cc103sys.cc103.Utils"
+isFinalfalse"
+inner classfalse"
+
+isAbstractfalse"e
+declarationStringP<mark class="modifier">public </mark><mark class="modifier">class </mark>Session"
+accesspublic*Session2å
+>com.cc103sys.cc103.Utils.Session.setUsername(java.lang.String)DECLARATION=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java ("2|
+.com.cc103sys.cc103.Utils.Session.getUsername()DECLARATION=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java
+ 
+($2v
+(com.cc103sys.cc103.Utils.Session.clear()DECLARATION=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (2Å
+3com.cc103sys.cc103.Utils.Session?username@4.26:4.34DECLARATION=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java ("ñ
+>com.cc103sys.cc103.Utils.Session.setUsername(java.lang.String)METHOD=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (""
+isFinalfalse"∑
+declarationString°<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">setUsername</mark>(String user)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*setUsername2z
+3com.cc103sys.cc103.Utils.Session?username@4.26:4.34CALL=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (2ä
+Ccom.cc103sys.cc103.Utils.Session.setUsername(java.lang.String)!userCALL=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (2è
+Ccom.cc103sys.cc103.Utils.Session.setUsername(java.lang.String)!user	PARAMETER=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java* (.2R
+voidRETURN_TYPE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (≤
+Ccom.cc103sys.cc103.Utils.Session.setUsername(java.lang.String)!user	PARAMETER=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java* (."
+typeString"
+isFinalfalse" 
+declarationStringString user*user2W
+java.lang.StringTYPE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java# ()Õ
+.com.cc103sys.cc103.Utils.Session.getUsername()METHOD=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java
+ 
+($"
+isFinalfalse"è
+declarationStringz<mark class="modifier">public </mark><mark class="modifier">static </mark>String <mark class="method">getUsername</mark>()"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typeString*getUsername2z
+3com.cc103sys.cc103.Utils.Session?username@4.26:4.34CALL=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (2^
+java.lang.StringRETURN_TYPE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java
+ 
+( 
+(com.cc103sys.cc103.Utils.Session.clear()METHOD=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java ("
+isFinalfalse"¶
+declarationStringê<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">clear</mark>()"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*clear2z
+3com.cc103sys.cc103.Utils.Session?username@4.26:4.34CALL=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (2R
+voidRETURN_TYPE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (ª
+3com.cc103sys.cc103.Utils.Session?username@4.26:4.34VARIABLE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (""
+isFinalfalse"
+typeString"ê
+declarationString{<mark class="modifier">private </mark><mark class="modifier">static </mark>String <mark class="class-field">username</mark>"
+isStatictrue"
+accessprivate*username2W
+java.lang.StringTYPE=
+3src\main\java\com\cc103sys\cc103\Utils\Session.java (

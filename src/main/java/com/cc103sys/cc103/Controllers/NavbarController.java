@@ -222,7 +222,7 @@ public class NavbarController implements TimerService.TimerListener {
 
     // ===== TIMER LISTENER METHODS =====
     @Override
-    public void onTimerUpdated(int secondsRemaining, boolean isRunning, boolean isExpired) {
+    public void onTimerUpdated(int secondsRemaining, boolean running, boolean paused) {
         updateTimerDisplay();
     }
 

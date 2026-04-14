@@ -15,13 +15,13 @@ import com.cc103sys.cc103.Models.ClassTask;
 import com.cc103sys.cc103.Models.TaskAttachment;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -31,7 +31,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 public class TaskDetailController {
@@ -40,7 +39,6 @@ public class TaskDetailController {
     private static final String TASK_UPLOADS_DIR = "task_submissions";
     private static final int REFRESH_INTERVAL_SECONDS = 5;
 
-    @FXML private Label breadcrumbLabel;
     @FXML private Label classNameLabel;
     @FXML private Label taskTitleLabel;
     @FXML private Label dueDateLabel;
@@ -59,23 +57,11 @@ public class TaskDetailController {
     private ObservableList<TaskAttachment> attachments = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
 
-    private Window window() {
-        return uploadFileButton != null && uploadFileButton.getScene() != null
-            ? uploadFileButton.getScene().getWindow()
-            : null;
-    }
-
     @FXML
     public void initialize() {
         // Navbar setup
         NavbarController.getInstance().setActive("classes");
         setupAttachmentsListView();
-        if (attachmentsListView != null) {
-            Label empty = new Label("No files attached yet.\nUse Upload File to add your work.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            attachmentsListView.setPlaceholder(empty);
-        }
         LOGGER.info("Task detail view initialized");
     }
 
@@ -128,22 +114,12 @@ public class TaskDetailController {
 
                     // Load class name
                     loadClassName();
-                    updateBreadcrumb();
                     updateUI();
                 }
             }
         } catch (Exception e) {
             LOGGER.severe("Failed to load task details: " + e.getMessage());
         }
-    }
-
-    private void updateBreadcrumb() {
-        if (breadcrumbLabel == null) {
-            return;
-        }
-        String cls = classNameLabel != null ? classNameLabel.getText() : "Class";
-        String task = currentTask != null ? currentTask.getTaskName() : "Task";
-        breadcrumbLabel.setText("Dashboard › Classes › " + cls + " › " + task);
     }
 
     private void loadClassName() {
@@ -241,22 +217,9 @@ public class TaskDetailController {
     }
 
     private void updateSubmissionStatus() {
-        if (submissionStatusLabel != null) {
-            submissionStatusLabel.getStyleClass().removeAll(
-                "status-badge", "status-badge-pending", "status-badge-review", "status-badge-approved", "status-badge-rejected"
-            );
-            submissionStatusLabel.getStyleClass().addAll("status-badge", "status-badge-pending");
-        }
         if (currentSubmissionId == null) {
-            if (submissionStatusLabel != null) {
-                submissionStatusLabel.setText("Submission: Draft — add files if needed, then submit.");
-            }
-            if (markDoneButton != null) {
-                markDoneButton.setDisable(false);
-            }
-            if (uploadFileButton != null) {
-                uploadFileButton.setDisable(false);
-            }
+            submissionStatusLabel.setText("Status: DRAFT");
+            markDoneButton.setDisable(false);
             return;
         }
         String sql = "SELECT submission_status FROM task_submissions WHERE id = ?";
@@ -266,52 +229,15 @@ public class TaskDetailController {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String status = rs.getString("submission_status");
-                    String label = formatSubmissionStatus(status);
-                    if (submissionStatusLabel != null) {
-                        submissionStatusLabel.setText(label);
-                        submissionStatusLabel.getStyleClass().removeAll(
-                            "status-badge", "status-badge-pending", "status-badge-review", "status-badge-approved", "status-badge-rejected"
-                        );
-                        submissionStatusLabel.getStyleClass().addAll("status-badge", statusStyleClass(status));
-                    }
-
-                    boolean locked = "SUBMITTED".equalsIgnoreCase(status) || "APPROVED".equalsIgnoreCase(status);
-                    if (markDoneButton != null) {
-                        markDoneButton.setDisable(locked);
-                    }
-                    if (uploadFileButton != null) {
-                        uploadFileButton.setDisable(locked);
-                    }
+                    submissionStatusLabel.setText("Status: " + status);
+                    
+                    // Disable Mark as Done if already submitted
+                    markDoneButton.setDisable("SUBMITTED".equals(status));
                 }
             }
         } catch (Exception e) {
             LOGGER.severe("Failed to update submission status: " + e.getMessage());
         }
-    }
-
-    private static String formatSubmissionStatus(String raw) {
-        if (raw == null) {
-            return "Submission: Draft";
-        }
-        return switch (raw.toUpperCase()) {
-            case "DRAFT" -> "Submission: Draft — not sent for approval yet.";
-            case "SUBMITTED" -> "Submission: Submitted — waiting for instructor review.";
-            case "APPROVED" -> "Submission: Approved.";
-            case "REJECTED" -> "Submission: Rejected — you can update files and submit again.";
-            default -> "Submission: " + raw;
-        };
-    }
-
-    private static String statusStyleClass(String raw) {
-        if (raw == null) {
-            return "status-badge-pending";
-        }
-        return switch (raw.toUpperCase()) {
-            case "SUBMITTED" -> "status-badge-review";
-            case "APPROVED" -> "status-badge-approved";
-            case "REJECTED" -> "status-badge-rejected";
-            default -> "status-badge-pending";
-        };
     }
 
     private void setupAttachmentsListView() {
@@ -337,15 +263,13 @@ public class TaskDetailController {
             if (selectedFile != null) {
                 // Validate file size (20MB max for task submissions)
                 if (selectedFile.length() > 20 * 1024 * 1024) {
-                    UiDialogs.error(window(), "File too large", "File size must not exceed 20MB.");
+                    showAlert("Error", "File Too Large", "File size must not exceed 20MB.");
                     return;
                 }
 
                 // Copy file to submissions directory
-                String baseName = selectedFile.getName();
-                int dot = baseName.lastIndexOf('.');
-                String ext = dot >= 0 ? baseName.substring(dot) : "";
-                String filename = currentUserId + "_" + System.currentTimeMillis() + ext;
+                String filename = currentUserId + "_" + System.currentTimeMillis() + 
+                                 selectedFile.getName().substring(selectedFile.getName().lastIndexOf('.'));
                 Path sourcePath = selectedFile.toPath();
                 Path destPath = Paths.get(TASK_UPLOADS_DIR, filename);
 
@@ -354,12 +278,12 @@ public class TaskDetailController {
                 // Save to database
                 saveAttachmentToDatabase(destPath.toString(), selectedFile.getName());
 
-                UiDialogs.info(window(), "File uploaded", "Your file was added to this submission.");
+                showAlert("Success", "File Uploaded", "File uploaded successfully!");
                 loadAttachments();
             }
         } catch (Exception e) {
             LOGGER.severe("Failed to upload file: " + e.getMessage());
-            UiDialogs.error(window(), "Upload failed", e.getMessage());
+            showAlert("Error", "Upload Failed", e.getMessage());
         }
     }
 
@@ -381,7 +305,7 @@ public class TaskDetailController {
     private void handleRemoveAttachment() {
         TaskAttachment selected = attachmentsListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            UiDialogs.warn(window(), "Nothing selected", "Select a file to remove.");
+            showAlert("Error", "No Selection", "Please select a file to remove.");
             return;
         }
 
@@ -402,19 +326,15 @@ public class TaskDetailController {
 
             LOGGER.info("Attachment removed: " + selected.getFileName());
             loadAttachments();
-            UiDialogs.info(window(), "Removed", "The file was removed from your submission.");
+            showAlert("Success", "Removed", "File removed successfully!");
         } catch (Exception e) {
             LOGGER.severe("Failed to remove attachment: " + e.getMessage());
-            UiDialogs.error(window(), "Removal failed", e.getMessage());
+            showAlert("Error", "Removal Failed", e.getMessage());
         }
     }
 
     @FXML
     private void handleMarkDone() {
-        if (!UiDialogs.confirm(window(), "Submit this task?",
-            "Submit for approval? While your submission is still a draft you can add or remove files. After you submit, your instructor will review it and you cannot change files until they act on it.")) {
-            return;
-        }
         try {
             // Update submission status to SUBMITTED
             String sql = "UPDATE task_submissions SET submission_status = 'SUBMITTED' WHERE id = ?";
@@ -436,22 +356,17 @@ public class TaskDetailController {
 
             LOGGER.info("Task marked as done - status changed to For Approval");
             updateSubmissionStatus();
-            UiDialogs.info(window(), "Task submitted", "Your task was submitted successfully and is waiting for approval.");
+            showAlert("Success", "Task Submitted", "Task submitted for approval!");
         } catch (Exception e) {
             LOGGER.severe("Failed to mark task as done: " + e.getMessage());
-            UiDialogs.error(window(), "Submission failed", e.getMessage());
+            showAlert("Error", "Submission Failed", e.getMessage());
         }
     }
 
     @FXML
     private void handleGoBack() {
         stopAutoRefresh();
-        if (currentClassId != null && currentClassId > 0) {
-            Session.setCurrentClassId(currentClassId);
-            Navigator.navigateTo("ClassDetail");
-        } else {
-            Navigator.navigateTo("classes");
-        }
+        Navigator.navigateTo("classes");
     }
 
     private void startAutoRefresh() {
@@ -477,6 +392,14 @@ public class TaskDetailController {
         }
     }
 
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     // Custom ListCell for displaying attachments
     private class AttachmentListCell extends ListCell<TaskAttachment> {
         @Override
@@ -491,7 +414,7 @@ public class TaskDetailController {
                 fileLabel.setStyle("-fx-font-size: 12;");
                 
                 Button removeBtn = new Button("Remove");
-                removeBtn.getStyleClass().addAll("button", "button-danger");
+                removeBtn.setStyle("-fx-padding: 5; -fx-font-size: 10;");
                 removeBtn.setOnAction(e -> {
                     attachmentsListView.getSelectionModel().select(item);
                     handleRemoveAttachment();

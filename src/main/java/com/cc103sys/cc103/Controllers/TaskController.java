@@ -16,7 +16,6 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.TimerService;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -36,7 +35,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
 
 public class TaskController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
@@ -111,12 +109,6 @@ public class TaskController implements TimerService.TimerListener {
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
 
-    private Window window() {
-        return allTaskList != null && allTaskList.getScene() != null
-            ? allTaskList.getScene().getWindow()
-            : null;
-    }
-
     @FXML
     public void initialize() {
         timerService = TimerService.getInstance();
@@ -138,23 +130,7 @@ public class TaskController implements TimerService.TimerListener {
         startAutoRefresh();
         // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
-        setupListPlaceholders();
         LOGGER.info("Task scene initialized successfully");
-    }
-
-    private void setupListPlaceholders() {
-        if (allTaskList != null) {
-            Label empty = new Label("No tasks yet.\nAdd a personal task above or enroll in a class.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            allTaskList.setPlaceholder(empty);
-        }
-        if (filteredTaskList != null) {
-            Label empty = new Label("No tasks for the selected class.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            filteredTaskList.setPlaceholder(empty);
-        }
     }
 
     private void startAutoRefresh() {
@@ -569,12 +545,7 @@ public class TaskController implements TimerService.TimerListener {
         LocalDate date = taskDate.getValue();
         String description = taskDescriptionArea != null ? taskDescriptionArea.getText().trim() : "";
 
-        if (taskName.isEmpty()) {
-            UiDialogs.warn(window(), "Missing name", "Please enter a task name.");
-            return;
-        }
-        if (date == null) {
-            UiDialogs.warn(window(), "Missing date", "Please choose a due date.");
+        if (taskName.isEmpty() || date == null) {
             return;
         }
 
@@ -605,10 +576,8 @@ public class TaskController implements TimerService.TimerListener {
             loadAllClassTasks();
             loadFilteredTasks();
             LOGGER.info("Personal task added successfully");
-            UiDialogs.info(window(), "Task added", "Your task was saved.");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to add task: " + e.getMessage());
-            UiDialogs.error(window(), "Could not add task", e.getMessage());
         }
     }
 
@@ -628,11 +597,6 @@ public class TaskController implements TimerService.TimerListener {
     private void handleDeleteTask() {
         Task selectedTask = getSelectedTask();
         if (selectedTask == null) {
-            UiDialogs.warn(window(), "Nothing selected", "Select a task to delete.");
-            return;
-        }
-        if (!UiDialogs.confirm(window(), "Delete task?",
-            "Remove \"" + selectedTask.getTaskName() + "\"? This cannot be undone.")) {
             return;
         }
 
@@ -647,10 +611,8 @@ public class TaskController implements TimerService.TimerListener {
             loadAllClassTasks();
             loadFilteredTasks();
             LOGGER.info("Task deleted");
-            UiDialogs.info(window(), "Deleted", "The task was removed.");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to delete task: " + e.getMessage());
-            UiDialogs.error(window(), "Delete failed", e.getMessage());
         }
     }
 

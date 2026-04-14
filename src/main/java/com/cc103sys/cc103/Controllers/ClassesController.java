@@ -10,7 +10,6 @@ import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +23,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 
 public class ClassesController {
     private static final Logger LOGGER = Logger.getLogger(ClassesController.class.getName());
@@ -43,12 +41,6 @@ public class ClassesController {
     @FXML private Label generatedCodeLabel;
     @FXML private Button copyCodeButton;
 
-    private Window window() {
-        return classList != null && classList.getScene() != null
-            ? classList.getScene().getWindow()
-            : null;
-    }
-
     @FXML
     public void initialize() {
         setupRoleBasedUI();
@@ -62,23 +54,7 @@ public class ClassesController {
         loadOwnedClasses();
 
         NavbarController.getInstance().setActive("classes");
-        setupListPlaceholders();
         LOGGER.info("Classes view initialized");
-    }
-
-    private void setupListPlaceholders() {
-        if (classList != null) {
-            Label empty = new Label("You're enrolled in every public class available right now,\nor there are no public classes yet.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            classList.setPlaceholder(empty);
-        }
-        if (myClassList != null) {
-            Label empty = new Label("No classes yet.\nCreate one as a host or join with a code.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            myClassList.setPlaceholder(empty);
-        }
     }
 
     private void setupRoleBasedUI() {
@@ -170,10 +146,7 @@ public class ClassesController {
         }
 
         String name = classNameField.getText();
-        if (name == null || name.isBlank()) {
-            UiDialogs.warn(window(), "Missing class name", "Enter a name for your class.");
-            return;
-        }
+        if (name == null || name.isBlank()) return;
 
         boolean isPublic = publicClassToggle.isSelected();
         String code = generateJoinCode();
@@ -197,7 +170,7 @@ public class ClassesController {
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int newClassId = rs.getInt(1);
-                    joinClass(newClassId, false);
+                    joinClass(newClassId);
                 }
             }
             classNameField.clear();
@@ -207,10 +180,8 @@ public class ClassesController {
             copyCodeButton.setVisible(true);
             loadPublicClasses();
             loadOwnedClasses();
-            UiDialogs.info(window(), "Class created", "Your class is ready. Share the join code with participants.");
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to create class: " + e.getMessage());
-            UiDialogs.error(window(), "Could not create class", e.getMessage());
         }
     }
 
@@ -223,7 +194,6 @@ public class ClassesController {
         content.putString(code);
         clipboard.setContent(content);
         LOGGER.info("Copied class code to clipboard: " + code);
-        UiDialogs.info(window(), "Copied", "Join code copied to clipboard.");
     }
 
     private String generateJoinCode() {
@@ -236,11 +206,9 @@ public class ClassesController {
         return code.toString();
     }
 
-    private void joinClass(int classId, boolean showSuccessDialog) {
+    private void joinClass(int classId) {
         Integer userId = getCurrentUserId();
-        if (userId == null) {
-            return;
-        }
+        if (userId == null) return;
 
         String sql = "INSERT IGNORE INTO user_classes (user_id, class_id) VALUES (?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -250,13 +218,8 @@ public class ClassesController {
             stmt.executeUpdate();
             assignPendingClassTasksToUser(classId, userId);
             loadPublicClasses();
-            loadOwnedClasses();
-            if (showSuccessDialog) {
-                UiDialogs.info(window(), "Joined class", "You have joined the class.");
-            }
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to join class: " + e.getMessage());
-            UiDialogs.error(window(), "Join failed", e.getMessage());
         }
     }
 
@@ -283,10 +246,7 @@ public class ClassesController {
     @SuppressWarnings("unused")
     private void joinPrivateClass() {
         String code = codeField.getText();
-        if (code == null || code.isBlank()) {
-            UiDialogs.warn(window(), "Missing code", "Enter the class join code.");
-            return;
-        }
+        if (code == null || code.isBlank()) return;
 
         code = code.trim().toUpperCase();
         String query = "SELECT id FROM classes WHERE UPPER(join_code) = ?";
@@ -295,23 +255,18 @@ public class ClassesController {
             stmt.setString(1, code);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    joinClass(rs.getInt("id"), true);
+                    joinClass(rs.getInt("id"));
                     codeField.clear();
-                } else {
-                    UiDialogs.warn(window(), "Code not found", "No class matches that code. Check with your instructor and try again.");
                 }
             }
         } catch (Exception e) {
             LOGGER.severe(() -> "Failed to join private class: " + e.getMessage());
-            UiDialogs.error(window(), "Join failed", e.getMessage());
         }
     }
 
     private void deleteClass(int classId) {
         Integer currentUserId = getCurrentUserId();
-        if (currentUserId == null) {
-            return;
-        }
+        if (currentUserId == null) return;
 
         // Verify the current user is the owner
         String checkOwnerSql = "SELECT owner_id FROM classes WHERE id = ?";
@@ -335,11 +290,6 @@ public class ClassesController {
             return;
         }
 
-        if (!UiDialogs.confirm(window(), "Delete this class?",
-            "This removes the class and related data for everyone. This cannot be undone.")) {
-            return;
-        }
-
         // Delete the class (cascade will handle related records)
         String deleteSql = "DELETE FROM classes WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -348,9 +298,7 @@ public class ClassesController {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 LOGGER.info(() -> "Class deleted successfully: " + classId);
-                loadOwnedClasses();
-                loadPublicClasses();
-                UiDialogs.info(window(), "Class deleted", "The class has been removed.");
+                loadOwnedClasses(); // Refresh the list
             } else {
                 LOGGER.warning("No class was deleted");
             }
@@ -361,13 +309,7 @@ public class ClassesController {
 
     private void leaveClass(int classId) {
         Integer currentUserId = getCurrentUserId();
-        if (currentUserId == null) {
-            return;
-        }
-        if (!UiDialogs.confirm(window(), "Leave this class?",
-            "You will lose access to class tasks until you join again.")) {
-            return;
-        }
+        if (currentUserId == null) return;
 
         String leaveSql = "DELETE FROM user_classes WHERE user_id = ? AND class_id = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -391,7 +333,6 @@ public class ClassesController {
 
         loadPublicClasses();
         loadOwnedClasses();
-        UiDialogs.info(window(), "Left class", "You are no longer enrolled in that class.");
     }
 
     private Integer getCurrentUserId() {
@@ -426,11 +367,11 @@ public class ClassesController {
                 
                 if (isOwner) {
                     // Create fresh button instances for each cell
-                    Button viewBtn = new Button("Open Class");
+                    Button viewBtn = new Button("View");
                     Button deleteBtn = new Button("Delete");
                     
-                    viewBtn.getStyleClass().addAll("button", "button-success");
-                    deleteBtn.getStyleClass().addAll("button", "button-danger");
+                    viewBtn.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand; -fx-background-color: #4caf50; -fx-text-fill: white;");
+                    deleteBtn.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand; -fx-background-color: #f44336; -fx-text-fill: white;");
                     
                     // Use final reference for lambda
                     final Classes classItem = item;
@@ -442,8 +383,8 @@ public class ClassesController {
                     
                     buttonBox.getChildren().addAll(viewBtn, deleteBtn);
                 } else {
-                    Button leaveBtn = new Button("Leave Class");
-                    leaveBtn.getStyleClass().addAll("button", "button-secondary");
+                    Button leaveBtn = new Button("Leave");
+                    leaveBtn.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand; -fx-background-color: #ff9800; -fx-text-fill: white;");
                     
                     final Classes classItem = item;
                     leaveBtn.setOnAction(e -> leaveClass(classItem.getId()));
@@ -457,14 +398,14 @@ public class ClassesController {
     }
 
     private class ClassListCell extends ListCell<Classes> {
-        private final Button joinButton = new Button("Join Class");
+        private final Button joinButton = new Button("Join");
 
         {
-            joinButton.getStyleClass().addAll("button", "button-success");
+            joinButton.setStyle("-fx-padding: 8 16 8 16; -fx-cursor: hand;");
             joinButton.setOnAction(e -> {
                 Classes c = getItem();
                 if (c != null) {
-                    joinClass(c.getId(), true);
+                    joinClass(c.getId());
                 }
             });
         }

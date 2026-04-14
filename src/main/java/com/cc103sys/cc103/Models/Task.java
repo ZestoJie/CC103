@@ -16,32 +16,27 @@ public class Task {
     private boolean isPersonal;
     private String username;
 
-   
+    // Constructor with minimal parameters
+    public Task(int id, String taskName, LocalDate date, String status) {
+        this(id, taskName, date, status, null, null, null, null, false, null);
+    }
 
+    // Constructor with class information only
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className) {
         this(id, taskName, date, status, null, classId, null, className, false, null);
     }
-
+    
+    // Constructor with personal flag
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal) {
         this(id, taskName, date, status, null, classId, null, className, isPersonal, null);
     }
 
+    // Constructor with username (for pending approvals)
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal, String username) {
         this(id, taskName, date, status, null, classId, null, className, isPersonal, username);
     }
 
-    public Task(int id, String taskName, LocalDate date, String status, Integer classId, Integer classTaskId, String className) {
-        this(id, taskName, date, status, null, classId, classTaskId, className, false, null);
-    }
-
-    public Task(int id, String taskName, LocalDate date, String status, Integer classId, Integer classTaskId, String className, boolean isPersonal, String username) {
-        this(id, taskName, date, status, null, classId, classTaskId, className, isPersonal, username);
-    }
-
-    public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, String className, boolean isPersonal, String username) {
-        this(id, taskName, date, status, description, classId, null, className, isPersonal, username);
-    }
-
+    // Constructor with full parameters
     public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, Integer classTaskId, String className, boolean isPersonal, String username) {
         this.id = id;
         this.taskName = taskName;

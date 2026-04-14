@@ -11,7 +11,6 @@ import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.ClassTask;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,9 +24,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 public class ClassDetailController {
@@ -37,18 +33,13 @@ public class ClassDetailController {
     private static final int LATE_TASK_POINTS = 5;
     private static final int REFRESH_INTERVAL_SECONDS = 5; // Auto-refresh every 5 seconds
 
-    @FXML private Label breadcrumbLabel;
     @FXML private Label classTitleLabel;
     @FXML private Label classCodeLabel;
     @FXML private Label classDescriptionLabel;
     @FXML private Label classVisibilityLabel;
-    @FXML private Label classMetricsLabel;
     @FXML private ListView<ClassTask> tasksListView;
     @FXML private ListView<String> participantsListView;
     @FXML private Label formTitleLabel;
-    @FXML private Label participantTaskHint;
-    @FXML private VBox ownerTaskFormCard;
-    @FXML private HBox ownerTaskActionsRow;
     @FXML private TextField taskTitleField;
     @FXML private TextArea taskDescriptionArea;
     @FXML private DatePicker taskDueDatePicker;
@@ -65,7 +56,6 @@ public class ClassDetailController {
     @FXML
     public void initialize() {
         setupTaskListView();
-        setupEmptyPlaceholders();
         loadClassDetails();
         loadClassTasks();
         loadParticipants();
@@ -75,27 +65,6 @@ public class ClassDetailController {
         NavbarController.getInstance().setActive("classes");
 
         LOGGER.info("Class detail view initialized");
-    }
-
-    private void setupEmptyPlaceholders() {
-        Label noTasks = new Label("No class tasks yet.\nThe host can add tasks on the right, or check back later.");
-        noTasks.getStyleClass().add("empty-state");
-        noTasks.setWrapText(true);
-        if (tasksListView != null) {
-            tasksListView.setPlaceholder(noTasks);
-        }
-        Label noPeople = new Label("No participants yet.");
-        noPeople.getStyleClass().add("empty-state");
-        noPeople.setWrapText(true);
-        if (participantsListView != null) {
-            participantsListView.setPlaceholder(noPeople);
-        }
-    }
-
-    private Window window() {
-        return classTitleLabel != null && classTitleLabel.getScene() != null
-            ? classTitleLabel.getScene().getWindow()
-            : null;
     }
 
     private void startAutoRefresh() {
@@ -142,21 +111,13 @@ public class ClassDetailController {
                     classTitleLabel.setText(rs.getString("class_name"));
                     String joinCode = rs.getString("join_code");
                     if (classCodeLabel != null) {
-                        classCodeLabel.setText(joinCode != null && !joinCode.isBlank() ? "Code: " + joinCode : "Code: — (public listing)");
+                        classCodeLabel.setText(joinCode != null && !joinCode.isBlank() ? "Code: " + joinCode : "Code: Public class");
                     }
-                    Integer uid = getCurrentUserId();
-                    isOwner = uid != null && rs.getInt("owner_id") == uid;
+                    isOwner = rs.getInt("owner_id") == getCurrentUserId();
                     int isPublic = rs.getInt("is_public");
-                    String visibility = isPublic == 1 ? "Public" : "Private";
+                    String visibility = isPublic == 1 ? "Public Class" : "Private Class";
                     if (classVisibilityLabel != null) {
                         classVisibilityLabel.setText(visibility);
-                        classVisibilityLabel.getStyleClass().removeAll(
-                            "status-badge", "status-badge-public", "status-badge-private", "status-badge-neutral"
-                        );
-                        classVisibilityLabel.getStyleClass().addAll(
-                            "status-badge",
-                            isPublic == 1 ? "status-badge-public" : "status-badge-private"
-                        );
                     }
                 }
             }
@@ -164,37 +125,11 @@ public class ClassDetailController {
             LOGGER.severe("Failed to load class details: " + e.getMessage());
         }
 
-        if (breadcrumbLabel != null && classTitleLabel != null) {
-            breadcrumbLabel.setText("Dashboard › Classes › " + classTitleLabel.getText());
-        }
+        // Approval system moved to Dashboard
 
         // For now, set a default description. In a real app, you'd have a description field in classes table
         classDescriptionLabel.setText("Welcome to " + classTitleLabel.getText() + ". Here you can manage class tasks and assignments.");
         loadParticipants();
-        applyOwnerParticipantUi();
-    }
-
-    private void applyOwnerParticipantUi() {
-        boolean owner = isOwner;
-        if (ownerTaskFormCard != null) {
-            ownerTaskFormCard.setVisible(owner);
-            ownerTaskFormCard.setManaged(owner);
-        }
-        if (formTitleLabel != null) {
-            formTitleLabel.setVisible(owner);
-            formTitleLabel.setManaged(owner);
-        }
-        if (participantTaskHint != null) {
-            participantTaskHint.setVisible(!owner);
-            participantTaskHint.setManaged(!owner);
-        }
-        if (ownerTaskActionsRow != null) {
-            ownerTaskActionsRow.setVisible(owner);
-            ownerTaskActionsRow.setManaged(owner);
-        }
-        if (submitTaskButton != null && owner) {
-            submitTaskButton.setText(editingTask != null ? "Update Task" : "Add Task");
-        }
     }
 
     private void loadClassTasks() {
@@ -222,16 +157,6 @@ public class ClassDetailController {
         } catch (Exception e) {
             LOGGER.severe("Failed to load class tasks: " + e.getMessage());
         }
-        refreshClassMetrics();
-    }
-
-    private void refreshClassMetrics() {
-        if (classMetricsLabel == null) {
-            return;
-        }
-        int taskCount = classTasks.size();
-        int participantCount = participantsListView != null ? participantsListView.getItems().size() : 0;
-        classMetricsLabel.setText(participantCount + " participant(s) · " + taskCount + " task(s)");
     }
 
     @FXML
@@ -245,29 +170,20 @@ public class ClassDetailController {
     @FXML
     @SuppressWarnings("unused")
     private void handleSubmitTask() {
-        if (!isOwner) {
-            UiDialogs.warn(window(), "Not allowed", "Only the class host can add or edit class tasks here.");
-            return;
-        }
         String title = taskTitleField.getText().trim();
         if (title.isEmpty()) {
-            UiDialogs.warn(window(), "Missing title", "Please enter a task title.");
             return;
         }
 
         String description = taskDescriptionArea.getText().trim();
         LocalDate dueDate = taskDueDatePicker.getValue();
-        if (dueDate == null) {
-            UiDialogs.warn(window(), "Missing due date", "Please choose a due date.");
-            return;
-        }
 
         if (editingTask != null) {
+            // Update existing task
             updateClassTask(editingTask.getId(), title, description, dueDate);
-            UiDialogs.info(window(), "Saved", "Task updated successfully.");
         } else {
+            // Create new task
             createClassTask(title, description, dueDate);
-            UiDialogs.info(window(), "Created", "Task added and assigned to class members.");
         }
 
         clearForm();
@@ -284,14 +200,8 @@ public class ClassDetailController {
     @FXML
     @SuppressWarnings("unused")
     private void handleEditTask() {
-        if (!isOwner) {
-            return;
-        }
         ClassTask selected = tasksListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            UiDialogs.warn(window(), "Nothing selected", "Select a task to edit.");
-            return;
-        }
+        if (selected == null) return;
 
         editingTask = selected;
         formTitleLabel.setText("Edit Task");
@@ -306,48 +216,33 @@ public class ClassDetailController {
     @FXML
     @SuppressWarnings("unused")
     private void handleDeleteTask() {
-        if (!isOwner) {
-            return;
-        }
         ClassTask selected = tasksListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            UiDialogs.warn(window(), "Nothing selected", "Select a task to delete.");
-            return;
-        }
-        if (!UiDialogs.confirm(window(), "Delete task?",
-            "Remove \"" + selected.getTaskName() + "\" from this class? This cannot be undone.")) {
-            return;
-        }
+        if (selected == null) return;
 
         deleteClassTask(selected.getId());
         loadClassTasks();
-        UiDialogs.info(window(), "Deleted", "The class task was removed.");
     }
 
     private void createClassTask(String title, String description, LocalDate dueDate) {
         Integer ownerId = getCurrentUserId();
-        if (ownerId == null) {
-            return;
-        }
+        if (ownerId == null) return;
 
         String sql = "INSERT INTO class_tasks (class_id, task_name, description, due_date, owner_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, currentClassId);
             stmt.setString(2, title);
-            stmt.setString(3, description.isEmpty() ? null : description);
+            stmt.setString(3, description);
             stmt.setDate(4, Date.valueOf(dueDate));
             stmt.setInt(5, ownerId);
             stmt.executeUpdate();
 
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                assignTaskToClassMembers(conn, keys);
-            }
+            // Assign task to all class members
+            assignTaskToClassMembers(stmt.getGeneratedKeys());
 
             LOGGER.info("Class task created successfully");
         } catch (Exception e) {
             LOGGER.severe("Failed to create class task: " + e.getMessage());
-            UiDialogs.error(window(), "Could not create task", e.getMessage());
         }
     }
 
@@ -380,21 +275,24 @@ public class ClassDetailController {
         }
     }
 
-    private void assignTaskToClassMembers(Connection conn, ResultSet generatedKeys) throws java.sql.SQLException {
-        if (generatedKeys == null || !generatedKeys.next()) {
-            return;
-        }
-        int classTaskId = generatedKeys.getInt(1);
-        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
-                   + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
-                   + "FROM class_tasks ct "
-                   + "JOIN users u ON u.id IN (SELECT user_id FROM user_classes WHERE class_id = ct.class_id) "
-                   + "WHERE ct.id = ? "
-                   + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
+    private void assignTaskToClassMembers(ResultSet generatedKeys) {
+        try {
+            if (generatedKeys.next()) {
+                int classTaskId = generatedKeys.getInt(1);
+                String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
+                           + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
+                           + "FROM class_tasks ct "
+                           + "JOIN users u ON u.id IN (SELECT user_id FROM user_classes WHERE class_id = ct.class_id) "
+                           + "WHERE ct.id = ? "
+                           + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
 
-        try (PreparedStatement assignStmt = conn.prepareStatement(sql)) {
-            assignStmt.setInt(1, classTaskId);
-            assignStmt.executeUpdate();
+                try (PreparedStatement assignStmt = DBUtil.getConnection().prepareStatement(sql)) {
+                    assignStmt.setInt(1, classTaskId);
+                    assignStmt.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Failed to assign task to class members: " + e.getMessage());
         }
     }
 
@@ -407,7 +305,6 @@ public class ClassDetailController {
         cancelEditButton.setVisible(false);
         cancelEditButton.setManaged(false);
         editingTask = null;
-        applyOwnerParticipantUi();
     }
 
     private void loadParticipants() {
@@ -430,7 +327,6 @@ public class ClassDetailController {
         } catch (Exception e) {
             LOGGER.severe("Failed to load class participants: " + e.getMessage());
         }
-        refreshClassMetrics();
     }
 
     private Integer getCurrentUserId() {
@@ -461,13 +357,14 @@ public class ClassDetailController {
             } else {
                 // Create button for View Task action
                 javafx.scene.control.Button viewButton = new javafx.scene.control.Button("View Task");
-                viewButton.getStyleClass().addAll("button", "button-secondary");
-                boolean hostOfClass = ClassDetailController.this.isOwner;
-                viewButton.setText(hostOfClass ? "Review Submissions" : "View Task");
+                viewButton.setStyle("-fx-padding: 5; -fx-font-size: 11;");
                 viewButton.setOnAction(e -> {
-                    if (hostOfClass) {
+                    // Route based on user role
+                    if (Session.isHost()) {
+                        // Host: Navigate to task review/approval page
                         Navigator.navigateToTaskReview(currentClassId, task.getId());
                     } else {
+                        // Participant: Navigate to task submission page
                         Navigator.navigateToTaskDetail(currentClassId, task.getId());
                     }
                 });

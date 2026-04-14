@@ -9,7 +9,6 @@ import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.ClassTask;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -17,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -25,7 +25,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 public class TaskReviewController {
@@ -33,7 +32,6 @@ public class TaskReviewController {
     private static final Logger LOGGER = Logger.getLogger(TaskReviewController.class.getName());
     private static final int REFRESH_INTERVAL_SECONDS = 5;
 
-    @FXML private Label breadcrumbLabel;
     @FXML private Label classNameLabel;
     @FXML private Label taskTitleLabel;
     @FXML private Label dueDateLabel;
@@ -48,22 +46,10 @@ public class TaskReviewController {
     private ObservableList<SubmissionRecord> submissions = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
 
-    private Window window() {
-        return backButton != null && backButton.getScene() != null
-            ? backButton.getScene().getWindow()
-            : null;
-    }
-
     @FXML
     public void initialize() {
         NavbarController.getInstance().setActive("classes");
         setupSubmissionsListView();
-        if (submissionsListView != null) {
-            Label empty = new Label("No submissions yet.\nStudents will appear here after they submit this task.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            submissionsListView.setPlaceholder(empty);
-        }
         LOGGER.info("Task review view initialized");
     }
 
@@ -94,22 +80,12 @@ public class TaskReviewController {
                     );
 
                     loadClassName();
-                    updateBreadcrumb();
                     updateUI();
                 }
             }
         } catch (Exception e) {
             LOGGER.severe(String.format("Failed to load task details: %s", e.getMessage()));
         }
-    }
-
-    private void updateBreadcrumb() {
-        if (breadcrumbLabel == null) {
-            return;
-        }
-        String cls = classNameLabel != null ? classNameLabel.getText() : "Class";
-        String task = currentTask != null ? currentTask.getTaskName() : "Task";
-        breadcrumbLabel.setText("Dashboard › Classes › " + cls + " › Review: " + task);
     }
 
     private void loadClassName() {
@@ -177,10 +153,6 @@ public class TaskReviewController {
     }
 
     private void approveSubmission(SubmissionRecord submission) {
-        if (!UiDialogs.confirm(window(), "Approve this submission?",
-            "Approve work from " + submission.username + "? Points will be awarded and the task will be marked done.")) {
-            return;
-        }
         try {
             Integer currentUserId = getCurrentUserId();
             
@@ -227,18 +199,14 @@ public class TaskReviewController {
 
             LOGGER.info(String.format("Submission from %s approved", submission.username));
             loadAllSubmissions();
-            UiDialogs.info(window(), "Approved", "Submission approved and 50 points awarded.");
+            showAlert("Success", "Approved", "Submission approved and 50 points awarded!");
         } catch (Exception e) {
             LOGGER.severe(String.format("Failed to approve submission: %s", e.getMessage()));
-            UiDialogs.error(window(), "Approval failed", e.getMessage());
+            showAlert("Error", "Approval Failed", e.getMessage());
         }
     }
 
     private void rejectSubmission(SubmissionRecord submission) {
-        if (!UiDialogs.confirm(window(), "Reject this submission?",
-            "Reject work from " + submission.username + "? They can update files and submit again.")) {
-            return;
-        }
         try {
             // Update submission status to REJECTED
             String sql = "UPDATE task_submissions SET submission_status = 'REJECTED' WHERE id = ?";
@@ -250,45 +218,20 @@ public class TaskReviewController {
 
             LOGGER.info(String.format("Submission from %s rejected", submission.username));
             loadAllSubmissions();
-            UiDialogs.info(window(), "Rejected", "Submission rejected — the participant can resubmit.");
+            showAlert("Success", "Rejected", "Submission rejected - participant can resubmit!");
         } catch (Exception e) {
             LOGGER.severe(String.format("Failed to reject submission: %s", e.getMessage()));
-            UiDialogs.error(window(), "Rejection failed", e.getMessage());
+            showAlert("Error", "Rejection Failed", e.getMessage());
         }
-    }
-
-    private static String formatSubmissionStatusLabel(String raw) {
-        if (raw == null) {
-            return "Pending";
-        }
-        return switch (raw.toUpperCase()) {
-            case "DRAFT" -> "Pending";
-            case "SUBMITTED" -> "For approval";
-            case "APPROVED" -> "Approved";
-            case "REJECTED" -> "Rejected";
-            default -> raw;
-        };
-    }
-
-    private static String submissionStatusStyle(String raw) {
-        if (raw == null) {
-            return "status-badge-pending";
-        }
-        return switch (raw.toUpperCase()) {
-            case "SUBMITTED" -> "status-badge-review";
-            case "APPROVED" -> "status-badge-approved";
-            case "REJECTED" -> "status-badge-rejected";
-            default -> "status-badge-pending";
-        };
     }
 
     private void viewSubmissionFiles(SubmissionRecord submission) {
         // This could open a new dialog or navigate to a file preview
         // For now, just show file count
         if (submission.fileCount == 0) {
-            UiDialogs.info(window(), "No files", "This submission has no attached files.");
+            showAlert("Info", "No Files", "This submission has no attached files.");
         } else {
-            UiDialogs.info(window(), "Files", "This submission has " + submission.fileCount + " file(s) attached.");
+            showAlert("Info", "Files", "This submission has " + submission.fileCount + " file(s) attached.");
         }
     }
 
@@ -312,12 +255,7 @@ public class TaskReviewController {
     @FXML
     private void handleGoBack() {
         stopAutoRefresh();
-        if (currentClassId != null && currentClassId > 0) {
-            Session.setCurrentClassId(currentClassId);
-            Navigator.navigateTo("ClassDetail");
-        } else {
-            Navigator.navigateTo("classes");
-        }
+        Navigator.navigateTo("classes");
     }
 
     private void startAutoRefresh() {
@@ -340,6 +278,14 @@ public class TaskReviewController {
             refreshTimeline.stop();
             LOGGER.info("Task review auto-refresh stopped");
         }
+    }
+
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     // ===== Inner Classes =====
@@ -377,8 +323,10 @@ public class TaskReviewController {
                 Label userLabel = new Label(submission.username);
                 userLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12;");
                 
-                Label statusLabel = new Label(formatSubmissionStatusLabel(submission.status));
-                statusLabel.getStyleClass().addAll("status-badge", submissionStatusStyle(submission.status));
+                Label statusLabel = new Label(submission.status);
+                String statusColor = "APPROVED".equals(submission.status) ? "#10b981" :
+                                    "REJECTED".equals(submission.status) ? "#ef4444" : "#3b82f6";
+                statusLabel.setStyle(String.format("-fx-text-fill: %s; -fx-font-weight: bold; -fx-font-size: 11;", statusColor));
                 
                 Label dateLabel = new Label("Submitted: " + submission.submittedAt);
                 dateLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 10;");
@@ -395,16 +343,16 @@ public class TaskReviewController {
                 buttonsBox.setPadding(new Insets(8, 0, 0, 0));
 
                 Button viewButton = new Button("View Files");
-                viewButton.getStyleClass().addAll("button", "button-secondary");
+                viewButton.setStyle("-fx-padding: 5; -fx-font-size: 11;");
                 viewButton.setOnAction(e -> viewSubmissionFiles(submission));
 
                 if (!"APPROVED".equals(submission.status) && !"REJECTED".equals(submission.status)) {
                     Button approveButton = new Button("Approve");
-                    approveButton.getStyleClass().addAll("button", "button-success");
+                    approveButton.setStyle("-fx-padding: 5; -fx-font-size: 11; -fx-background-color: #10b981; -fx-text-fill: white;");
                     approveButton.setOnAction(e -> approveSubmission(submission));
 
                     Button rejectButton = new Button("Reject");
-                    rejectButton.getStyleClass().addAll("button", "button-danger");
+                    rejectButton.setStyle("-fx-padding: 5; -fx-font-size: 11; -fx-background-color: #ef4444; -fx-text-fill: white;");
                     rejectButton.setOnAction(e -> rejectSubmission(submission));
 
                     buttonsBox.getChildren().addAll(viewButton, approveButton, rejectButton);

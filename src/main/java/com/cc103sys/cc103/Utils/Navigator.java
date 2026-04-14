@@ -7,10 +7,7 @@ import java.util.Objects;
 import com.cc103sys.cc103.Controllers.TaskDetailController;
 import com.cc103sys.cc103.Controllers.TaskReviewController;
 
-import javafx.animation.FadeTransition;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.util.Duration;
 
 public class Navigator {
 
@@ -68,7 +65,7 @@ public class Navigator {
             javafx.scene.layout.HBox root = loader.load();
             TaskDetailController controller = loader.getController();
             controller.setTaskData(classId, taskId);
-            setRootWithTransition(root);
+            scene.setRoot(root);
             return true;
         } catch (Exception e) {
             System.err.println("Failed to navigate to task detail: " + e.getMessage());
@@ -86,7 +83,7 @@ public class Navigator {
             javafx.scene.layout.HBox root = loader.load();
             TaskReviewController controller = loader.getController();
             controller.setTaskData(classId, taskId);
-            setRootWithTransition(root);
+            scene.setRoot(root);
             return true;
         } catch (Exception e) {
             System.err.println("Failed to navigate to task review: " + e.getMessage());
@@ -96,25 +93,12 @@ public class Navigator {
 
     public static boolean switchScene(String fxml) {
         try {
-            Parent root = ResourceLoader.loadFXML(fxml);
-            setRootWithTransition(root);
+            scene.setRoot(ResourceLoader.loadFXML(fxml));
             return true;
         } catch (IOException e) {
             System.err.println("Failed to switch to scene: " + fxml);
             e.printStackTrace();
             return false;
         }
-    }
-
-    private static void setRootWithTransition(Parent root) {
-        if (scene == null) {
-            return;
-        }
-        root.setOpacity(0);
-        scene.setRoot(root);
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(160), root);
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
-        fadeIn.play();
     }
 }

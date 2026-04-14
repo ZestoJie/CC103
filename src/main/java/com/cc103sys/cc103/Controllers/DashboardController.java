@@ -16,7 +16,6 @@ import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.TimerService;
-import com.cc103sys.cc103.Utils.UiDialogs;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -37,7 +36,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 public class DashboardController implements TimerService.TimerListener {
@@ -74,12 +72,6 @@ public class DashboardController implements TimerService.TimerListener {
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
     private static final int REFRESH_INTERVAL_SECONDS = 5; // Auto-refresh every 5 seconds
-
-    private Window window() {
-        return welcomeLabel != null && welcomeLabel.getScene() != null
-            ? welcomeLabel.getScene().getWindow()
-            : null;
-    }
 
     @FXML
     public void initialize() {
@@ -118,31 +110,9 @@ public class DashboardController implements TimerService.TimerListener {
             }
 
             NavbarController.getInstance().setActive("dashboard");
-            setupListPlaceholders();
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
             LOGGER.severe("Dashboard initialization error: " + e.getMessage());
-        }
-    }
-
-    private void setupListPlaceholders() {
-        if (taskList != null) {
-            Label empty = new Label("No tasks yet.\nAdd a task below or join a class to receive assignments.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            taskList.setPlaceholder(empty);
-        }
-        if (leaderboardPreview != null) {
-            Label empty = new Label("Pick a class above to preview top learners.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            leaderboardPreview.setPlaceholder(empty);
-        }
-        if (pendingApprovalsListView != null) {
-            Label empty = new Label("Nothing waiting for approval.\nSubmissions will appear here automatically.");
-            empty.getStyleClass().add("empty-state");
-            empty.setWrapText(true);
-            pendingApprovalsListView.setPlaceholder(empty);
         }
     }
 
@@ -204,63 +174,17 @@ public class DashboardController implements TimerService.TimerListener {
                     super.updateItem(task, empty);
                     if (empty || task == null) {
                         setText(null);
-                        setGraphic(null);
                     } else {
                         String classLabel = task.getClassName() != null ? "[" + task.getClassName() + "] " : "";
-                        Label line = new Label(String.format("%s%s · Due %s",
+                        setText(String.format("%s%s | %s | %s", 
                             classLabel,
-                            task.getTaskName(),
-                            task.getDate()));
-                        line.setWrapText(true);
-                        line.setMaxWidth(Double.MAX_VALUE);
-                        Label badge = new Label(formatTaskStatusLabel(task.getStatus()));
-                        badge.getStyleClass().addAll("status-badge", taskStatusStyle(task.getStatus()));
-                        HBox row = new HBox(12, line, badge);
-                        row.setStyle("-fx-alignment: CENTER_LEFT;");
-                        HBox.setHgrow(line, javafx.scene.layout.Priority.ALWAYS);
-                        setText(null);
-                        setGraphic(row);
+                            task.getTaskName(), 
+                            task.getDate(), 
+                            task.getStatus()));
                     }
                 }
             });
         }
-    }
-
-    private static String formatTaskStatusLabel(String status) {
-        if (status == null) {
-            return "Pending";
-        }
-        String s = status.trim();
-        if ("Done".equalsIgnoreCase(s) || "completed".equalsIgnoreCase(s)) {
-            return "Approved";
-        }
-        if ("For Approval".equalsIgnoreCase(s)) {
-            return "For approval";
-        }
-        if ("Rejected".equalsIgnoreCase(s)) {
-            return "Rejected";
-        }
-        if ("Pending".equalsIgnoreCase(s)) {
-            return "Pending";
-        }
-        return s;
-    }
-
-    private static String taskStatusStyle(String status) {
-        if (status == null) {
-            return "status-badge-pending";
-        }
-        String s = status.trim();
-        if ("Done".equalsIgnoreCase(s) || "completed".equalsIgnoreCase(s)) {
-            return "status-badge-approved";
-        }
-        if ("For Approval".equalsIgnoreCase(s)) {
-            return "status-badge-review";
-        }
-        if ("Rejected".equalsIgnoreCase(s)) {
-            return "status-badge-rejected";
-        }
-        return "status-badge-pending";
     }
 
     private void setupTimerPresets() {
@@ -313,11 +237,6 @@ public class DashboardController implements TimerService.TimerListener {
             LOGGER.info("Loaded " + tasks.size() + " tasks");
         } catch (Exception e) {
             LOGGER.severe("Failed to load tasks: " + e.getMessage());
-        }
-        if (noTaskLabel != null) {
-            boolean empty = tasks.isEmpty();
-            noTaskLabel.setVisible(empty);
-            noTaskLabel.setManaged(empty);
         }
     }
 
@@ -403,13 +322,9 @@ public class DashboardController implements TimerService.TimerListener {
             return;
         }
 
-        // If user is a host and has selected a class they own, create a class task
+        // If user is a host and has selected a class, create a class task
         if (Session.isHost()) {
             Classes selectedClass = classSelector == null ? null : classSelector.getValue();
-            if (selectedClass != null && !isCurrentUserClassOwner(selectedClass.getId())) {
-                UiDialogs.warn(window(), "Cannot post to this class",
-                    "You can only create class tasks for classes you own. This task will be saved as a personal task instead.");
-            }
             if (selectedClass != null && isCurrentUserClassOwner(selectedClass.getId())) {
                 try {
                     int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
@@ -476,11 +391,7 @@ public class DashboardController implements TimerService.TimerListener {
         try {
             Task selected = taskList.getSelectionModel().getSelectedItem();
             if (selected == null) {
-                UiDialogs.warn(window(), "Nothing selected", "Select a task to delete.");
-                return;
-            }
-            if (!UiDialogs.confirm(window(), "Delete task?",
-                "Permanently remove \"" + selected.getTaskName() + "\"? This cannot be undone.")) {
+                LOGGER.warning("No task selected for deletion");
                 return;
             }
 
@@ -585,14 +496,7 @@ public class DashboardController implements TimerService.TimerListener {
     }
     
     private void approveTask(Task task) {
-        if (task == null || task.getId() <= 0) {
-            return;
-        }
-        String who = task.getUsername() != null ? task.getUsername() : "this participant";
-        if (!UiDialogs.confirm(window(), "Approve task?",
-            "Approve \"" + task.getTaskName() + "\" submitted by " + who + "?")) {
-            return;
-        }
+        if (task == null || task.getId() <= 0) return;
         
         int points = calculateTaskCompletionPoints(task.getDate());
         String updateSql = "UPDATE tasks SET status = 'Done', completed_date = ?, points_awarded = ?, approved_by = ?, approved_date = ? WHERE id = ?";
@@ -623,14 +527,7 @@ public class DashboardController implements TimerService.TimerListener {
     }
     
     private void rejectTask(Task task) {
-        if (task == null || task.getId() <= 0) {
-            return;
-        }
-        String who = task.getUsername() != null ? task.getUsername() : "this participant";
-        if (!UiDialogs.confirm(window(), "Reject task?",
-            "Reject \"" + task.getTaskName() + "\" from " + who + "? They can submit again after updating their work.")) {
-            return;
-        }
+        if (task == null || task.getId() <= 0) return;
         
         String updateSql = "UPDATE tasks SET status = 'Rejected', approved_by = ?, approved_date = ? WHERE id = ?";
         
@@ -664,8 +561,8 @@ public class DashboardController implements TimerService.TimerListener {
                 Button approveBtn = new Button("Approve");
                 Button rejectBtn = new Button("Reject");
                 
-                approveBtn.getStyleClass().addAll("button", "button-success");
-                rejectBtn.getStyleClass().addAll("button", "button-danger");
+                approveBtn.setStyle("-fx-padding: 4 12; -fx-font-size: 11; -fx-background-color: #4caf50; -fx-text-fill: white;");
+                rejectBtn.setStyle("-fx-padding: 4 12; -fx-font-size: 11; -fx-background-color: #f44336; -fx-text-fill: white;");
                 
                 final Task approvalTask = task;
                 approveBtn.setOnAction(e -> approveTask(approvalTask));
@@ -907,12 +804,10 @@ public class DashboardController implements TimerService.TimerListener {
     private boolean validateTaskInput(String taskName, LocalDate date) {
         if (taskName == null || taskName.isBlank()) {
             LOGGER.warning("Task name is empty");
-            UiDialogs.warn(window(), "Missing task name", "Please enter what you need to do.");
             return false;
         }
         if (date == null) {
             LOGGER.warning("Task date is null");
-            UiDialogs.warn(window(), "Missing date", "Please choose a due date.");
             return false;
         }
         return true;

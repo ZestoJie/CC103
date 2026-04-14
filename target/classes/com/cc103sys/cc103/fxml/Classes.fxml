@@ -10,7 +10,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
 
-<HBox spacing="20" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+<HBox spacing="20" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.ClassesController" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
     <children>
 
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
@@ -28,7 +28,7 @@
                         <VBox spacing="15" HBox.hgrow="ALWAYS">
                             <children>
                                 <Label text="Available Classes" styleClass="heading-2" />
-                                
+
                                 <VBox fx:id="createClassSection" spacing="14" styleClass="card">
                                     <children>
                                         <Label text="Create Class" styleClass="heading-3" />
@@ -42,7 +42,7 @@
                                         <Label text="Public classes appear in list; private classes require code." styleClass="subtitle" wrapText="true" />
                                     </children>
                                 </VBox>
-                                
+
                                 <VBox spacing="14" styleClass="card">
                                     <children>
                                         <Label text="Join Private Class" styleClass="heading-3" />
@@ -51,7 +51,7 @@
                                         <Button onAction="#joinPrivateClass" text="Join Class" />
                                     </children>
                                 </VBox>
-                                
+
                                 <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
                                     <content>
                                         <VBox spacing="10" styleClass="card">

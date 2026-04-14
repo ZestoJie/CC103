@@ -8,6 +8,7 @@ public class Task {
     private String taskName;
     private LocalDate date;
     private String status;
+    private String description;
 
     private Integer classId;
     private String className;
@@ -15,22 +16,27 @@ public class Task {
     private String username;
 
     public Task(int id, String taskName, LocalDate date, String status) {
-        this(id, taskName, date, status, null, null, false, null);
+        this(id, taskName, date, status, null, null, null, false, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className) {
-        this(id, taskName, date, status, classId, className, false, null);
+        this(id, taskName, date, status, null, classId, className, false, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal) {
-        this(id, taskName, date, status, classId, className, isPersonal, null);
+        this(id, taskName, date, status, null, classId, className, isPersonal, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal, String username) {
+        this(id, taskName, date, status, null, classId, className, isPersonal, username);
+    }
+
+    public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, String className, boolean isPersonal, String username) {
         this.id = id;
         this.taskName = taskName;
         this.date = date;
         this.status = status;
+        this.description = description;
         this.classId = classId;
         this.className = className;
         this.isPersonal = isPersonal;
@@ -44,6 +50,8 @@ public class Task {
     public LocalDate getDate() { return date; }
 
     public String getStatus() { return status; }
+
+    public String getDescription() { return description; }
 
     public Integer getClassId() { return classId; }
 

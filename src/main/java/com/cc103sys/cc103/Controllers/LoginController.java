@@ -6,10 +6,12 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
+import com.cc103sys.cc103.Utils.CredentialsManager;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -19,10 +21,21 @@ public class LoginController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private CheckBox rememberMe;
     @FXML private Label errorLabel;
 
     @FXML
     public void initialize() {
+        // Load saved credentials if they exist
+        String[] savedCredentials = CredentialsManager.loadCredentials();
+        if (savedCredentials != null && savedCredentials.length == 2) {
+            usernameField.setText(savedCredentials[0]);
+            passwordField.setText(savedCredentials[1]);
+            if (rememberMe != null) {
+                rememberMe.setSelected(true);
+            }
+        }
+
         // Clear error message when user starts typing
         if (usernameField != null) {
             usernameField.textProperty().addListener((obs, oldText, newText) -> clearError());
@@ -45,6 +58,13 @@ public class LoginController {
 
             boolean authenticated = authenticateUser(username, password);
             if (authenticated) {
+                // Handle remember me functionality
+                if (rememberMe != null && rememberMe.isSelected()) {
+                    CredentialsManager.saveCredentials(username, password);
+                } else {
+                    CredentialsManager.clearCredentials();
+                }
+
                 Session.setCurrentClassId(-1);
                 Navigator.switchScene("Dashboard");
                 LOGGER.info(() -> "User logged in: " + username);

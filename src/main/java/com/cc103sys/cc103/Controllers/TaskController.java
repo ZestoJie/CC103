@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.logging.Logger;
@@ -94,6 +95,12 @@ public class TaskController implements TimerService.TimerListener {
     @FXML
     private ComboBox<Classes> approvalClassFilterComboBox;
 
+    // Submit/Unsubmit for participants
+    @FXML
+    private Button submitTaskBtn;
+    @FXML
+    private Button unsubmitTaskBtn;
+
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
@@ -155,6 +162,16 @@ public class TaskController implements TimerService.TimerListener {
             approvalsView.setVisible(isHost);
             approvalsView.setManaged(isHost);
         }
+
+        // Show/hide submit/unsubmit buttons for participants only
+        if (submitTaskBtn != null) {
+            submitTaskBtn.setVisible(!isHost);
+            submitTaskBtn.setManaged(!isHost);
+        }
+        if (unsubmitTaskBtn != null) {
+            unsubmitTaskBtn.setVisible(!isHost);
+            unsubmitTaskBtn.setManaged(!isHost);
+        }
         
         // All users can add personal tasks from the Task page.
         // Host-only class task creation remains on the Dashboard.
@@ -164,10 +181,36 @@ public class TaskController implements TimerService.TimerListener {
         if (allTaskList != null) {
             allTaskList.setItems(allTasks);
             allTaskList.setCellFactory(param -> createTaskListCell());
+            allTaskList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    loadTaskDetails(newVal);
+                }
+            });
         }
         if (filteredTaskList != null) {
             filteredTaskList.setItems(filteredTasks);
             filteredTaskList.setCellFactory(param -> createTaskListCell());
+            filteredTaskList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    loadTaskDetails(newVal);
+                }
+            });
+        }
+    }
+
+    private void loadTaskDetails(Task task) {
+        if (task == null) return;
+
+        // Load description
+        if (taskInstructions != null) {
+            taskInstructions.setText(task.getDescription() != null ? task.getDescription() : "");
+        }
+
+        // Load attachments (for now, clear and show placeholder)
+        if (attachmentsList != null) {
+            attachmentsList.getItems().clear();
+            // TODO: Load actual attachments from database
+            attachmentsList.getItems().add("No attachments uploaded yet");
         }
     }
 
@@ -375,16 +418,21 @@ public class TaskController implements TimerService.TimerListener {
             
             LOGGER.info("Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
             
-            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, COALESCE(c.class_name, '') as class_name "
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, COALESCE(c.class_name, '') as class_name "
                        + "FROM tasks t "
                        + "LEFT JOIN classes c ON t.class_id = c.id "
-                       + "WHERE t.user_id = ? "
+                       + "WHERE (t.user_id = ? OR t.username = ?) "
                        + "ORDER BY t.task_date DESC";
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, userId);
-                LOGGER.info("Executing SQL: " + sql.replace("?", userId.toString()));
+                if (userId != null) {
+                    stmt.setInt(1, userId);
+                } else {
+                    stmt.setNull(1, Types.INTEGER);
+                }
+                stmt.setString(2, Session.getUsername());
+                LOGGER.info(() -> "Executing SQL: " + sql + " [userId=" + (userId != null ? userId : "NULL") + ", username=" + Session.getUsername() + "]");
                 try (ResultSet rs = stmt.executeQuery()) {
                     int count = 0;
                     while (rs.next()) {
@@ -396,8 +444,11 @@ public class TaskController implements TimerService.TimerListener {
                             rs.getString("task_name"),
                             rs.getDate("task_date").toLocalDate(),
                             rs.getString("status"),
+                            rs.getString("description"),
                             classId > 0 ? classId : null,
-                            className != null && !className.isEmpty() ? className : null
+                            className != null && !className.isEmpty() ? className : null,
+                            false, // isPersonal
+                            Session.getUsername()
                         );
                         allTasks.add(task);
                         LOGGER.info("Added task: " + rs.getString("task_name") + " (ID: " + rs.getInt("id") + ", ClassID: " + classId + ")");
@@ -431,15 +482,20 @@ public class TaskController implements TimerService.TimerListener {
                 return;
             }
 
-            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, c.class_name "
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, c.class_name "
                        + "FROM tasks t "
                        + "JOIN classes c ON t.class_id = c.id "
-                       + "WHERE t.user_id = ? AND t.class_id = ?";
+                       + "WHERE (t.user_id = ? OR t.username = ?) AND t.class_id = ?";
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, userId);
-                stmt.setInt(2, selected.getId());
+                if (userId != null) {
+                    stmt.setInt(1, userId);
+                } else {
+                    stmt.setNull(1, Types.INTEGER);
+                }
+                stmt.setString(2, Session.getUsername());
+                stmt.setInt(3, selected.getId());
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         filteredTasks.add(new Task(
@@ -447,8 +503,11 @@ public class TaskController implements TimerService.TimerListener {
                             rs.getString("task_name"),
                             rs.getDate("task_date").toLocalDate(),
                             rs.getString("status"),
+                            rs.getString("description"),
                             rs.getInt("class_id"),
-                            rs.getString("class_name")
+                            rs.getString("class_name"),
+                            false,
+                            Session.getUsername()
                         ));
                     }
                 }
@@ -464,12 +523,13 @@ public class TaskController implements TimerService.TimerListener {
     private void handleAddTask() {
         String taskName = taskField.getText().trim();
         LocalDate date = taskDate.getValue();
+        String description = taskDescriptionArea != null ? taskDescriptionArea.getText().trim() : "";
 
         if (taskName.isEmpty() || date == null) {
             return;
         }
 
-        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal) VALUES (?, ?, ?, ?, 'Pending', 1)";
+        String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, is_personal, description) VALUES (?, ?, ?, ?, 'Pending', 1, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -485,10 +545,14 @@ public class TaskController implements TimerService.TimerListener {
             
             stmt.setString(3, taskName);
             stmt.setDate(4, java.sql.Date.valueOf(date));
+            stmt.setString(5, description);
             stmt.executeUpdate();
 
             taskField.clear();
             taskDate.setValue(null);
+            if (taskDescriptionArea != null) {
+                taskDescriptionArea.clear();
+            }
             loadAllClassTasks();
             loadFilteredTasks();
             LOGGER.info("Personal task added successfully");
@@ -667,6 +731,31 @@ public class TaskController implements TimerService.TimerListener {
         loadPendingApprovals();
     }
 
+    // ===== SUBMIT/UNSUBMIT METHODS (FOR PARTICIPANTS) =====
+    @FXML
+    private void handleSubmitTask() {
+        Task selected = allTaskList.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            selected = filteredTaskList.getSelectionModel().getSelectedItem();
+        }
+        if (selected == null) return;
+
+        completeTask(selected);
+        LOGGER.info("Task submitted for approval: " + selected.getTaskName());
+    }
+
+    @FXML
+    private void handleUnsubmitTask() {
+        Task selected = allTaskList.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            selected = filteredTaskList.getSelectionModel().getSelectedItem();
+        }
+        if (selected == null) return;
+
+        undoTaskCompletion(selected);
+        LOGGER.info("Task un-submitted: " + selected.getTaskName());
+    }
+
     private void approveTask(Task task) {
         updateTaskStatus(task, "Done");
     }
@@ -683,12 +772,17 @@ public class TaskController implements TimerService.TimerListener {
                      "COALESCE(c.class_name, '') as class_name, t.is_personal " +
                      "FROM tasks t " +
                      "LEFT JOIN classes c ON t.class_id = c.id " +
-                     "WHERE t.status = 'For Approval' AND t.user_id = ? " +
+                     "WHERE t.status = 'For Approval' AND (t.user_id = ? OR t.username = ?) " +
                      "ORDER BY t.task_date DESC";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
+            if (userId != null) {
+                stmt.setInt(1, userId);
+            } else {
+                stmt.setNull(1, Types.INTEGER);
+            }
+            stmt.setString(2, Session.getUsername());
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

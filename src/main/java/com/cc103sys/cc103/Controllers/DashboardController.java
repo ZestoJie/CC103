@@ -15,6 +15,7 @@ import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Models.UserRank;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -734,7 +735,7 @@ public class DashboardController implements TimerService.TimerListener {
             }
 
             int seconds = convertToSeconds(selected);
-            boolean xpActive = xpEnabledCheckBox != null && xpEnabledCheckBox.isSelected();
+            boolean xpActive = xpActiveCheckbox != null && xpActiveCheckbox.isSelected();
             
             TimerService.getInstance().start(seconds, null, xpActive); // No specific task for dashboard timer
             updateTimerDisplay();
@@ -862,7 +863,7 @@ public class DashboardController implements TimerService.TimerListener {
             timerLabel.setText("Done!");
         }
 
-        if (xpEnabledCheckBox != null && xpEnabledCheckBox.isSelected()) {
+        if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
             awardTimerXp(10);
         }
     }

@@ -159,6 +159,10 @@ public class DBUtil {
                 stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN approved_date DATE NULL");
             }
 
+            if (!columnExists(conn, "tasks", "description")) {
+                stmt.executeUpdate("ALTER TABLE tasks ADD COLUMN description TEXT NULL");
+            }
+
             if (!columnExists(conn, "class_tasks", "owner_id")) {
                 stmt.executeUpdate("ALTER TABLE class_tasks ADD COLUMN owner_id INT NOT NULL");
             }

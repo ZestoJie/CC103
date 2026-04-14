@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+    <children>
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        
+        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f3f4f6;">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+            <children>
+                <Label text="Leaderboard" styleClass="heading-1" maxWidth="Infinity" alignment="CENTER" />
+
+                <StackPane VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="20" maxWidth="1050" prefWidth="1050" VBox.vgrow="ALWAYS">
+                            <children>
+                                <VBox spacing="12" styleClass="card">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="10">
+                                            <children>
+                                                <Label text="Class Rankings" styleClass="heading-2" />
+                                                <ComboBox fx:id="classComboBox" promptText="Select Class" prefWidth="190"/>
+                                            </children>
+                                        </HBox>
+                                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="285" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                            <content>
+                                                <TableView fx:id="table" visible="true" style="-fx-font-size: 12;">
+                                                    <columns>
+                                                        <TableColumn fx:id="usernameCol" text="Student Name" prefWidth="460" />
+                                                        <TableColumn fx:id="pointsCol" text="Total XP (Points)" prefWidth="300" />
+                                                        <TableColumn fx:id="levelCol" text="Level" prefWidth="230" />
+                                                    </columns>
+                                                </TableView>
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="12" styleClass="card">
+                                    <children>
+                                        <Label text="Global Rankings" styleClass="heading-2" />
+                                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="285" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                            <content>
+                                                <TableView fx:id="overallTable" style="-fx-font-size: 12;">
+                                                    <columns>
+                                                        <TableColumn fx:id="overallUsernameCol" text="Student Name" prefWidth="460" />
+                                                        <TableColumn fx:id="overallPointsCol" text="Total XP (Points)" prefWidth="300" />
+                                                        <TableColumn fx:id="overallLevelCol" text="Level" prefWidth="230" />
+                                                    </columns>
+                                                </TableView>
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

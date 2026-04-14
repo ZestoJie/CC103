@@ -1,0 +1,7 @@
+target/  
+user_prefs/  
+*.class  
+*.log  
+*.jar  
+*.iml  
+.DS_Store  

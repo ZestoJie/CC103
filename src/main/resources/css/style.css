@@ -1,0 +1,457 @@
+/* ============================================
+   UNIFIED DESIGN SYSTEM - CC103 Task Manager
+   ============================================ */
+
+/* COLOR PALETTE */
+:root {
+    /* Backgrounds */
+    -primary-background: #f8fafc;
+    -card-background: #ffffff;
+    -input-background: #ffffff;
+    
+    /* Text Colors */
+    -text-primary: #111827;
+    -text-secondary: #6b7280;
+    -text-tertiary: #9ca3af;
+    
+    /* Accent Colors */
+    -accent-blue: #3b82f6;
+    -accent-blue-light: rgba(59, 130, 246, 0.1);
+    -accent-green: #10b981;
+    -accent-red: #ef4444;
+    -accent-orange: #f59e0b;
+    
+    /* Borders */
+    -border-color: rgba(15, 23, 42, 0.08);
+    -border-subtle: rgba(15, 23, 42, 0.04);
+}
+
+/* ============================================
+   ROOT / GLOBAL STYLING
+   ============================================ */
+.root {
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica", "Arial", sans-serif;
+    -fx-background-color: #f8fafc;
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+.label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 14px;
+}
+
+.label.heading-1 {
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #111827;
+}
+
+.label.heading-2 {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #111827;
+}
+
+.label.heading-3 {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #111827;
+}
+
+.label.body {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: #111827;
+}
+
+.label.subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: 400;
+    -fx-text-fill: #6b7280;
+}
+
+.label.caption {
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #111827;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.button {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 10 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.15), 8, 0.2, 0, 2);
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.button:pressed {
+    -fx-opacity: 0.8;
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.button.button-secondary {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 4, 0.1, 0, 1);
+}
+
+.button.button-secondary:hover {
+    -fx-background-color: #d1d5db;
+}
+
+.button.button-danger {
+    -fx-background-color: #ef4444;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.15), 8, 0.2, 0, 2);
+}
+
+.button.button-success {
+    -fx-background-color: #10b981;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.15), 8, 0.2, 0, 2);
+}
+
+/* ============================================
+   INPUT FIELDS
+   ============================================ */
+.text-field, .combo-box, .date-picker {
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-text-fill: #111827;
+}
+
+.text-field:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 8, 0.2, 0, 2);
+}
+
+.text-field::prompt-text, .combo-box::prompt-text, .date-picker::prompt-text {
+    -fx-text-fill: #9ca3af;
+}
+
+/* Keep ComboBox controls and popup lists fully opaque (fixes transparent overlap). */
+.combo-box .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.combo-box-base > .arrow-button {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 0 8 8 0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-background-insets: 0;
+    -fx-opacity: 1.0;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #111827;
+}
+
+/* ============================================
+   LIST VIEWS & CELLS
+   ============================================ */
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+.list-cell {
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-padding: 12 14;
+    -fx-text-fill: #111827;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.04), 4, 0.1, 0, 1);
+    -fx-font-size: 13px;
+}
+
+.list-cell:filled:selected, .list-cell:selected {
+    -fx-background-color: rgba(59, 130, 246, 0.1);
+    -fx-border-color: #3b82f6;
+}
+
+.list-cell:hover {
+    -fx-background-color: #f9fafb;
+}
+
+/* ============================================
+   TABLE VIEWS
+   ============================================ */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.04), 4, 0.1, 0, 1);
+}
+
+.table-view .column-header {
+    -fx-background-color: #f3f4f6;
+    -fx-border-color: #e5e7eb;
+    -fx-text-fill: #111827;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-padding: 12 14;
+}
+
+.table-cell {
+    -fx-padding: 12 14;
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+    -fx-border-color: #f3f4f6;
+}
+
+.table-row-cell {
+    -fx-background-color: #ffffff;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(59, 130, 246, 0.1);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f9fafb;
+}
+
+/* ============================================
+   SCROLL PANE
+   ============================================ */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical > .thumb {
+    -fx-background-color: #d1d5db;
+    -fx-background-radius: 8;
+}
+
+.scroll-bar:vertical > .thumb:hover {
+    -fx-background-color: #9ca3af;
+}
+
+/* ============================================
+   CONTAINERS (VBox, HBox)
+   ============================================ */
+.vbox, .hbox {
+    -fx-spacing: 16;
+}
+
+.vbox.spacing-xs, .hbox.spacing-xs {
+    -fx-spacing: 8;
+}
+
+.vbox.spacing-s, .hbox.spacing-s {
+    -fx-spacing: 12;
+}
+
+.vbox.spacing-m, .hbox.spacing-m {
+    -fx-spacing: 16;
+}
+
+.vbox.spacing-l, .hbox.spacing-l {
+    -fx-spacing: 20;
+}
+
+/* ============================================
+   CARDS / CONTAINERS
+   ============================================ */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+}
+
+.card.card-minimal {
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+.card.card-elevated {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 12, 0.2, 0, 4);
+}
+
+/* ============================================
+   SEPARATORS & DIVIDERS
+   ============================================ */
+.separator {
+    -fx-border-color: #e5e7eb;
+}
+
+/* ============================================
+   RADIO BUTTONS & CHECK BOXES
+   ============================================ */
+.radio-button, .check-box {
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+}
+
+.radio-button .radio, .check-box .box {
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 4;
+    -fx-padding: 4;
+}
+
+.radio-button:selected .radio, .check-box:selected .box {
+    -fx-background-color: #3b82f6;
+    -fx-border-color: #3b82f6;
+}
+
+/* ============================================
+   SPECIAL COMPONENTS
+   ============================================ */
+.context-menu {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb;
+}
+
+.menu-item:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.tooltip {
+    -fx-background-color: #1f2d3d;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: transparent;
+    -fx-padding: 8 10;
+}
+
+/* ============================================
+   BREADCRUMBS & EMPTY STATES
+   ============================================ */
+.label.breadcrumb {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+    -fx-wrap-text: true;
+}
+
+.empty-state {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13px;
+    -fx-padding: 16;
+    -fx-wrap-text: true;
+}
+
+/* ============================================
+   STATUS BADGES (tasks / submissions)
+   ============================================ */
+.label.status-badge {
+    -fx-padding: 4 10;
+    -fx-background-radius: 999;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+.label.status-badge-neutral {
+    -fx-text-fill: #334155;
+    -fx-background-color: #e2e8f0;
+}
+
+.label.status-badge-public {
+    -fx-text-fill: #0f766e;
+    -fx-background-color: rgba(20, 184, 166, 0.15);
+}
+
+.label.status-badge-private {
+    -fx-text-fill: #9a3412;
+    -fx-background-color: rgba(251, 146, 60, 0.18);
+}
+
+.label.status-badge-pending {
+    -fx-text-fill: #92400e;
+    -fx-background-color: rgba(245, 158, 11, 0.2);
+}
+
+.label.status-badge-review {
+    -fx-text-fill: #1e40af;
+    -fx-background-color: rgba(59, 130, 246, 0.15);
+}
+
+.label.status-badge-approved {
+    -fx-text-fill: #065f46;
+    -fx-background-color: rgba(16, 185, 129, 0.18);
+}
+
+.label.status-badge-rejected {
+    -fx-text-fill: #991b1b;
+    -fx-background-color: rgba(239, 68, 68, 0.15);
+}
+
+/* ============================================
+   TOGGLE BUTTONS (match primary buttons)
+   ============================================ */
+.toggle-button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+    -fx-background-radius: 8;
+    -fx-padding: 10 16;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+}
+
+.toggle-button:hover {
+    -fx-opacity: 0.92;
+}

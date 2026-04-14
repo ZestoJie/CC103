@@ -1,0 +1,94 @@
+/* ===== BACKGROUND ===== */
+.root-bg {
+    -fx-background-color: linear-gradient(to bottom right, #0b1f2a, #123a52, #1e5a7a);
+    -fx-font-family: "Segoe UI";
+}
+
+/* ===== LOGIN CARD ===== */
+.login-card {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 22;
+    -fx-padding: 30 35 30 35;
+}
+
+/* ===== TITLE ===== */
+.app-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1c2b3a;
+}
+
+/* ===== SUBTITLE ===== */
+.subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7c8c;
+}
+
+/* ===== INPUTS ===== */
+.input-field {
+    -fx-background-color: #eef2f6;
+    -fx-background-radius: 14;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+}
+
+/* focus animation feel */
+.input-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #4da3ff;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(77,163,255,0.35), 12, 0.3, 0, 0);
+}
+
+/* ===== ERROR ===== */
+.error-label {
+    -fx-text-fill: #ff4d4d;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ===== BUTTON ===== */
+.login-button {
+    -fx-background-color: #2f5f7a;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 16;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+/* hover = modern green glow */
+.login-button:hover {
+    -fx-background-color: #2ecc71;
+    -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.5), 15, 0.3, 0, 0);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.login-button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* ===== REGISTER LINK ===== */
+.link-text {
+    -fx-text-fill: #2f80ed;
+    -fx-font-weight: bold;
+}
+
+.link-text:hover {
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+/* ===== MUTED TEXT ===== */
+.muted-text {
+    -fx-text-fill: #6b7c8c;
+}
+
+/* ===== CHECKBOX TEXT ===== */
+.remember-text {
+    -fx-text-fill: #3a4a5a;
+}

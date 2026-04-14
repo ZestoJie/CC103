@@ -7,18 +7,19 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+<AnchorPane style="-fx-background-color: #f8fbff;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
 
     <children>
-        <fx:include source="navbar.fxml" HBox.hgrow="NEVER" />
+        <fx:include source="navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" />
 
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;" AnchorPane.leftAnchor="230" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
             <content>
-                <VBox prefHeight="870.0" prefWidth="1300" spacing="24" style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS">
+                <VBox maxWidth="Infinity" spacing="24" style="-fx-background-color: #f8fbff;">
                     <padding>
                         <Insets bottom="28" left="28" right="28" top="28" />
                     </padding>
@@ -130,4 +131,4 @@
             </content>
         </ScrollPane>
     </children>
-</HBox>
+</AnchorPane>

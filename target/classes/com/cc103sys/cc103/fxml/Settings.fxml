@@ -9,21 +9,22 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox spacing="0" style="-fx-background-color: #f8fbff;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.SettingsController">
+<AnchorPane style="-fx-background-color: #f8fbff;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.SettingsController">
 
     <children>
 
         <!-- Navbar -->
-        <fx:include source="navbar.fxml" />
+        <fx:include source="navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"/>
 
         <!-- Main Content -->
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" AnchorPane.leftAnchor="230" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
             <content>
 
-                <VBox prefHeight="610.0" prefWidth="1300.0" spacing="24">
+                <VBox spacing="24">
                     <padding>
                         <Insets bottom="28" left="28" right="28" top="28" />
                     </padding>
@@ -104,4 +105,4 @@
         </ScrollPane>
 
     </children>
-</HBox>
+</AnchorPane>

@@ -18,6 +18,7 @@ public class App extends Application {
 
         stage.setTitle("CC103 Task Manager");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 

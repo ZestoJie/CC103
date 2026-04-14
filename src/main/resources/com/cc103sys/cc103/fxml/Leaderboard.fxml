@@ -4,13 +4,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #f8fbff;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<AnchorPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.LeaderboardController" style="-fx-background-color: #f8fbff;">
     <children>
-        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        <fx:include source="navbar.fxml" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"/>
         
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;" AnchorPane.leftAnchor="230" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
             <content>
-                <VBox spacing="24" prefWidth="1300" style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS">
+                <VBox spacing="24" style="-fx-background-color: #f8fbff;">
                     <padding>
                         <Insets top="28" right="28" bottom="28" left="28"/>
                     </padding>
@@ -78,4 +78,4 @@
             </content>
         </ScrollPane>
     </children>
-</HBox>
+</AnchorPane>

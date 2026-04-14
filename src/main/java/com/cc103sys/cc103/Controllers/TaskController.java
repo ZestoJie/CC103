@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
+import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 import com.cc103sys.cc103.Utils.TimerService;
 
@@ -31,6 +32,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
@@ -217,12 +219,14 @@ public class TaskController implements TimerService.TimerListener {
     private ListCell<Task> createTaskListCell() {
         return new javafx.scene.control.ListCell<Task>() {
             private final Label taskLabel = new Label();
-            private final Button actionButton = new Button();
-            private final HBox container = new HBox(12, taskLabel, actionButton);
+            private final Button markDoneButton = new Button();
+            private final Button viewButton = new Button("View Task");
+            private final HBox container = new HBox(12, taskLabel, viewButton, markDoneButton);
 
             {
                 container.setStyle("-fx-alignment: CENTER_LEFT;");
-                actionButton.setOnAction(e -> {
+                
+                markDoneButton.setOnAction(e -> {
                     Task task = getItem();
                     if (task == null) return;
                     if ("Done".equalsIgnoreCase(task.getStatus()) || "For Approval".equalsIgnoreCase(task.getStatus())) {
@@ -230,6 +234,17 @@ public class TaskController implements TimerService.TimerListener {
                     } else {
                         completeTask(task);
                     }
+                });
+
+                viewButton.setStyle("-fx-padding: 5 15; -fx-font-size: 11;");
+                viewButton.setOnAction(e -> {
+                    Task task = getItem();
+                    if (task == null) return;
+                    if (task.getClassId() == null || task.getClassTaskId() == null) {
+                        LOGGER.info(() -> "Task has no class assignment, cannot open class detail: " + task.getTaskName());
+                        return;
+                    }
+                    Navigator.navigateToTaskDetail(task.getClassId(), task.getClassTaskId());
                 });
             }
 
@@ -244,8 +259,8 @@ public class TaskController implements TimerService.TimerListener {
                     boolean isCompleted = "Done".equalsIgnoreCase(task.getStatus()) || "For Approval".equalsIgnoreCase(task.getStatus());
                     if (isCompleted) {
                         taskLabel.setStyle("-fx-text-fill: #6b7280; -fx-opacity: 0.7;");
-                        actionButton.setText("Undo");
-                        actionButton.setStyle("-fx-background-color: #9ca3af; -fx-text-fill: white;");
+                        markDoneButton.setText("Undo");
+                        markDoneButton.setStyle("-fx-background-color: #9ca3af; -fx-text-fill: white; -fx-padding: 5 15;");
                         if ("For Approval".equalsIgnoreCase(task.getStatus())) {
                             taskLabel.setText(formatTaskWithClass(task) + " (For Approval)");
                         } else {
@@ -253,10 +268,13 @@ public class TaskController implements TimerService.TimerListener {
                         }
                     } else {
                         taskLabel.setStyle("-fx-text-fill: black;");
-                        actionButton.setText("Mark Done");
-                        actionButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white;");
+                        markDoneButton.setText("Mark Done");
+                        markDoneButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white; -fx-padding: 5 15;");
                         taskLabel.setText(formatTaskWithClass(task));
                     }
+                    viewButton.setDisable(task.getClassTaskId() == null || task.getClassId() == null);
+                    viewButton.setStyle("-fx-padding: 5 15; -fx-font-size: 11;");
+                    HBox.setHgrow(taskLabel, Priority.ALWAYS);
                     setText(null);
                     setGraphic(container);
                 }
@@ -418,7 +436,7 @@ public class TaskController implements TimerService.TimerListener {
             
             LOGGER.info("Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
             
-            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, COALESCE(c.class_name, '') as class_name "
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, t.class_task_id, COALESCE(c.class_name, '') as class_name "
                        + "FROM tasks t "
                        + "LEFT JOIN classes c ON t.class_id = c.id "
                        + "WHERE (t.user_id = ? OR t.username = ?) "
@@ -446,6 +464,7 @@ public class TaskController implements TimerService.TimerListener {
                             rs.getString("status"),
                             rs.getString("description"),
                             classId > 0 ? classId : null,
+                            rs.getObject("class_task_id") != null ? rs.getInt("class_task_id") : null,
                             className != null && !className.isEmpty() ? className : null,
                             false, // isPersonal
                             Session.getUsername()
@@ -482,7 +501,7 @@ public class TaskController implements TimerService.TimerListener {
                 return;
             }
 
-            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, c.class_name "
+            String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, t.class_task_id, c.class_name "
                        + "FROM tasks t "
                        + "JOIN classes c ON t.class_id = c.id "
                        + "WHERE (t.user_id = ? OR t.username = ?) AND t.class_id = ?";
@@ -505,6 +524,7 @@ public class TaskController implements TimerService.TimerListener {
                             rs.getString("status"),
                             rs.getString("description"),
                             rs.getInt("class_id"),
+                            rs.getObject("class_task_id") != null ? rs.getInt("class_task_id") : null,
                             rs.getString("class_name"),
                             false,
                             Session.getUsername()

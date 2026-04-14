@@ -353,11 +353,37 @@ public class ClassDetailController {
             super.updateItem(task, empty);
             if (empty || task == null) {
                 setText(null);
+                setGraphic(null);
             } else {
+                // Create button for View Task action
+                javafx.scene.control.Button viewButton = new javafx.scene.control.Button("View Task");
+                viewButton.setStyle("-fx-padding: 5; -fx-font-size: 11;");
+                viewButton.setOnAction(e -> {
+                    // Route based on user role
+                    if (Session.isHost()) {
+                        // Host: Navigate to task review/approval page
+                        Navigator.navigateToTaskReview(currentClassId, task.getId());
+                    } else {
+                        // Participant: Navigate to task submission page
+                        Navigator.navigateToTaskDetail(currentClassId, task.getId());
+                    }
+                });
+
+                // Create label with task info
+                javafx.scene.control.Label taskLabel = new javafx.scene.control.Label();
                 String description = task.getDescription() != null && !task.getDescription().isEmpty()
                     ? "\n" + task.getDescription()
                     : "";
-                setText(task.getTaskName() + " (Due: " + task.getDueDate() + ")" + description);
+                taskLabel.setText(task.getTaskName() + " (Due: " + task.getDueDate() + ")" + description);
+                taskLabel.setWrapText(true);
+
+                // Create container with label and button
+                javafx.scene.layout.HBox container = new javafx.scene.layout.HBox(12, taskLabel, viewButton);
+                container.setStyle("-fx-alignment: CENTER_LEFT;");
+                javafx.scene.layout.HBox.setHgrow(taskLabel, javafx.scene.layout.Priority.ALWAYS);
+
+                setText(null);
+                setGraphic(container);
             }
         }
     }

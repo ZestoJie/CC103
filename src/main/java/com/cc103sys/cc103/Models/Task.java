@@ -11,6 +11,7 @@ public class Task {
     private String description;
 
     private Integer classId;
+    private Integer classTaskId;
     private String className;
     private boolean isPersonal;
     private String username;
@@ -20,24 +21,33 @@ public class Task {
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className) {
-        this(id, taskName, date, status, null, classId, className, false, null);
+        this(id, taskName, date, status, null, classId, null, className, false, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal) {
-        this(id, taskName, date, status, null, classId, className, isPersonal, null);
+        this(id, taskName, date, status, null, classId, null, className, isPersonal, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className, boolean isPersonal, String username) {
-        this(id, taskName, date, status, null, classId, className, isPersonal, username);
+        this(id, taskName, date, status, null, classId, null, className, isPersonal, username);
+    }
+
+    public Task(int id, String taskName, LocalDate date, String status, Integer classId, Integer classTaskId, String className) {
+        this(id, taskName, date, status, null, classId, classTaskId, className, false, null);
+    }
+
+    public Task(int id, String taskName, LocalDate date, String status, Integer classId, Integer classTaskId, String className, boolean isPersonal, String username) {
+        this(id, taskName, date, status, null, classId, classTaskId, className, isPersonal, username);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, String className, boolean isPersonal, String username) {
-        this.id = id;
-        this.taskName = taskName;
-        this.date = date;
-        this.status = status;
+        this(id, taskName, date, status, description, classId, null, className, isPersonal, username);
+    }
+
+    public Task(int id, String taskName, LocalDate date, String status, String description, Integer classId, Integer classTaskId, String className, boolean isPersonal, String username) {
         this.description = description;
         this.classId = classId;
+        this.classTaskId = classTaskId;
         this.className = className;
         this.isPersonal = isPersonal;
         this.username = username;
@@ -54,6 +64,8 @@ public class Task {
     public String getDescription() { return description; }
 
     public Integer getClassId() { return classId; }
+
+    public Integer getClassTaskId() { return classTaskId; }
 
     public String getClassName() { return className; }
 

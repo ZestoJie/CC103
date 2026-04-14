@@ -87,6 +87,25 @@ public class DBUtil {
                     + "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
                     + ")");
 
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS task_submissions ("
+                    + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "class_task_id INT NOT NULL, "
+                    + "user_id INT NOT NULL, "
+                    + "submission_status VARCHAR(50) DEFAULT 'SUBMITTED', "
+                    + "submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                    + "FOREIGN KEY (class_task_id) REFERENCES class_tasks(id) ON DELETE CASCADE, "
+                    + "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+                    + ")");
+
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS task_attachments ("
+                    + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "submission_id INT NOT NULL, "
+                    + "file_name VARCHAR(255) NOT NULL, "
+                    + "file_path VARCHAR(500) NOT NULL, "
+                    + "uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                    + "FOREIGN KEY (submission_id) REFERENCES task_submissions(id) ON DELETE CASCADE"
+                    + ")");
+
             if (!columnExists(conn, "users", "role")) {
                 stmt.executeUpdate("ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'PARTICIPANT'");
             }

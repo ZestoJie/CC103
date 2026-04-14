@@ -61,6 +61,7 @@ public class ClassDetailController {
     private final ObservableList<ClassTask> classTasks = FXCollections.observableArrayList();
     private boolean isOwner = false;
     private Timeline refreshTimeline;
+    private boolean disposed;
 
     @FXML
     public void initialize() {
@@ -70,11 +71,31 @@ public class ClassDetailController {
         loadClassTasks();
         loadParticipants();
         startAutoRefresh();
+        registerLifecycleHooks();
 
         // Set navbar active
         NavbarController.getInstance().setActive("classes");
 
         LOGGER.info("Class detail view initialized");
+    }
+
+    private void registerLifecycleHooks() {
+        if (classTitleLabel != null) {
+            classTitleLabel.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        stopAutoRefresh();
+        LOGGER.info("Class detail resources cleaned up");
     }
 
     private void setupEmptyPlaceholders() {

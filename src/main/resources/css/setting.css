@@ -25,7 +25,6 @@
 /* "Active" toggled state (you'll add this class via Java) */
 .fancy-button.active {
     -fx-background-color: #21dc62;
-
     -fx-effect: dropshadow(gaussian, rgba(33,220,98,0.35), 15, 0, 0, 5);
 }
 

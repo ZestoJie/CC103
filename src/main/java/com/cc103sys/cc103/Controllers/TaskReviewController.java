@@ -47,6 +47,7 @@ public class TaskReviewController {
     private Integer currentTaskId;
     private ObservableList<SubmissionRecord> submissions = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
+    private boolean disposed;
 
     private Window window() {
         return backButton != null && backButton.getScene() != null
@@ -64,7 +65,27 @@ public class TaskReviewController {
             empty.setWrapText(true);
             submissionsListView.setPlaceholder(empty);
         }
+        registerLifecycleHooks();
         LOGGER.info("Task review view initialized");
+    }
+
+    private void registerLifecycleHooks() {
+        if (taskTitleLabel != null) {
+            taskTitleLabel.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        stopAutoRefresh();
+        LOGGER.info("Task review resources cleaned up");
     }
 
     public void setTaskData(Integer classId, Integer taskId) {

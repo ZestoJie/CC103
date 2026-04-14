@@ -110,6 +110,7 @@ public class TaskController implements TimerService.TimerListener {
     private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
+    private boolean disposed;
 
     private Window window() {
         return allTaskList != null && allTaskList.getScene() != null
@@ -139,7 +140,30 @@ public class TaskController implements TimerService.TimerListener {
         // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
         setupListPlaceholders();
+        registerLifecycleHooks();
         LOGGER.info("Task scene initialized successfully");
+    }
+
+    private void registerLifecycleHooks() {
+        if (allTaskList != null) {
+            allTaskList.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        stopAutoRefresh();
+        if (timerService != null) {
+            timerService.removeTimerListener(this);
+        }
+        LOGGER.info("Task scene resources cleaned up");
     }
 
     private void setupListPlaceholders() {

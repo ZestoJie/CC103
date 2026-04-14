@@ -41,8 +41,8 @@ import javafx.util.Duration;
 
 public class DashboardController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
-    private static final int BASE_TASK_POINTS = 10;
-    private static final int LATE_TASK_POINTS = 5;
+    private static final String POMODORO_STUDY_PRESET = "25 Minutes";
+    private static final String POMODORO_BREAK_PRESET = "5 Minutes";
 
     @FXML private ComboBox<Classes> classSelector;
     @FXML private Label welcomeLabel;
@@ -70,6 +70,8 @@ public class DashboardController implements TimerService.TimerListener {
     @FXML private Label approvalsCountLabel;
 
     private Timeline refreshTimeline;
+    private boolean disposed;
+    private boolean pomodoroRunning;
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
     private static final int REFRESH_INTERVAL_SECONDS = 5; // Auto-refresh every 5 seconds
@@ -118,10 +120,32 @@ public class DashboardController implements TimerService.TimerListener {
 
             NavbarController.getInstance().setActive("dashboard");
             setupListPlaceholders();
+            registerLifecycleHooks();
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
             LOGGER.severe("Dashboard initialization error: " + e.getMessage());
         }
+    }
+
+    private void registerLifecycleHooks() {
+        if (welcomeLabel != null) {
+            welcomeLabel.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        pomodoroRunning = false;
+        stopAutoRefresh();
+        TimerService.getInstance().removeTimerListener(this);
+        LOGGER.info("Dashboard resources cleaned up");
     }
 
     private void setupListPlaceholders() {
@@ -264,10 +288,11 @@ public class DashboardController implements TimerService.TimerListener {
 
     private void setupTimerPresets() {
         if (timerPreset != null) {
-            timerPreset.getItems().addAll(
-                "1 Minute", "5 Minutes", "10 Minutes", "1 Hour"
-            );
-            timerPreset.setValue("10 Minutes");
+            timerPreset.getItems().setAll("25 Minutes", "45 Minutes", "1 Hour");
+            timerPreset.setValue(POMODORO_STUDY_PRESET);
+        }
+        if (studyModeRadio != null) {
+            studyModeRadio.setSelected(true);
         }
     }
 
@@ -828,12 +853,17 @@ public class DashboardController implements TimerService.TimerListener {
         try {
             String selected = timerPreset.getValue();
             if (selected == null || selected.isBlank()) {
-                LOGGER.warning("No timer preset selected");
-                return;
+                selected = studyModeRadio != null && studyModeRadio.isSelected()
+                    ? POMODORO_STUDY_PRESET
+                    : POMODORO_BREAK_PRESET;
+                if (timerPreset != null) {
+                    timerPreset.setValue(selected);
+                }
             }
 
             int seconds = convertToSeconds(selected);
             boolean xpActive = xpActiveCheckbox != null && xpActiveCheckbox.isSelected();
+            pomodoroRunning = true;
             
             TimerService.getInstance().start(seconds, null, xpActive); // No specific task for dashboard timer
             updateTimerDisplay();
@@ -966,6 +996,31 @@ public class DashboardController implements TimerService.TimerListener {
         if (xpActiveCheckbox != null && xpActiveCheckbox.isSelected()) {
             awardTimerXp(10);
         }
+        if (pomodoroRunning) {
+            startNextPomodoroSession();
+        }
+    }
+
+    private void startNextPomodoroSession() {
+        boolean moveToBreak = studyModeRadio != null && studyModeRadio.isSelected();
+        if (moveToBreak) {
+            if (breakModeRadio != null) {
+                breakModeRadio.setSelected(true);
+            }
+            handleModeChange(null);
+            if (timerPreset != null) {
+                timerPreset.setValue(POMODORO_BREAK_PRESET);
+            }
+        } else {
+            if (studyModeRadio != null) {
+                studyModeRadio.setSelected(true);
+            }
+            handleModeChange(null);
+            if (timerPreset != null) {
+                timerPreset.setValue(POMODORO_STUDY_PRESET);
+            }
+        }
+        handleStartTimer();
     }
 
     private void awardTimerXp(int points) {

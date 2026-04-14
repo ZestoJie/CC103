@@ -58,6 +58,7 @@ public class TaskDetailController {
     private Integer currentSubmissionId;
     private ObservableList<TaskAttachment> attachments = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
+    private boolean disposed;
 
     private Window window() {
         return uploadFileButton != null && uploadFileButton.getScene() != null
@@ -76,7 +77,27 @@ public class TaskDetailController {
             empty.setWrapText(true);
             attachmentsListView.setPlaceholder(empty);
         }
+        registerLifecycleHooks();
         LOGGER.info("Task detail view initialized");
+    }
+
+    private void registerLifecycleHooks() {
+        if (taskTitleLabel != null) {
+            taskTitleLabel.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        stopAutoRefresh();
+        LOGGER.info("Task detail resources cleaned up");
     }
 
     public void setTaskData(Integer classId, Integer taskId) {

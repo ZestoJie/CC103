@@ -17,7 +17,7 @@ public class Task {
     private String username;
 
     public Task(int id, String taskName, LocalDate date, String status) {
-        this(id, taskName, date, status, null, null, null, false, null);
+        this(id, taskName, date, status, (String) null, null, null, false, null);
     }
 
     public Task(int id, String taskName, LocalDate date, String status, Integer classId, String className) {

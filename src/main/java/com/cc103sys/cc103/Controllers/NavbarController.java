@@ -50,6 +50,7 @@ public class NavbarController implements TimerService.TimerListener {
     private Button timerPauseBtn;
     @FXML
     private Button timerStopBtn;
+    private boolean disposed;
 
     @FXML
     public void initialize() {
@@ -60,11 +61,30 @@ public class NavbarController implements TimerService.TimerListener {
         // Register with TimerService
         TimerService.getInstance().addTimerListener(this);
         updateTimerDisplay();
+        registerLifecycleHooks();
         
         if (classesBtn != null) {
             classesBtn.setDisable(false);
             classesBtn.setOpacity(1.0);
         }
+    }
+
+    private void registerLifecycleHooks() {
+        if (dashboardBtn != null) {
+            dashboardBtn.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (oldScene != null && newScene == null) {
+                    cleanupResources();
+                }
+            });
+        }
+    }
+
+    private void cleanupResources() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
+        TimerService.getInstance().removeTimerListener(this);
     }
 
     private void setupRoleBasedAccess() {

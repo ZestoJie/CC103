@@ -1,152 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<HBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cc103sys.cc103.Controllers.DashboardController"
-      style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<HBox style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
 
     <children>
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER" />
 
-        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;">
+            <content>
+                <VBox prefHeight="870.0" prefWidth="1300" spacing="24" style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="28" left="28" right="28" top="28" />
+                    </padding>
 
-        <VBox spacing="20" style="-fx-background-color: #f8fafc;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-
-            <HBox alignment="CENTER_LEFT">
-                <children>
-
-                    <Label fx:id="welcomeLabel"
-                           text="Welcome back, User!"
-                           styleClass="heading-1" />
-
-                    <Region HBox.hgrow="ALWAYS"/>
-
-                    <Button onAction="#goSettings"
-                            styleClass="button-secondary">
-                        <graphic>
-                            <ImageView fitHeight="20" fitWidth="20">
-                                <image>
-                                    <Image url="@/images/icon-settingsblue.png"/>
-                                </image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                </children>
-            </HBox>
-
-            <HBox spacing="20" VBox.vgrow="ALWAYS">
-
-                <VBox spacing="20" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-
-                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-
-                        <Label text="My Tasks" styleClass="heading-3" />
-
-                        <Label text="Tasks assigned to you" styleClass="subtitle" />
-
-                        <ListView fx:id="taskList" VBox.vgrow="ALWAYS"/>
-
-                        <Label fx:id="noTaskLabel"
-                               text="No activities to accomplish"
-                               styleClass="subtitle"
-                               visible="false"/>
+                    <!-- Header Section -->
+                    <VBox spacing="8">
+                        <Label fx:id="welcomeLabel" styleClass="heading-1" text="Welcome back, User!" />
+                        <Label styleClass="subtitle" text="Here's what's happening with your tasks today" />
                     </VBox>
 
-                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-                        <HBox>
-                            <Label text="Mini Leaderboard" styleClass="heading-3" />
+                    <!-- Quick Actions Bar -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Button onAction="#goSettings" styleClass="button-secondary" text="Settings" />
+                        <Region HBox.hgrow="ALWAYS" />
+                    </HBox>
 
-                            <Region HBox.hgrow="ALWAYS"/>
+                    <!-- Main Content Grid -->
+                    <HBox spacing="20" VBox.vgrow="ALWAYS">
+                        <!-- Left Column - Tasks -->
+                        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <!-- My Tasks Card -->
+                            <VBox spacing="14" styleClass="card" VBox.vgrow="ALWAYS">
+                                <VBox spacing="6">
+                                    <Label styleClass="heading-3" text="My Tasks" />
+                                    <Label styleClass="subtitle" text="Tasks assigned to you this week" />
+                                </VBox>
 
-                            <ComboBox fx:id="classSelector" promptText="Class"/>
-                        </HBox>
+                                <Separator styleClass="separator" />
 
-                        <ListView fx:id="leaderboardPreview" VBox.vgrow="ALWAYS"/>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <VBox spacing="8" style="-fx-background-color: transparent;">
+                                            <ListView fx:id="taskList" prefHeight="300" style="-fx-padding: 0;" VBox.vgrow="ALWAYS" />
+                                            <Label fx:id="noTaskLabel" alignment="CENTER" styleClass="subtitle" text="No activities to accomplish" visible="false" />
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </VBox>
 
-                        <Button text="Open Full Leaderboard" onAction="#openLeaderboardScene"/>
-                    </VBox>
+                            <!-- Pending Approvals Card -->
+                            <VBox spacing="14" styleClass="card" VBox.vgrow="ALWAYS">
+                                <VBox spacing="6">
+                                    <Label styleClass="heading-3" text="Pending Approvals" />
+                                    <Label styleClass="subtitle" text="Task submissions waiting for review" />
+                                </VBox>
 
+                                <Separator styleClass="separator" />
+
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <ListView fx:id="pendingApprovalsListView" prefHeight="200" style="-fx-padding: 0;" />
+                                    </content>
+                                </ScrollPane>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Right Column - Stats & Leaderboard -->
+                        <VBox prefWidth="300" spacing="20" HBox.hgrow="ALWAYS">
+
+                            <!-- Quick Stats Card -->
+                            <VBox spacing="16" styleClass="card">
+                                <Label styleClass="heading-3" text="Quick Stats" />
+                                <Separator styleClass="separator" />
+
+                                <HBox alignment="TOP_LEFT" spacing="12">
+                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="caption" text="Total Tasks" />
+                                        <Label fx:id="totalTasksLabel" styleClass="heading-2" text="0" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox alignment="TOP_LEFT" spacing="12">
+                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="caption" text="Completed" />
+                                        <Label fx:id="completedTasksLabel" style="-fx-text-fill: #16a34a;" styleClass="heading-2" text="0" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox alignment="TOP_LEFT" spacing="12">
+                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="caption" text="Pending" />
+                                        <Label fx:id="pendingTasksLabel" style="-fx-text-fill: #ca8a04;" styleClass="heading-2" text="0" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Leaderboard Preview Card -->
+                            <VBox spacing="14" styleClass="card" VBox.vgrow="ALWAYS">
+                                <VBox spacing="6">
+                                    <Label styleClass="heading-3" text="Top Performers" />
+                                    <Label styleClass="subtitle" text="Class leaderboard ranking" />
+                                </VBox>
+
+                                <Separator styleClass="separator" />
+
+                                <ComboBox fx:id="classSelector" promptText="Select class" />
+
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <ListView fx:id="leaderboardPreview" prefHeight="200" style="-fx-padding: 0;" />
+                                    </content>
+                                </ScrollPane>
+
+                                <Button onAction="#openLeaderboardScene" text="View Full Leaderboard" />
+                            </VBox>
+                        </VBox>
+                    </HBox>
                 </VBox>
-
-                <VBox spacing="20" HBox.hgrow="ALWAYS">
-
-                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-
-                        <Label text="Timer Panel" styleClass="heading-3" />
-
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <Label text="Mode:" styleClass="caption" />
-                                <RadioButton fx:id="studyModeRadio" text="Study" selected="true" toggleGroup="$timerModeGroup" onAction="#handleModeChange" />
-                                <RadioButton fx:id="breakModeRadio" text="Break" toggleGroup="$timerModeGroup" onAction="#handleModeChange" />
-                            </children>
-                        </HBox>
-
-                        <TextField fx:id="timerSubjectField" promptText="Subject" />
-
-                        <HBox alignment="CENTER" style="-fx-background-color: #f3f4f6; -fx-padding: 20; -fx-background-radius: 12;">
-                            <children>
-                                <Label fx:id="timerLabel"
-                                       text="00:00"
-                                       style="-fx-font-size: 32px; -fx-font-weight: bold;" />
-                            </children>
-                        </HBox>
-
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <ComboBox fx:id="timerPreset" promptText="Select Duration" HBox.hgrow="ALWAYS" />
-                                <Button fx:id="timerStartButton" text="Start" onAction="#handleStartTimer" />
-                                <Button fx:id="timerPauseButton" text="Pause" onAction="#handlePauseTimer" />
-                            </children>
-                        </HBox>
-
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <CheckBox fx:id="xpActiveCheckbox" text="XP Earning Active" selected="true" onAction="#updateXpStatus" />
-                            </children>
-                        </HBox>
-                    </VBox>
-
-                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-
-                        <Label text="Daily Goal Progress" styleClass="heading-3" />
-
-                        <Label fx:id="dailyGoalSummary"
-                               text="Loading today's progress..."
-                               styleClass="subtitle" />
-
-                        <ProgressBar fx:id="dailyProgressBar" progress="0.0" maxWidth="Infinity" />
-
-                        <Label fx:id="dailyGoalTip" text="Complete your tasks to earn more XP." styleClass="subtitle" />
-                    </VBox>
-
-                    <VBox fx:id="approvalsSection" spacing="12" VBox.vgrow="ALWAYS" visible="false" managed="false"
-                          styleClass="card">
-
-                        <HBox>
-                            <Label text="Pending Approvals" styleClass="heading-3" />
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="approvalsCountLabel" text="Pending: 0" styleClass="caption" />
-                        </HBox>
-
-                        <Label text="Review tasks submitted by participants" styleClass="subtitle" />
-
-                        <ListView fx:id="pendingApprovalsListView" VBox.vgrow="ALWAYS"/>
-                    </VBox>
-
-                </VBox>
-
-            </HBox>
-
-        </VBox>
-
+            </content>
+        </ScrollPane>
     </children>
 </HBox>

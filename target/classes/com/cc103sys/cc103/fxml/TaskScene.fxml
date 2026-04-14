@@ -4,67 +4,100 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<HBox spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TaskController" style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<HBox spacing="0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TaskController" style="-fx-background-color: #f8fbff;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
     <children>
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
-        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fafc;">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <children>
-                <Label text="Task Manager" styleClass="heading-1" />
-
-                <VBox spacing="12" styleClass="card">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS">
+            <content>
+                <VBox spacing="24" style="-fx-background-color: #f8fbff;" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets top="28" right="28" bottom="28" left="28"/>
+                    </padding>
                     <children>
-                        <HBox spacing="10" alignment="CENTER_LEFT">
+                        <!-- Header -->
+                        <VBox spacing="8">
+                            <Label text="Task Manager" styleClass="heading-1" />
+                            <Label text="Organize and manage all your tasks" styleClass="subtitle" />
+                        </VBox>
+
+                        <!-- Add Task Card -->
+                        <VBox spacing="14" styleClass="card">
                             <children>
-                                <Label text="Add New Task" styleClass="heading-3" HBox.hgrow="ALWAYS" />
-                                <Button text="Add Task" onAction="#handleAddTask" />
+                                <VBox spacing="6">
+                                    <Label text="Add New Task" styleClass="heading-3" />
+                                    <Label text="Create a new task with description and due date" styleClass="subtitle" />
+                                </VBox>
+                                <Separator styleClass="separator" />
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <children>
+                                        <TextField fx:id="taskField" promptText="Enter task description" HBox.hgrow="ALWAYS"/>
+                                        <DatePicker fx:id="taskDate" />
+                                        <Button text="Add Task" onAction="#handleAddTask" styleClass="button" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Filter Section -->
+                        <VBox spacing="14" styleClass="card">
+                            <children>
+                                <VBox spacing="6">
+                                    <Label text="Filter Tasks" styleClass="heading-3" />
+                                    <Label text="View tasks by class" styleClass="subtitle" />
+                                </VBox>
+                                <Separator styleClass="separator" />
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Class:" styleClass="caption" />
+                                        <ComboBox fx:id="classFilterComboBox" promptText="Select class" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Task Lists Grid -->
+                        <HBox spacing="20" VBox.vgrow="ALWAYS">
+                            <!-- All Tasks -->
+                            <VBox spacing="14" styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                <children>
+                                    <VBox spacing="6">
+                                        <Label text="All Tasks" styleClass="heading-3" />
+                                        <Label text="Complete list of all tasks" styleClass="subtitle" />
+                                    </VBox>
+                                    <Separator styleClass="separator" />
+                                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                        <ListView fx:id="allTaskList" style="-fx-padding: 0;" />
+                                    </ScrollPane>
+                                </children>
+                            </VBox>
+
+                            <!-- Filtered Tasks -->
+                            <VBox spacing="14" styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                <children>
+                                    <VBox spacing="6">
+                                        <Label text="Filtered Tasks" styleClass="heading-3" />
+                                        <Label text="Tasks from selected class" styleClass="subtitle" />
+                                    </VBox>
+                                    <Separator styleClass="separator" />
+                                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                        <ListView fx:id="filteredTaskList" style="-fx-padding: 0;" />
+                                    </ScrollPane>
+                                </children>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Actions -->
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <Button text="Mark Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS" styleClass="button-success"/>
+                                <Button text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS" styleClass="button-danger"/>
                             </children>
                         </HBox>
-                        <HBox spacing="10">
-                            <children>
-                                <TextField fx:id="taskField" promptText="Enter Task Description" HBox.hgrow="ALWAYS"/>
-                                <DatePicker fx:id="taskDate"/>
-                            </children>
-                        </HBox>
                     </children>
                 </VBox>
-
-                <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-                    <children>
-                        <Label text="All Tasks" styleClass="heading-3" />
-                        <ListView fx:id="allTaskList" VBox.vgrow="ALWAYS" />
-                    </children>
-                </VBox>
-
-                <VBox spacing="12" styleClass="card">
-                    <children>
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <Label text="Filter by Class:" styleClass="heading-3" />
-                                <ComboBox fx:id="classFilterComboBox" promptText="Select class" HBox.hgrow="ALWAYS" />
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-
-                <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-                    <children>
-                        <Label text="Filtered Tasks" styleClass="heading-3" />
-                        <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS" />
-                    </children>
-                </VBox>
-
-                <HBox spacing="10">
-                    <children>
-                        <Button text="Mark Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS"/>
-                        <Button text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS" styleClass="button-danger"/>
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
+            </content>
+        </ScrollPane>
     </children>
 </HBox>
 

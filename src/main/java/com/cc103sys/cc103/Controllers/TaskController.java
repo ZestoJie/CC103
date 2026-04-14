@@ -62,16 +62,6 @@ public class TaskController implements TimerService.TimerListener {
     @SuppressWarnings("unused")
     private Button deleteTaskBtn;
     
-    // Tab Navigation
-    @FXML
-    private Button tabMyTasksBtn;
-    @FXML
-    private Button tabApprovalsBtn;
-    @FXML
-    private VBox myTasksView;
-    @FXML
-    private VBox approvalsView;
-    
     // Task Details Display
     @FXML
     private TextArea taskDescriptionArea;
@@ -100,6 +90,8 @@ public class TaskController implements TimerService.TimerListener {
     @FXML
     private Button rejectSelectedBtn;
     @FXML
+    private VBox approvalsView;
+    @FXML
     private ComboBox<Classes> approvalClassFilterComboBox;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
@@ -119,18 +111,11 @@ public class TaskController implements TimerService.TimerListener {
         setupTimerDropdown();
         loadUserClasses();
         
-        // Initialize Tabs Logic
-        switchToMyTasksView();
-        
         loadAllClassTasks();
         loadFilteredTasks();
         
         if (Session.isHost()) {
             loadPendingApprovals();
-            if (approvalClassFilterComboBox != null) {
-                approvalClassFilterComboBox.setItems(userClasses);
-                approvalClassFilterComboBox.setOnAction(e -> loadPendingApprovals());
-            }
         }
         
         startAutoRefresh();
@@ -166,13 +151,9 @@ public class TaskController implements TimerService.TimerListener {
         // Show/hide approvals for hosts only
         boolean isHost = Session.isHost();
         
-        if (tabApprovalsBtn != null) {
-            tabApprovalsBtn.setVisible(isHost);
-            tabApprovalsBtn.setManaged(isHost);
-        }
         if (approvalsView != null) {
-            approvalsView.setVisible(false);
-            approvalsView.setManaged(false);
+            approvalsView.setVisible(isHost);
+            approvalsView.setManaged(isHost);
         }
         
         // All users can add personal tasks from the Task page.
@@ -576,48 +557,6 @@ public class TaskController implements TimerService.TimerListener {
             LOGGER.warning("Failed to get current user ID: " + e.getMessage());
         }
         return null;
-    }
-
-    // ===== TAB SWITCHING METHODS =====
-    @FXML
-    private void switchToMyTasksView() {
-        if (myTasksView != null) {
-            myTasksView.setVisible(true);
-            myTasksView.setManaged(true);
-        }
-        if (approvalsView != null) {
-            approvalsView.setVisible(false);
-            approvalsView.setManaged(false);
-        }
-        updateTabStyles(true);
-        loadAllClassTasks();
-        loadFilteredTasks();
-    }
-
-    @FXML
-    private void switchToApprovalsView() {
-        if (myTasksView != null) {
-            myTasksView.setVisible(false);
-            myTasksView.setManaged(false);
-        }
-        if (approvalsView != null) {
-            approvalsView.setVisible(true);
-            approvalsView.setManaged(true);
-        }
-        updateTabStyles(false);
-        loadPendingApprovals();
-    }
-
-    private void updateTabStyles(boolean isMyTasksActive) {
-        String activeStyle = "-fx-background-color: #3182ce; -fx-text-fill: white; -fx-border-color: #3182ce;";
-        String inactiveStyle = "-fx-background-color: white; -fx-text-fill: #cbd5e0; -fx-border-color: #e2e8f0;";
-        
-        if (tabMyTasksBtn != null) {
-            tabMyTasksBtn.setStyle(isMyTasksActive ? activeStyle : inactiveStyle);
-        }
-        if (tabApprovalsBtn != null) {
-            tabApprovalsBtn.setStyle(isMyTasksActive ? inactiveStyle : activeStyle);
-        }
     }
 
     // ===== TIMER METHODS =====

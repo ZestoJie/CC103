@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.logging.Logger;
@@ -12,6 +13,7 @@ import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Models.Classes;
 import com.cc103sys.cc103.Models.Task;
 import com.cc103sys.cc103.Utils.Session;
+import com.cc103sys.cc103.Utils.TimerService;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -25,14 +27,20 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
-public class TaskController {
+public class TaskController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
     private static final int LATE_TASK_POINTS = 5;
     private static final int REFRESH_INTERVAL_SECONDS = 5; // Auto-refresh every 5 seconds
+
+    private TimerService timerService;
+    private Task timerTask;
 
     @FXML
     private TextField taskField;
@@ -53,19 +61,78 @@ public class TaskController {
     @FXML
     @SuppressWarnings("unused")
     private Button deleteTaskBtn;
+    
+    // Tab Navigation
+    @FXML
+    private Button tabMyTasksBtn;
+    @FXML
+    private Button tabApprovalsBtn;
+    @FXML
+    private VBox myTasksView;
+    @FXML
+    private VBox approvalsView;
+    
+    // Task Details Display
+    @FXML
+    private TextArea taskDescriptionArea;
+    @FXML
+    private TextArea taskInstructions;
+    
+    // Attachment Management
+    @FXML
+    private Button uploadAttachmentBtn;
+    @FXML
+    private ListView<String> attachmentsList;
+    
+    // Timer Controls
+    @FXML
+    private Button startTimerBtn;
+    @FXML
+    private Button saveTaskInfoBtn;
+    @FXML
+    private ComboBox<String> timerDuration;
+    
+    // Approval Management (for hosts/teachers)
+    @FXML
+    private ListView<Task> pendingApprovalsList;
+    @FXML
+    private Button approveSelectedBtn;
+    @FXML
+    private Button rejectSelectedBtn;
+    @FXML
+    private ComboBox<Classes> approvalClassFilterComboBox;
 
     private final ObservableList<Task> allTasks = FXCollections.observableArrayList();
     private final ObservableList<Task> filteredTasks = FXCollections.observableArrayList();
+    private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
     private final ObservableList<Classes> userClasses = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
 
     @FXML
     public void initialize() {
+        timerService = TimerService.getInstance();
+        timerService.removeTimerListener(this);
+        timerService.addTimerListener(this);
+        
         setupRoleBasedUI();
         setupTaskListView();
+        setupTimerDropdown();
         loadUserClasses();
+        
+        // Initialize Tabs Logic
+        switchToMyTasksView();
+        
         loadAllClassTasks();
         loadFilteredTasks();
+        
+        if (Session.isHost()) {
+            loadPendingApprovals();
+            if (approvalClassFilterComboBox != null) {
+                approvalClassFilterComboBox.setItems(userClasses);
+                approvalClassFilterComboBox.setOnAction(e -> loadPendingApprovals());
+            }
+        }
+        
         startAutoRefresh();
         // Set navbar active to tasks
         NavbarController.getInstance().setActive("tasks");
@@ -96,6 +163,18 @@ public class TaskController {
     }
 
     private void setupRoleBasedUI() {
+        // Show/hide approvals for hosts only
+        boolean isHost = Session.isHost();
+        
+        if (tabApprovalsBtn != null) {
+            tabApprovalsBtn.setVisible(isHost);
+            tabApprovalsBtn.setManaged(isHost);
+        }
+        if (approvalsView != null) {
+            approvalsView.setVisible(false);
+            approvalsView.setManaged(false);
+        }
+        
         // All users can add personal tasks from the Task page.
         // Host-only class task creation remains on the Dashboard.
     }
@@ -497,5 +576,215 @@ public class TaskController {
             LOGGER.warning("Failed to get current user ID: " + e.getMessage());
         }
         return null;
+    }
+
+    // ===== TAB SWITCHING METHODS =====
+    @FXML
+    private void switchToMyTasksView() {
+        if (myTasksView != null) {
+            myTasksView.setVisible(true);
+            myTasksView.setManaged(true);
+        }
+        if (approvalsView != null) {
+            approvalsView.setVisible(false);
+            approvalsView.setManaged(false);
+        }
+        updateTabStyles(true);
+        loadAllClassTasks();
+        loadFilteredTasks();
+    }
+
+    @FXML
+    private void switchToApprovalsView() {
+        if (myTasksView != null) {
+            myTasksView.setVisible(false);
+            myTasksView.setManaged(false);
+        }
+        if (approvalsView != null) {
+            approvalsView.setVisible(true);
+            approvalsView.setManaged(true);
+        }
+        updateTabStyles(false);
+        loadPendingApprovals();
+    }
+
+    private void updateTabStyles(boolean isMyTasksActive) {
+        String activeStyle = "-fx-background-color: #3182ce; -fx-text-fill: white; -fx-border-color: #3182ce;";
+        String inactiveStyle = "-fx-background-color: white; -fx-text-fill: #cbd5e0; -fx-border-color: #e2e8f0;";
+        
+        if (tabMyTasksBtn != null) {
+            tabMyTasksBtn.setStyle(isMyTasksActive ? activeStyle : inactiveStyle);
+        }
+        if (tabApprovalsBtn != null) {
+            tabApprovalsBtn.setStyle(isMyTasksActive ? inactiveStyle : activeStyle);
+        }
+    }
+
+    // ===== TIMER METHODS =====
+    private void setupTimerDropdown() {
+        if (timerDuration != null) {
+            ObservableList<String> durations = FXCollections.observableArrayList(
+                "5 min", "10 min", "15 min", "20 min", "25 min", "30 min", "45 min", "60 min"
+            );
+            timerDuration.setItems(durations);
+            timerDuration.getSelectionModel().select(4); // Default to 25 min (Pomodoro)
+        }
+    }
+
+    @FXML
+    private void handleStartTimer() {
+        Task selected = getSelectedTask();
+        if (selected == null) return;
+        
+        String durationStr = timerDuration != null ? timerDuration.getValue() : "25 min";
+        int minutes = Integer.parseInt(durationStr.replace(" min", ""));
+        int totalSeconds = minutes * 60;
+        
+        timerTask = selected;
+        LOGGER.info(() -> "Timer started for " + minutes + " minutes on task: " + selected.getTaskName());
+        timerService.start(totalSeconds, selected.getId(), true);
+    }
+
+    public Button getStartTimerBtn() {
+        return startTimerBtn;
+    }
+
+    public void setStartTimerBtn(Button startTimerBtn) {
+        this.startTimerBtn = startTimerBtn;
+    }
+
+    public void updateTimerDisplay() {
+        // Timer display will be updated by TimerService
+    }
+
+    // ===== ATTACHMENT METHODS =====
+    @FXML
+    private void handleUploadAttachment() {
+        Task selected = getSelectedTask();
+        if (selected == null) return;
+        
+        showAttachmentDialog(selected);
+        LOGGER.info(() -> "Upload attachment handler for task: " + selected.getTaskName());
+    }
+
+    private void showAttachmentDialog(Task task) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Attachment");
+        java.io.File selectedFile = fileChooser.showOpenDialog(null);
+        
+        if (selectedFile != null) {
+            // Update attachment list display
+            if (attachmentsList != null) {
+                attachmentsList.getItems().clear();
+                attachmentsList.getItems().add("📎 " + selectedFile.getName());
+                attachmentsList.getItems().add("Path: " + selectedFile.getAbsolutePath());
+            }
+            
+            // Update task status to pending approval
+            updateTaskStatus(task, "For Approval");
+            LOGGER.info(() -> "Attachment added for task: " + task.getTaskName());
+        } else {
+            // Allow submission without attachment
+            updateTaskStatus(task, "For Approval");
+        }
+    }
+
+    @FXML
+    private void handleSaveTaskInfo() {
+        Task selected = getSelectedTask();
+        if (selected == null) return;
+        
+        String notes = taskInstructions != null ? taskInstructions.getText() : "";
+        try (Connection conn = DBUtil.getConnection()) {
+            String updateSql = "UPDATE tasks SET description = ? WHERE id = ? AND username = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+                stmt.setString(1, notes);
+                stmt.setInt(2, selected.getId());
+                stmt.setString(3, Session.getUsername());
+                stmt.executeUpdate();
+            }
+            LOGGER.info("Task notes saved for task: " + selected.getTaskName());
+        } catch (Exception e) {
+            LOGGER.severe("Failed to save task notes: " + e.getMessage());
+        }
+    }
+
+    // ===== APPROVAL METHODS (FOR HOSTS) =====
+    @FXML
+    private void handleApproveSelected() {
+        Task selected = pendingApprovalsList != null ? pendingApprovalsList.getSelectionModel().getSelectedItem() : null;
+        if (selected == null) return;
+        
+        approveTask(selected);
+        loadPendingApprovals();
+    }
+
+    @FXML
+    private void handleRejectSelected() {
+        Task selected = pendingApprovalsList != null ? pendingApprovalsList.getSelectionModel().getSelectedItem() : null;
+        if (selected == null) return;
+        
+        updateTaskStatus(selected, "Pending");
+        loadPendingApprovals();
+    }
+
+    private void approveTask(Task task) {
+        updateTaskStatus(task, "Done");
+    }
+
+    private void loadPendingApprovals() {
+        if (pendingApprovalsList == null) return;
+        
+        Integer userId = getCurrentUserId();
+        if (userId == null) return;
+        
+        pendingApprovals.clear();
+        
+        String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, " +
+                     "COALESCE(c.class_name, '') as class_name, t.is_personal " +
+                     "FROM tasks t " +
+                     "LEFT JOIN classes c ON t.class_id = c.id " +
+                     "WHERE t.status = 'For Approval' AND t.user_id = ? " +
+                     "ORDER BY t.task_date DESC";
+        
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Task task = new Task(
+                        rs.getInt("id"),
+                        rs.getString("task_name"),
+                        rs.getDate("task_date").toLocalDate(),
+                        rs.getString("status"),
+                        rs.getInt("class_id") > 0 ? rs.getInt("class_id") : null,
+                        rs.getString("class_name"),
+                        rs.getBoolean("is_personal")
+                    );
+                    pendingApprovals.add(task);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Failed to load pending approvals: " + e.getMessage());
+        }
+        
+        pendingApprovalsList.setItems(pendingApprovals);
+        pendingApprovalsList.setCellFactory(param -> createTaskListCell());
+    }
+
+    // ===== HELPER METHODS =====
+    public void onTimerTick(int secondsRemaining) {
+        // Optional: Update UI with remaining time
+    }
+
+    public void onTimerUpdated(int secondsRemaining, boolean isRunning, boolean isExpired) {
+        // Update UI with timer state
+    }
+
+    public void onTimerCompleted() {
+        LOGGER.info("Timer completed for task");
+        loadAllClassTasks();
+        loadFilteredTasks();
     }
 }

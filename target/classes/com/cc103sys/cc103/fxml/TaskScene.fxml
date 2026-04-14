@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<HBox spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TaskController" style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+<HBox spacing="20" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.TaskController" style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
     <children>
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
@@ -13,56 +13,170 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
             <children>
+                <!-- Page Title -->
                 <Label text="Task Manager" styleClass="heading-1" />
 
-                <VBox spacing="12" styleClass="card">
+                <!-- Tab Navigation -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
                     <children>
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <Label text="Add New Task" styleClass="heading-3" HBox.hgrow="ALWAYS" />
-                                <Button text="Add Task" onAction="#handleAddTask" />
-                            </children>
-                        </HBox>
-                        <HBox spacing="10">
-                            <children>
-                                <TextField fx:id="taskField" promptText="Enter Task Description" HBox.hgrow="ALWAYS"/>
-                                <DatePicker fx:id="taskDate"/>
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-
-                <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-                    <children>
-                        <Label text="All Tasks" styleClass="heading-3" />
-                        <ListView fx:id="allTaskList" VBox.vgrow="ALWAYS" />
-                    </children>
-                </VBox>
-
-                <VBox spacing="12" styleClass="card">
-                    <children>
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <children>
-                                <Label text="Filter by Class:" styleClass="heading-3" />
-                                <ComboBox fx:id="classFilterComboBox" promptText="Select class" HBox.hgrow="ALWAYS" />
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-
-                <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
-                    <children>
-                        <Label text="Filtered Tasks" styleClass="heading-3" />
-                        <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS" />
-                    </children>
-                </VBox>
-
-                <HBox spacing="10">
-                    <children>
-                        <Button text="Mark Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS"/>
-                        <Button text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS" styleClass="button-danger"/>
+                        <Button fx:id="tabMyTasksBtn" onAction="#switchToMyTasksView" 
+                            style="-fx-background-color: white; -fx-text-fill: #718096; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: hand;" 
+                            text="My Tasks" />
+                        <Button fx:id="tabApprovalsBtn" onAction="#switchToApprovalsView" 
+                            style="-fx-background-color: white; -fx-text-fill: #cbd5e0; -fx-border-color: #e2e8f0; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 20; -fx-font-weight: 600; -fx-cursor: default;" 
+                            text="Pendings" visible="false" managed="false" />
                     </children>
                 </HBox>
+
+                <!-- My Tasks View -->
+                <VBox fx:id="myTasksView" spacing="20" VBox.vgrow="ALWAYS">
+                    <!-- Task Input Section -->
+                    <VBox spacing="12" styleClass="card">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="Add New Task" styleClass="heading-3" HBox.hgrow="ALWAYS" />
+                                    <Button text="Add Task" onAction="#handleAddTask" />
+                                </children>
+                            </HBox>
+                            <HBox spacing="10">
+                                <children>
+                                    <TextField fx:id="taskField" promptText="Enter Task Description" HBox.hgrow="ALWAYS"/>
+                                    <DatePicker fx:id="taskDate"/>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <!-- Task Description Area -->
+                    <TextArea fx:id="taskDescriptionArea" prefRowCount="3" 
+                        promptText="Task description (optional)..." 
+                        style="-fx-padding: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff;" 
+                        wrapText="true" />
+
+                    <!-- All Tasks List -->
+                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
+                        <children>
+                            <Label text="All Tasks" styleClass="heading-3" />
+                            <ListView fx:id="allTaskList" VBox.vgrow="ALWAYS" />
+                        </children>
+                    </VBox>
+
+                    <!-- Filter by Class -->
+                    <VBox spacing="12" styleClass="card">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="Filter by Class:" styleClass="heading-3" />
+                                    <ComboBox fx:id="classFilterComboBox" promptText="Select class" HBox.hgrow="ALWAYS" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <!-- Filtered Tasks List -->
+                    <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
+                        <children>
+                            <Label text="Filtered Tasks" styleClass="heading-3" />
+                            <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS" />
+                        </children>
+                    </VBox>
+
+                    <!-- Task Instructions/Details -->
+                    <TextArea fx:id="taskInstructions" prefRowCount="6"
+                        promptText="Select a task to view details..." 
+                        style="-fx-padding: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff; -fx-wrap-text: true;" 
+                        wrapText="true" />
+
+                    <!-- Attachments List -->
+                    <VBox spacing="8" styleClass="card">
+                        <children>
+                            <Label text="Attachments" styleClass="heading-3" />
+                            <ListView fx:id="attachmentsList" prefHeight="80" 
+                                style="-fx-background-color: #f7fafc; -fx-border-color: #edf2f7; -fx-background-radius: 8;" />
+                        </children>
+                    </VBox>
+
+                    <!-- Timer Dropdown -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="Focus Duration:" styleClass="heading-3" />
+                            <ComboBox fx:id="timerDuration" promptText="Select duration" HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+
+                    <!-- Action Buttons -->
+                    <HBox spacing="10">
+                        <children>
+                            <Button fx:id="startTimerBtn" onAction="#handleStartTimer" 
+                                style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                text="Start Timer" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="saveTaskInfoBtn" onAction="#handleSaveTaskInfo" 
+                                style="-fx-background-color: #edf2f7; -fx-text-fill: #4a5568; -fx-background-radius: 8; -fx-padding: 10; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                text="Save Notes" HBox.hgrow="ALWAYS"/>
+                        </children>
+                    </HBox>
+
+                    <!-- Complete Task Buttons -->
+                    <HBox spacing="10">
+                        <children>
+                            <Button fx:id="markDoneBtn" onAction="#handleMarkDone" 
+                                style="-fx-background-color: #38a169; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 15; -fx-font-weight: bold; -fx-font-size: 14; -fx-cursor: hand;" 
+                                text="Mark as Done" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="uploadAttachmentBtn" onAction="#handleUploadAttachment" 
+                                style="-fx-background-color: white; -fx-text-fill: #3182ce; -fx-border-color: #3182ce; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                text="Upload Attachment" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="deleteTaskBtn" onAction="#handleDeleteTask" 
+                                style="-fx-background-color: #fff5f5; -fx-text-fill: #e53e3e; -fx-border-color: #e53e3e; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                text="Delete Task" HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                </VBox>
+
+                <!-- Pending Approvals View (for hosts/teachers) -->
+                <VBox fx:id="approvalsView" managed="false" spacing="20" visible="false" VBox.vgrow="ALWAYS">
+                    <children>
+                        <!-- Approvals Filter -->
+                        <VBox spacing="12" styleClass="card">
+                            <children>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Filter by Class:" styleClass="heading-3" />
+                                        <ComboBox fx:id="approvalClassFilterComboBox" promptText="Select class" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Pending Approvals List -->
+                        <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
+                            <children>
+                                <Label text="Pending Task Approvals" styleClass="heading-3" />
+                                <ListView fx:id="pendingApprovalsList" 
+                                    style="-fx-background-color: transparent; -fx-border-color: transparent;" 
+                                    VBox.vgrow="ALWAYS" />
+                            </children>
+                        </VBox>
+
+                        <!-- Approval Task Details -->
+                        <TextArea fx:id="taskInstructions" prefRowCount="6"
+                            promptText="Select a pending task to view details..." 
+                            style="-fx-padding: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: #ffffff; -fx-wrap-text: true;" 
+                            wrapText="true" />
+
+                        <!-- Approval Action Buttons -->
+                        <HBox spacing="10">
+                            <children>
+                                <Button fx:id="approveSelectedBtn" onAction="#handleApproveSelected" 
+                                    style="-fx-background-color: #38a169; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                    text="Approve Selected" HBox.hgrow="ALWAYS" />
+                                <Button fx:id="rejectSelectedBtn" onAction="#handleRejectSelected" 
+                                    style="-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 12; -fx-font-weight: 600; -fx-cursor: hand;" 
+                                    text="Reject Selected" HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
             </children>
         </VBox>
     </children>

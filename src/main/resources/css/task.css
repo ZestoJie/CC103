@@ -181,3 +181,99 @@
     background-color: rgba(255,255,255,0.2);
     -fx-background-radius: 10;
 }
+
+/* ===== TAB BUTTONS ===== */
+.tab-button {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-text-fill: #718096;
+    -fx-border-color: #e2e8f0;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 8 20;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    cursor: pointer;
+    
+    -fx-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    -fx-background-color: #f0f4f8;
+    background-color: #f0f4f8;
+    -fx-translate-y: -1;
+}
+
+.tab-button-active {
+    -fx-background-color: #3182ce;
+    background-color: #3182ce;
+    -fx-text-fill: white;
+    -fx-border-color: #3182ce;
+}
+
+/* ===== TEXT AREA ANIMATIONS ===== */
+.text-area {
+    -fx-control-inner-background: #ffffff;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    
+    -fx-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.text-area:focused {
+    -fx-border-color: #3182ce;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.2), 10, 0.2, 0, 4);
+}
+
+/* ===== COMBO BOX ANIMATIONS ===== */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-cursor: hand;
+    
+    -fx-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.combo-box:hover {
+    -fx-border-color: #cbd5e0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.2, 0, 2);
+}
+
+.combo-box:focused {
+    -fx-border-color: #3182ce;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.2), 10, 0.2, 0, 4);
+}
+
+/* ===== ADDITIONAL BUTTON STATE ANIMATIONS ===== */
+.button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.6), 12, 0.3, 0, 4);
+}
+
+/* ===== LABEL ANIMATIONS ===== */
+.heading-1 {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 28;
+    -fx-font-weight: bold;
+}
+
+.heading-3 {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+}

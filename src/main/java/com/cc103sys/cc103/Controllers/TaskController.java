@@ -774,10 +774,6 @@ public class TaskController implements TimerService.TimerListener {
     }
 
     // ===== HELPER METHODS =====
-    public void onTimerTick(int secondsRemaining) {
-        // Optional: Update UI with remaining time
-    }
-
     public void onTimerUpdated(int secondsRemaining, boolean isRunning, boolean isExpired) {
         // Update UI with timer state
     }

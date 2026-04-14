@@ -43,6 +43,20 @@
                style="-fx-text-fill: white; -fx-font-size: 12px;" />
     </VBox>
 
+    <!-- Timer Display (Persistent) -->
+    <VBox alignment="CENTER" spacing="8" style="-fx-background-color: #1e3a52; -fx-padding: 10; -fx-border-radius: 8; -fx-background-radius: 8;">
+        <Label fx:id="timerStatusLabel" text="Timer Inactive"
+               style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px;" />
+        <Label fx:id="timerDisplayLabel" text="--:--"
+               style="-fx-text-fill: #00ff00; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Courier New';" />
+        <HBox alignment="CENTER" spacing="5">
+            <Button fx:id="timerPauseBtn" text="Pause" prefWidth="50" 
+                    style="-fx-font-size: 10px; -fx-padding: 5;" onAction="#handleTimerPause" />
+            <Button fx:id="timerStopBtn" text="Stop" prefWidth="50"
+                    style="-fx-font-size: 10px; -fx-padding: 5;" onAction="#handleTimerStop" />
+        </HBox>
+    </VBox>
+
     <VBox spacing="12">
 
         <Button fx:id="dashboardBtn" text="Dashboard" onAction="#goDashboard"

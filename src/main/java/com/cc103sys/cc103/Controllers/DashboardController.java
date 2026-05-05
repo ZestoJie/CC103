@@ -790,6 +790,7 @@ public class DashboardController implements TimerService.TimerListener {
                    + "JOIN user_classes uc ON ct.class_id = uc.class_id "
                    + "JOIN users u ON uc.user_id = u.id "
                    + "WHERE ct.id = ? "
+                   + "AND u.id != ct.owner_id "
                    + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
 
         try (Connection conn = DBUtil.getConnection();

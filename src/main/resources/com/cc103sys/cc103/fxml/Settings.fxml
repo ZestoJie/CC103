@@ -78,29 +78,6 @@
                                     </HBox>
                                 </children>
                             </VBox>
-                            
-                            
-                            <VBox spacing="12" styleClass="card">
-                                <children>
-                                    <Label text="Sounds" styleClass="heading-3" />
-                                    
-                                    
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Enable Music" styleClass="body" HBox.hgrow="ALWAYS" />
-                                            <CheckBox fx:id="enableMusicToggle" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    
-                                    <HBox spacing="15" alignment="CENTER_LEFT">
-                                        <children>
-                                            <Label text="Enable SFX" styleClass="body" HBox.hgrow="ALWAYS" />
-                                            <CheckBox fx:id="enableSFXToggle" />
-                                        </children>
-                                    </HBox>
-                                </children>
-                            </VBox>
                         </VBox>
                     </content>
                 </ScrollPane>

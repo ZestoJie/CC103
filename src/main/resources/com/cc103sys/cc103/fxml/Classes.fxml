@@ -15,11 +15,13 @@
 
         <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
 
-        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fafc;">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <children>
+        <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fafc;">
+            <content>
+                <VBox spacing="20" style="-fx-background-color: #f8fafc;">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <children>
                 <Label text="Classes" styleClass="heading-1" />
 
                 <HBox spacing="20" VBox.vgrow="ALWAYS">
@@ -84,5 +86,7 @@
                 </HBox>
             </children>
         </VBox>
+            </content>
+        </ScrollPane>
     </children>
 </HBox>

@@ -58,6 +58,12 @@ public class TaskController implements TimerService.TimerListener {
     @FXML
     private ListView<Task> filteredTaskList;
     @FXML
+    private VBox classFilterSection;
+    @FXML
+    private VBox filteredTasksSection;
+    @FXML
+    private HBox actionControls;
+    @FXML
     @SuppressWarnings("unused")
     private Button addTaskBtn;
     @FXML
@@ -213,6 +219,19 @@ public class TaskController implements TimerService.TimerListener {
         if (unsubmitTaskBtn != null) {
             unsubmitTaskBtn.setVisible(!isHost);
             unsubmitTaskBtn.setManaged(!isHost);
+        }
+
+        if (classFilterSection != null) {
+            classFilterSection.setVisible(!isHost);
+            classFilterSection.setManaged(!isHost);
+        }
+        if (filteredTasksSection != null) {
+            filteredTasksSection.setVisible(!isHost);
+            filteredTasksSection.setManaged(!isHost);
+        }
+        if (actionControls != null) {
+            actionControls.setVisible(!isHost);
+            actionControls.setManaged(!isHost);
         }
     }
 
@@ -473,6 +492,7 @@ public class TaskController implements TimerService.TimerListener {
                        + "FROM tasks t "
                        + "LEFT JOIN classes c ON t.class_id = c.id "
                        + "WHERE (t.user_id = ? OR t.username = ?) "
+                       + "AND NOT (t.created_by = ? AND t.class_task_id IS NOT NULL) "
                        + "ORDER BY t.task_date DESC";
 
             try (Connection conn = DBUtil.getConnection();
@@ -483,6 +503,11 @@ public class TaskController implements TimerService.TimerListener {
                     stmt.setNull(1, Types.INTEGER);
                 }
                 stmt.setString(2, Session.getUsername());
+                if (userId != null) {
+                    stmt.setInt(3, userId);
+                } else {
+                    stmt.setNull(3, Types.INTEGER);
+                }
                 LOGGER.info(() -> "Executing SQL: " + sql + " [userId=" + (userId != null ? userId : "NULL") + ", username=" + Session.getUsername() + "]");
                 try (ResultSet rs = stmt.executeQuery()) {
                     int count = 0;
@@ -537,7 +562,8 @@ public class TaskController implements TimerService.TimerListener {
             String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, t.class_task_id, c.class_name "
                        + "FROM tasks t "
                        + "JOIN classes c ON t.class_id = c.id "
-                       + "WHERE (t.user_id = ? OR t.username = ?) AND t.class_id = ?";
+                       + "WHERE (t.user_id = ? OR t.username = ?) AND t.class_id = ? "
+                       + "AND NOT (t.created_by = ? AND t.class_task_id IS NOT NULL)";
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -548,6 +574,11 @@ public class TaskController implements TimerService.TimerListener {
                 }
                 stmt.setString(2, Session.getUsername());
                 stmt.setInt(3, selected.getId());
+                if (userId != null) {
+                    stmt.setInt(4, userId);
+                } else {
+                    stmt.setNull(4, Types.INTEGER);
+                }
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         filteredTasks.add(new Task(

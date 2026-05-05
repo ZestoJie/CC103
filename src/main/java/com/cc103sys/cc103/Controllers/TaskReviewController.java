@@ -1,5 +1,7 @@
 package com.cc103sys.cc103.Controllers;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +21,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -27,6 +30,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
@@ -326,8 +330,139 @@ public class TaskReviewController {
     private void viewSubmissionFiles(SubmissionRecord submission) {
         if (submission.fileCount == 0) {
             UiDialogs.info(window(), "No files", "This submission has no attached files.");
-        } else {
-            UiDialogs.info(window(), "Files", "This submission has " + submission.fileCount + " file(s) attached.");
+            return;
+        }
+
+        // Query the database for all files in this submission
+        String sql = "SELECT id, file_name, file_path, uploaded_at FROM task_attachments WHERE submission_id = ? ORDER BY uploaded_at DESC";
+        ObservableList<FileRecord> files = FXCollections.observableArrayList();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, submission.submissionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    files.add(new FileRecord(
+                        rs.getInt("id"),
+                        rs.getString("file_name"),
+                        rs.getString("file_path"),
+                        rs.getTimestamp("uploaded_at").toLocalDateTime()
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Failed to load submission files: " + e.getMessage());
+            UiDialogs.error(window(), "Error", "Failed to load files: " + e.getMessage());
+            return;
+        }
+
+        // Create a file viewer dialog
+        Stage fileViewerStage = new Stage();
+        fileViewerStage.setTitle("Submission Files - " + submission.username);
+        fileViewerStage.setWidth(600);
+        fileViewerStage.setHeight(400);
+
+        ListView<FileRecord> fileListView = new ListView<>(files);
+        fileListView.setCellFactory(lv -> new FileListCell());
+
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(15));
+        container.getChildren().add(new Label("Files in submission:"));
+        container.getChildren().add(fileListView);
+        VBox.setVgrow(fileListView, Priority.ALWAYS);
+
+        Scene scene = new Scene(container);
+        fileViewerStage.setScene(scene);
+        fileViewerStage.show();
+    }
+
+    private static class FileRecord {
+        public int id;
+        public String fileName;
+        public String filePath;
+        public java.time.LocalDateTime uploadedAt;
+
+        public FileRecord(int id, String fileName, String filePath, java.time.LocalDateTime uploadedAt) {
+            this.id = id;
+            this.fileName = fileName;
+            this.filePath = filePath;
+            this.uploadedAt = uploadedAt;
+        }
+    }
+
+    private class FileListCell extends ListCell<FileRecord> {
+        @Override
+        protected void updateItem(FileRecord file, boolean empty) {
+            super.updateItem(file, empty);
+            if (empty || file == null) {
+                setGraphic(null);
+                setText(null);
+            } else {
+                HBox container = new HBox(10);
+                container.setPadding(new Insets(8));
+                container.setStyle("-fx-border-color: #e2e8f0; -fx-border-radius: 4; -fx-background-color: #f9fafb;");
+
+                VBox fileInfo = new VBox(4);
+                Label fileNameLabel = new Label(file.fileName);
+                fileNameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12;");
+                Label uploadTimeLabel = new Label("Uploaded: " + file.uploadedAt);
+                uploadTimeLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 10;");
+                Label filePathLabel = new Label("Path: " + file.filePath);
+                filePathLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 9;");
+                fileInfo.getChildren().addAll(fileNameLabel, uploadTimeLabel, filePathLabel);
+
+                Button openButton = new Button("Open File");
+                openButton.getStyleClass().addAll("button", "button-secondary");
+                openButton.setOnAction(e -> openSubmissionFile(file));
+
+                Button openFolderButton = new Button("Show in Folder");
+                openFolderButton.getStyleClass().addAll("button", "button-secondary");
+                openFolderButton.setOnAction(e -> openFileLocation(file));
+
+                HBox buttonsBox = new HBox(8);
+                buttonsBox.getChildren().addAll(openButton, openFolderButton);
+
+                container.getChildren().addAll(fileInfo, buttonsBox);
+                HBox.setHgrow(fileInfo, Priority.ALWAYS);
+                setGraphic(container);
+                setText(null);
+            }
+        }
+    }
+
+    private void openSubmissionFile(FileRecord file) {
+        File targetFile = new File(file.filePath);
+        if (!targetFile.exists()) {
+            UiDialogs.error(window(), "File not found", "The file no longer exists: " + file.filePath);
+            LOGGER.warning("File not found: " + file.filePath);
+            return;
+        }
+
+        try {
+            Desktop.getDesktop().open(targetFile);
+            LOGGER.info("Opened file: " + file.filePath);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to open file: " + e.getMessage());
+            UiDialogs.error(window(), "Error", "Could not open file: " + e.getMessage());
+        }
+    }
+
+    private void openFileLocation(FileRecord file) {
+        File targetFile = new File(file.filePath);
+        File parentDir = targetFile.getParentFile();
+
+        if (parentDir == null || !parentDir.exists()) {
+            UiDialogs.error(window(), "Folder not found", "The folder no longer exists.");
+            LOGGER.warning("Parent directory not found: " + file.filePath);
+            return;
+        }
+
+        try {
+            Desktop.getDesktop().open(parentDir);
+            LOGGER.info("Opened folder: " + parentDir.getAbsolutePath());
+        } catch (Exception e) {
+            LOGGER.severe("Failed to open folder: " + e.getMessage());
+            UiDialogs.error(window(), "Error", "Could not open folder: " + e.getMessage());
         }
     }
 

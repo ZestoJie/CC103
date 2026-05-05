@@ -409,6 +409,7 @@ public class ClassDetailController {
                    + "FROM class_tasks ct "
                    + "JOIN users u ON u.id IN (SELECT user_id FROM user_classes WHERE class_id = ct.class_id) "
                    + "WHERE ct.id = ? "
+                   + "AND u.id != ct.owner_id "
                    + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
 
         try (PreparedStatement assignStmt = conn.prepareStatement(sql)) {

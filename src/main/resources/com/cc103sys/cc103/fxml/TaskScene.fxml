@@ -39,7 +39,7 @@
                     </children>
                 </VBox>
 
-                <VBox spacing="12" styleClass="card">
+                <VBox fx:id="classFilterSection" spacing="12" styleClass="card">
                     <children>
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <children>
@@ -50,14 +50,14 @@
                     </children>
                 </VBox>
 
-                <VBox spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
+                <VBox fx:id="filteredTasksSection" spacing="12" VBox.vgrow="ALWAYS" styleClass="card">
                     <children>
                         <Label text="Filtered Tasks" styleClass="heading-3" />
                         <ListView fx:id="filteredTaskList" VBox.vgrow="ALWAYS" />
                     </children>
                 </VBox>
 
-                <HBox spacing="10">
+                <HBox fx:id="actionControls" spacing="10">
                     <children>
                         <Button text="Mark Done" onAction="#handleMarkDone" HBox.hgrow="ALWAYS"/>
                         <Button text="Delete Task" onAction="#handleDeleteTask" HBox.hgrow="ALWAYS" styleClass="button-danger"/>

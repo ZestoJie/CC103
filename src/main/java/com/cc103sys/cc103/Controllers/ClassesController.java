@@ -267,6 +267,7 @@ public class ClassesController {
                    + "JOIN users u ON u.id = ? "
                    + "WHERE ct.class_id = ? "
                    + "AND ct.due_date >= CURDATE() "
+                   + "AND u.id != ct.owner_id "
                    + "AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.class_task_id = ct.id AND t.user_id = u.id)";
 
         try (Connection conn = DBUtil.getConnection();

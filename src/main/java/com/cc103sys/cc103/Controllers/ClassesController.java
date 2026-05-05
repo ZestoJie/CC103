@@ -424,29 +424,24 @@ public class ClassesController {
                 setText(item.getClassName());
                 javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(5);
                 
+                Button viewBtn = new Button("View Class");
+                viewBtn.getStyleClass().addAll("button", "button-success");
+                final Classes classItem = item;
+                viewBtn.setOnAction(e -> {
+                    Session.setCurrentClassId(classItem.getId());
+                    Navigator.navigateTo("ClassDetail");
+                });
+                
                 if (isOwner) {
-                    Button viewBtn = new Button("Open Class");
                     Button deleteBtn = new Button("Delete");
-                    
-                    viewBtn.getStyleClass().addAll("button", "button-success");
                     deleteBtn.getStyleClass().addAll("button", "button-danger");
-
-                    final Classes classItem = item;
-                    viewBtn.setOnAction(e -> {
-                        Session.setCurrentClassId(classItem.getId());
-                        Navigator.navigateTo("ClassDetail");
-                    });
                     deleteBtn.setOnAction(e -> deleteClass(classItem.getId()));
-                    
                     buttonBox.getChildren().addAll(viewBtn, deleteBtn);
                 } else {
                     Button leaveBtn = new Button("Leave Class");
                     leaveBtn.getStyleClass().addAll("button", "button-secondary");
-                    
-                    final Classes classItem = item;
                     leaveBtn.setOnAction(e -> leaveClass(classItem.getId()));
-                    
-                    buttonBox.getChildren().add(leaveBtn);
+                    buttonBox.getChildren().addAll(viewBtn, leaveBtn);
                 }
 
                 setGraphic(buttonBox);

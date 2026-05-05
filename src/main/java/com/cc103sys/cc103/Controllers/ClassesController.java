@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -222,7 +223,7 @@ public class ClassesController {
         ClipboardContent content = new ClipboardContent();
         content.putString(code);
         clipboard.setContent(content);
-        LOGGER.info("Copied class code to clipboard: " + code);
+        LOGGER.log(Level.INFO, "Copied class code to clipboard: {0}", code);
         UiDialogs.info(window(), "Copied", "Join code copied to clipboard.");
     }
 

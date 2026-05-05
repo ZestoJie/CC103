@@ -18,8 +18,13 @@ public class Classes {
     }
 
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    
     public String getClassName() { return className; }
+    public void setClassName(String className) { this.className = className; }
+    
     public Integer getOwnerId() { return ownerId; }
+    public void setOwnerId(Integer ownerId) { this.ownerId = ownerId; }
 
     @Override
     public String toString() {

@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class TaskSubmission {
 
-    private int id;
-    private int classTaskId;
-    private int userId;
+    private final int id;
+    private final int classTaskId;
+    private final int userId;
     private String submissionStatus;
-    private LocalDateTime submittedAt;
+    private final LocalDateTime submittedAt;
 
     public TaskSubmission(int id, int classTaskId, int userId, String submissionStatus, LocalDateTime submittedAt) {
         this.id = id;

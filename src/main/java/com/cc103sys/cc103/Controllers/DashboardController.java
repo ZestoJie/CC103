@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -60,7 +61,8 @@ public class DashboardController implements TimerService.TimerListener {
     @FXML private RadioButton studyModeRadio;
     @FXML private RadioButton breakModeRadio;
     @FXML private CheckBox xpActiveCheckbox;
-    @FXML private TextField timerSubjectField;
+    @FXML@SuppressWarnings("unused")
+    private TextField timerSubjectField;
     @FXML private Label totalTasksLabel;
     @FXML private Label completedTasksLabel;
     @FXML private Label pendingTasksLabel;
@@ -121,7 +123,7 @@ public class DashboardController implements TimerService.TimerListener {
             registerLifecycleHooks();
             LOGGER.info("Dashboard initialized successfully");
         } catch (Exception e) {
-            LOGGER.severe("Dashboard initialization error: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Dashboard initialization error: {0}", e.getMessage());
         }
     }
 
@@ -174,7 +176,10 @@ public class DashboardController implements TimerService.TimerListener {
         
         refreshTimeline = new Timeline(
             new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> {
-                loadTasks();
+                try {
+                    loadTasks();
+                } catch (Exception e1) {
+                }
                 if (Session.isHost()) {
                     loadPendingApprovals();
                 }
@@ -182,7 +187,7 @@ public class DashboardController implements TimerService.TimerListener {
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
-        LOGGER.info("Dashboard auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
+        LOGGER.log(Level.INFO, "Dashboard auto-refresh timeline started (interval: {0} seconds)", REFRESH_INTERVAL_SECONDS);
     }
 
     private void stopAutoRefresh() {
@@ -294,7 +299,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
     }
 
-    private void loadTasks() {
+    private void loadTasks() throws Exception {
         tasks.clear();
 
         try {
@@ -332,9 +337,9 @@ public class DashboardController implements TimerService.TimerListener {
             if (totalTasksLabel != null) {
                 updateQuickStats();
             }
-            LOGGER.info("Loaded " + tasks.size() + " tasks");
-        } catch (Exception e) {
-            LOGGER.severe("Failed to load tasks: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Loaded {0} tasks", tasks.size());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to load tasks: {0}", e.getMessage());
         }
         if (noTaskLabel != null) {
             boolean empty = tasks.isEmpty();
@@ -370,7 +375,7 @@ public class DashboardController implements TimerService.TimerListener {
                 pendingTasksLabel.setText("Pending Tasks: " + pending);
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to update quick stats: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to update quick stats: {0}", e.getMessage());
         }
     }
 
@@ -404,9 +409,9 @@ public class DashboardController implements TimerService.TimerListener {
                     loadLeaderboardPreviewForClass();
                 }
             }
-            LOGGER.info("Loaded " + userClasses.size() + " user classes");
+            LOGGER.info(String.format("Loaded %d user classes", userClasses.size()));
         } catch (Exception e) {
-            LOGGER.severe("Failed to load user classes: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load user classes: {0}", e.getMessage());
         }
 
     }
@@ -431,7 +436,7 @@ public class DashboardController implements TimerService.TimerListener {
                 try {
                     int classTaskId = createClassTask(selectedClass.getId(), taskName, date);
                     if (classTaskId <= 0) {
-                        LOGGER.severe("Failed to create class task for " + taskName);
+                        LOGGER.log(Level.SEVERE, "Failed to create class task for {0}", taskName);
                         return;
                     }
 
@@ -443,12 +448,12 @@ public class DashboardController implements TimerService.TimerListener {
                     try {
                         playAddTaskAnimation();
                     } catch (Exception e) {
-                        LOGGER.warning("Error playing animation: " + e.getMessage());
+                        LOGGER.log(Level.WARNING, "Error playing animation: {0}", e.getMessage());
                     }
-                    LOGGER.info("Class task created and assigned: " + taskName);
+                    LOGGER.log(Level.INFO, "Class task created and assigned: {0}", taskName);
                     return;
                 } catch (SQLException e) {
-                    LOGGER.severe("Failed to create task: " + e.getMessage());
+                    LOGGER.log(Level.SEVERE, "Failed to create task: {0}", e.getMessage());
                     return;
                 }
             }
@@ -477,11 +482,11 @@ public class DashboardController implements TimerService.TimerListener {
             try {
                 playAddTaskAnimation();
             } catch (Exception e) {
-                LOGGER.warning("Error playing animation: " + e.getMessage());
+                LOGGER.log(Level.WARNING, "Error playing animation: {0}", e.getMessage());
             }
-            LOGGER.info("Personal task created: " + taskName);
+            LOGGER.log(Level.INFO, "Personal task created: {0}", taskName);
         } catch (SQLException e) {
-            LOGGER.severe("Failed to create personal task: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to create personal task: {0}", e.getMessage());
         }
     }
 
@@ -505,10 +510,10 @@ public class DashboardController implements TimerService.TimerListener {
                 stmt.setInt(1, selected.getId());
                 stmt.executeUpdate();
                 loadTasks();
-                LOGGER.info("Task deleted: " + selected.getTaskName());
+                LOGGER.log(Level.INFO, "Task deleted: {0}", selected.getTaskName());
             }
         } catch (SQLException e) {
-            LOGGER.severe("Failed to delete task: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to delete task: {0}", e.getMessage());
         }
     }
 
@@ -526,7 +531,7 @@ public class DashboardController implements TimerService.TimerListener {
         }
 
         if (isTaskAlreadyCompleted(selected.getStatus())) {
-            LOGGER.warning("Task is already completed: " + selected.getTaskName());
+            LOGGER.log(Level.WARNING, "Task is already completed: {0}", selected.getTaskName());
             return;
         }
 
@@ -551,9 +556,9 @@ public class DashboardController implements TimerService.TimerListener {
 
             loadTasks();
             loadLeaderboardPreviewForClass();
-            LOGGER.info("Task completed: " + selected.getTaskName() + " and awarded " + points + " points");
+            LOGGER.log(Level.INFO, "Task completed: {0} and awarded {1} points", new Object[]{selected.getTaskName(), points});
         } catch (SQLException e) {
-            LOGGER.severe("Failed to update task status: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to update task status: {0}", e.getMessage());
         }
     }
 
@@ -593,9 +598,9 @@ public class DashboardController implements TimerService.TimerListener {
             if (approvalsCountLabel != null) {
                 approvalsCountLabel.setText("Pending: " + pendingApprovals.size());
             }
-            LOGGER.info("Loaded " + pendingApprovals.size() + " pending approvals");
+            LOGGER.log(Level.INFO, "Loaded {0} pending approvals", pendingApprovals.size());
         } catch (Exception e) {
-            LOGGER.severe("Failed to load pending approvals: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load pending approvals: {0}", e.getMessage());
         }
     }
     
@@ -615,9 +620,10 @@ public class DashboardController implements TimerService.TimerListener {
         
         try (Connection conn = DBUtil.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+                Integer userId = getCurrentUserId();
                 stmt.setDate(1, Date.valueOf(LocalDate.now()));
                 stmt.setInt(2, points);
-                stmt.setInt(3, getCurrentUserId() != null ? getCurrentUserId() : 0);
+                stmt.setInt(3, userId != null ? userId : 0);
                 stmt.setDate(4, Date.valueOf(LocalDate.now()));
                 stmt.setInt(5, task.getId());
                 stmt.executeUpdate();
@@ -631,9 +637,9 @@ public class DashboardController implements TimerService.TimerListener {
             
             loadPendingApprovals();
             loadTasks();
-            LOGGER.info("Task approved and " + points + " points awarded to " + task.getUsername());
+            LOGGER.log(Level.INFO, "Task approved and {0} points awarded to {1}", new Object[]{points, task.getUsername()});
         } catch (Exception e) {
-            LOGGER.severe("Failed to approve task: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to approve task: {0}", e.getMessage());
         }
     }
     
@@ -651,16 +657,16 @@ public class DashboardController implements TimerService.TimerListener {
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(updateSql)) {
-            stmt.setInt(1, getCurrentUserId() != null ? getCurrentUserId() : 0);
+            stmt.setInt(1, getCurrentUserId());
             stmt.setDate(2, Date.valueOf(LocalDate.now()));
             stmt.setInt(3, task.getId());
             stmt.executeUpdate();
             
             loadPendingApprovals();
             loadTasks();
-            LOGGER.info("Task rejected: " + task.getTaskName());
+            LOGGER.log(Level.INFO, "Task rejected: {0}", task.getTaskName());
         } catch (Exception e) {
-            LOGGER.severe("Failed to reject task: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to reject task: {0}", e.getMessage());
         }
     }
 
@@ -735,7 +741,7 @@ public class DashboardController implements TimerService.TimerListener {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to check class owner: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to check class owner: {0}", e.getMessage());
             return false;
         }
 
@@ -753,7 +759,7 @@ public class DashboardController implements TimerService.TimerListener {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to get current user id: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to get current user id: {0}", e.getMessage());
         }
         return null;
     }
@@ -783,7 +789,7 @@ public class DashboardController implements TimerService.TimerListener {
         return -1;
     }
 
-    private void assignClassTaskToMembers(int classTaskId, int classId) {
+    private void assignClassTaskToMembers(int classTaskId, @SuppressWarnings("unused") int classId) {
         String sql = "INSERT INTO tasks (username, user_id, task_name, task_date, status, class_id, class_task_id, created_by) "
                    + "SELECT u.username, u.id, ct.task_name, ct.due_date, 'Pending', ct.class_id, ct.id, ct.owner_id "
                    + "FROM class_tasks ct "
@@ -798,7 +804,7 @@ public class DashboardController implements TimerService.TimerListener {
             stmt.setInt(1, classTaskId);
             stmt.executeUpdate();
         } catch (Exception e) {
-            LOGGER.severe("Failed to assign class task to members: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to assign class task to members: {0}", e.getMessage());
         }
     }
 
@@ -837,7 +843,7 @@ public class DashboardController implements TimerService.TimerListener {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.severe("Failed to load leaderboard preview: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load leaderboard preview: {0}", e.getMessage());
         }
     }
 
@@ -853,7 +859,7 @@ public class DashboardController implements TimerService.TimerListener {
             Session.setCurrentClassId(selectedClass.getId());
             Navigator.switchScene("Leaderboard");
         } catch (Exception e) {
-            LOGGER.severe("Failed to open leaderboard: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to open leaderboard: {0}", e.getMessage());
         }
     }
 
@@ -881,9 +887,9 @@ public class DashboardController implements TimerService.TimerListener {
             if (timerStartButton != null) {
                 timerStartButton.setText("Restart");
             }
-            LOGGER.info("Timer started: " + seconds + " seconds");
+            LOGGER.log(Level.INFO, "Timer started: {0} seconds", seconds);
         } catch (Exception e) {
-            LOGGER.severe("Failed to start timer: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to start timer: {0}", e.getMessage());
         }
     }
 
@@ -958,7 +964,7 @@ public class DashboardController implements TimerService.TimerListener {
         try {
             Navigator.switchScene("Settings");
         } catch (Exception e) {
-            LOGGER.severe("Failed to navigate to Settings: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to navigate to Settings: {0}", e.getMessage());
         }
     }
 
@@ -968,7 +974,7 @@ public class DashboardController implements TimerService.TimerListener {
         try {
             LOGGER.info("Opening timer popup");
         } catch (Exception e) {
-            LOGGER.severe("Failed to open timer popup: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to open timer popup: {0}", e.getMessage());
         }
     }
 
@@ -1038,13 +1044,13 @@ public class DashboardController implements TimerService.TimerListener {
             stmt.executeUpdate();
             Session.setPoints(Session.getPoints() + points);
             refreshNavbarPoints();
-            LOGGER.info("Timer XP awarded: " + points);
+            LOGGER.log(Level.INFO, "Timer XP awarded: {0}", points);
         } catch (Exception e) {
-            LOGGER.severe("Failed to award timer XP: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to award timer XP: {0}", e.getMessage());
         }
     }
 
-    private void refreshNavbarPoints() {
+    private void refreshNavbarPoints() throws Exception {
         if (NavbarController.getInstance() != null) {
             NavbarController.getInstance().loadUserInfo();
         }

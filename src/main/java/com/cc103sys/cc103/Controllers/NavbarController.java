@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.cc103sys.cc103.DB.DBUtil;
 import com.cc103sys.cc103.Utils.Navigator;
@@ -52,7 +53,7 @@ public class NavbarController implements TimerService.TimerListener {
     private boolean disposed;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         instance = this;
         setupRoleBasedAccess();
         loadUserInfo();
@@ -88,7 +89,7 @@ public class NavbarController implements TimerService.TimerListener {
     private void setupRoleBasedAccess() {
     }
 
-    public void loadUserInfo() {
+    public void loadUserInfo() throws Exception {
         if (usernameLabel != null) {
             usernameLabel.setText(Session.getUsername() != null ? Session.getUsername() : "Unknown User");
         }
@@ -105,7 +106,7 @@ public class NavbarController implements TimerService.TimerListener {
         loadProfilePicture();
     }
 
-    private void loadProfilePicture() {
+    private void loadProfilePicture() throws Exception {
         try {
             Integer userId = getCurrentUserId();
             if (userId != null) {
@@ -129,7 +130,7 @@ public class NavbarController implements TimerService.TimerListener {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
         }
 
         try {

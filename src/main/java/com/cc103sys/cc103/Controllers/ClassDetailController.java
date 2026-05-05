@@ -33,7 +33,9 @@ import javafx.util.Duration;
 public class ClassDetailController {
 
     private static final Logger LOGGER = Logger.getLogger(ClassDetailController.class.getName());
+    @SuppressWarnings("unused")
     private static final int BASE_TASK_POINTS = 10;
+    @SuppressWarnings("unused")
     private static final int LATE_TASK_POINTS = 5;
     private static final int REFRESH_INTERVAL_SECONDS = 5;
 
@@ -54,8 +56,10 @@ public class ClassDetailController {
     @FXML private DatePicker taskDueDatePicker;
     @FXML private Button submitTaskButton;
     @FXML private Button cancelEditButton;
-    @FXML private Button editTaskButton;
-    @FXML private Button deleteTaskButton;
+    @FXML@SuppressWarnings("unused")
+    private Button editTaskButton;
+    @FXML@SuppressWarnings("unused")
+    private Button deleteTaskButton;
     private int currentClassId = -1;
     private ClassTask editingTask = null;
     private final ObservableList<ClassTask> classTasks = FXCollections.observableArrayList();
@@ -131,7 +135,7 @@ public class ClassDetailController {
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
-        LOGGER.info("Class detail auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
+        LOGGER.info(() -> "Class detail auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
     }
 
     private void stopAutoRefresh() {
@@ -181,7 +185,7 @@ public class ClassDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load class details: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load class details: " + e.getMessage());
         }
 
         if (breadcrumbLabel != null && classTitleLabel != null) {
@@ -237,9 +241,9 @@ public class ClassDetailController {
                     ));
                 }
             }
-            LOGGER.info("Loaded " + classTasks.size() + " class tasks");
+            LOGGER.info(() -> "Loaded " + classTasks.size() + " class tasks");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load class tasks: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load class tasks: " + e.getMessage());
         }
         refreshClassMetrics();
     }
@@ -365,7 +369,7 @@ public class ClassDetailController {
 
             LOGGER.info("Class task created successfully");
         } catch (Exception e) {
-            LOGGER.severe("Failed to create class task: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to create class task: " + e.getMessage());
             UiDialogs.error(window(), "Could not create task", e.getMessage());
         }
     }
@@ -383,7 +387,7 @@ public class ClassDetailController {
 
             LOGGER.info("Class task updated successfully");
         } catch (Exception e) {
-            LOGGER.severe("Failed to update class task: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to update class task: " + e.getMessage());
         }
     }
 
@@ -395,7 +399,7 @@ public class ClassDetailController {
             stmt.setInt(2, currentClassId);
             stmt.executeUpdate();
         } catch (Exception e) {
-            LOGGER.severe("Failed to delete class task: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to delete class task: " + e.getMessage());
         }
     }
 
@@ -446,9 +450,9 @@ public class ClassDetailController {
                     participantsListView.getItems().add(rs.getString("username"));
                 }
             }
-            LOGGER.info("Loaded " + participantsListView.getItems().size() + " participants");
+            LOGGER.info(() -> "Loaded " + participantsListView.getItems().size() + " participants");
         } catch (Exception e) {
-            LOGGER.severe("Failed to load class participants: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to load class participants: " + e.getMessage());
         }
         refreshClassMetrics();
     }
@@ -464,7 +468,7 @@ public class ClassDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to get current user ID: " + e.getMessage());
+            LOGGER.severe(() -> "Failed to get current user ID: " + e.getMessage());
         }
         return null;
     }

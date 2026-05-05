@@ -210,6 +210,6 @@ public class TimerService {
 
     public interface TimerListener {
         void onTimerUpdated(int remainingSeconds, boolean running, boolean paused);
-        void onTimerCompleted();
+        void onTimerCompleted() throws Exception;
     }
 }

@@ -1,13 +1,16 @@
 package com.cc103sys.cc103.Controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -47,7 +50,8 @@ public class TaskDetailController {
     @FXML private TextArea taskDescriptionArea;
     @FXML private Button uploadFileButton;
     @FXML private Button markDoneButton;
-    @FXML private Button backButton;
+    @FXML@SuppressWarnings("unused")
+    private Button backButton;
     @FXML private ListView<TaskAttachment> attachmentsListView;
     @FXML private Label submissionStatusLabel;
 
@@ -56,7 +60,7 @@ public class TaskDetailController {
     private Integer currentTaskId;
     private Integer currentUserId;
     private Integer currentSubmissionId;
-    private ObservableList<TaskAttachment> attachments = FXCollections.observableArrayList();
+    private final ObservableList<TaskAttachment> attachments = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
     private boolean disposed;
 
@@ -114,7 +118,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to get user ID: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to get user ID: {0}", e.getMessage());
         }
 
         File uploadsDir = new File(TASK_UPLOADS_DIR);
@@ -150,7 +154,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load task details: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load task details: {0}", e.getMessage());
         }
     }
 
@@ -174,7 +178,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load class name: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load class name: {0}", e.getMessage());
         }
     }
 
@@ -194,7 +198,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load submission data: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load submission data: {0}", e.getMessage());
         }
     }
 
@@ -214,7 +218,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to create submission: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to create submission: {0}", e.getMessage());
         }
     }
 
@@ -236,9 +240,9 @@ public class TaskDetailController {
                     ));
                 }
             }
-            LOGGER.info("Loaded " + attachments.size() + " attachments");
+            LOGGER.log(Level.INFO, "Loaded {0} attachments", attachments.size());
         } catch (Exception e) {
-            LOGGER.severe("Failed to load attachments: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load attachments: {0}", e.getMessage());
         }
     }
 
@@ -301,7 +305,7 @@ public class TaskDetailController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to update submission status: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to update submission status: {0}", e.getMessage());
         }
     }
 
@@ -336,6 +340,7 @@ public class TaskDetailController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleUploadFile() {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -370,8 +375,8 @@ public class TaskDetailController {
                 UiDialogs.info(window(), "File uploaded", "Your file was added to this submission.");
                 loadAttachments();
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to upload file: " + e.getMessage());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to upload file: {0}", e.getMessage());
             UiDialogs.error(window(), "Upload failed", e.getMessage());
         }
     }
@@ -384,14 +389,14 @@ public class TaskDetailController {
             stmt.setString(2, fileName);
             stmt.setString(3, filePath);
             stmt.executeUpdate();
-            LOGGER.info("Attachment saved to database: " + fileName);
+            LOGGER.log(Level.INFO, "Attachment saved to database: {0}", fileName);
         } catch (Exception e) {
-            LOGGER.severe("Failed to save attachment to database: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to save attachment to database: {0}", e.getMessage());
         }
     }
 
     @FXML
-    private void handleRemoveAttachment() {
+    private void handleRemoveAttachment() throws Exception {
         TaskAttachment selected = attachmentsListView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             UiDialogs.warn(window(), "Nothing selected", "Select a file to remove.");
@@ -411,17 +416,18 @@ public class TaskDetailController {
                 file.delete();
             }
 
-            LOGGER.info("Attachment removed: " + selected.getFileName());
+            LOGGER.log(Level.INFO, "Attachment removed: {0}", selected.getFileName());
             loadAttachments();
             UiDialogs.info(window(), "Removed", "The file was removed from your submission.");
-        } catch (Exception e) {
-            LOGGER.severe("Failed to remove attachment: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to remove attachment: {0}", e.getMessage());
             UiDialogs.error(window(), "Removal failed", e.getMessage());
         }
     }
 
     @FXML
-    private void handleMarkDone() {
+    @SuppressWarnings("unused")
+    private void handleMarkDone() throws Exception {
         if (!UiDialogs.confirm(window(), "Submit this task?",
             "Submit for approval? While your submission is still a draft you can add or remove files. After you submit, your instructor will review it and you cannot change files until they act on it.")) {
             return;
@@ -446,13 +452,14 @@ public class TaskDetailController {
             LOGGER.info("Task marked as done - status changed to For Approval");
             updateSubmissionStatus();
             UiDialogs.info(window(), "Task submitted", "Your task was submitted successfully and is waiting for approval.");
-        } catch (Exception e) {
-            LOGGER.severe("Failed to mark task as done: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to mark task as done: {0}", e.getMessage());
             UiDialogs.error(window(), "Submission failed", e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleGoBack() {
         stopAutoRefresh();
         if (currentClassId != null && currentClassId > 0) {
@@ -502,7 +509,10 @@ public class TaskDetailController {
                 removeBtn.getStyleClass().addAll("button", "button-danger");
                 removeBtn.setOnAction(e -> {
                     attachmentsListView.getSelectionModel().select(item);
-                    handleRemoveAttachment();
+                    try {
+                        handleRemoveAttachment();
+                    } catch (Exception e1) {
+                    }
                 });
 
                 HBox.setHgrow(fileLabel, Priority.ALWAYS);

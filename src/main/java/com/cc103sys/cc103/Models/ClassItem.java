@@ -1,8 +1,8 @@
 package com.cc103sys.cc103.Models;
 
 public class ClassItem {
-    private int classId;
-    private String className;
+    private final int classId;
+    private final String className;
 
     public ClassItem(int classId, String className) {
         this.classId = classId;

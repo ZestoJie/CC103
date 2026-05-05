@@ -2,11 +2,14 @@ package com.cc103sys.cc103.Controllers;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -53,7 +56,7 @@ public class TaskReviewController {
     private ClassTask currentTask;
     private Integer currentClassId;
     private Integer currentTaskId;
-    private ObservableList<SubmissionRecord> submissions = FXCollections.observableArrayList();
+    private final ObservableList<SubmissionRecord> submissions = FXCollections.observableArrayList();
     private Timeline refreshTimeline;
     private boolean disposed;
 
@@ -205,7 +208,7 @@ public class TaskReviewController {
         submissionsListView.setCellFactory(lv -> new SubmissionListCell());
     }
 
-    private void approveSubmission(SubmissionRecord submission) {
+    private void approveSubmission(SubmissionRecord submission) throws Exception {
         if (!UiDialogs.confirm(window(), "Approve this submission?",
             "Approve work from " + submission.username + "? Points will be awarded and the task will be marked done.")) {
             return;
@@ -260,7 +263,7 @@ public class TaskReviewController {
 
             LOGGER.info(String.format("Submission from %s approved", submission.username));
             loadAllSubmissions();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(String.format("Failed to approve submission: %s", e.getMessage()));
             UiDialogs.error(window(), "Approval failed", e.getMessage());
         }
@@ -280,7 +283,7 @@ public class TaskReviewController {
         return BASE_TASK_POINTS * multiplier;
     }
 
-    private void rejectSubmission(SubmissionRecord submission) {
+    private void rejectSubmission(SubmissionRecord submission) throws Exception {
         if (!UiDialogs.confirm(window(), "Reject this submission?",
             "Reject work from " + submission.username + "? They can update files and submit again.")) {
             return;
@@ -296,7 +299,7 @@ public class TaskReviewController {
             LOGGER.info(String.format("Submission from %s rejected", submission.username));
             loadAllSubmissions();
             UiDialogs.info(window(), "Rejected", "Submission rejected — the participant can resubmit.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.severe(String.format("Failed to reject submission: %s", e.getMessage()));
             UiDialogs.error(window(), "Rejection failed", e.getMessage());
         }
@@ -351,7 +354,7 @@ public class TaskReviewController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Failed to load submission files: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to load submission files: {0}", e.getMessage());
             UiDialogs.error(window(), "Error", "Failed to load files: " + e.getMessage());
             return;
         }
@@ -377,6 +380,7 @@ public class TaskReviewController {
     }
 
     private static class FileRecord {
+        @SuppressWarnings("unused")
         public int id;
         public String fileName;
         public String filePath;
@@ -434,15 +438,15 @@ public class TaskReviewController {
         File targetFile = new File(file.filePath);
         if (!targetFile.exists()) {
             UiDialogs.error(window(), "File not found", "The file no longer exists: " + file.filePath);
-            LOGGER.warning("File not found: " + file.filePath);
+            LOGGER.log(Level.WARNING, "File not found: {0}", file.filePath);
             return;
         }
 
         try {
             Desktop.getDesktop().open(targetFile);
-            LOGGER.info("Opened file: " + file.filePath);
-        } catch (Exception e) {
-            LOGGER.severe("Failed to open file: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Opened file: {0}", file.filePath);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to open file: {0}", e.getMessage());
             UiDialogs.error(window(), "Error", "Could not open file: " + e.getMessage());
         }
     }
@@ -453,15 +457,15 @@ public class TaskReviewController {
 
         if (parentDir == null || !parentDir.exists()) {
             UiDialogs.error(window(), "Folder not found", "The folder no longer exists.");
-            LOGGER.warning("Parent directory not found: " + file.filePath);
+            LOGGER.log(Level.WARNING, "Parent directory not found: {0}", file.filePath);
             return;
         }
 
         try {
             Desktop.getDesktop().open(parentDir);
-            LOGGER.info("Opened folder: " + parentDir.getAbsolutePath());
-        } catch (Exception e) {
-            LOGGER.severe("Failed to open folder: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Opened folder: {0}", parentDir.getAbsolutePath());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to open folder: {0}", e.getMessage());
             UiDialogs.error(window(), "Error", "Could not open folder: " + e.getMessage());
         }
     }
@@ -484,6 +488,7 @@ public class TaskReviewController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleGoBack() {
         stopAutoRefresh();
         if (currentClassId != null && currentClassId > 0) {
@@ -570,11 +575,21 @@ public class TaskReviewController {
                 if (!"APPROVED".equals(submission.status) && !"REJECTED".equals(submission.status)) {
                     Button approveButton = new Button("Approve");
                     approveButton.getStyleClass().addAll("button", "button-success");
-                    approveButton.setOnAction(e -> approveSubmission(submission));
+                    approveButton.setOnAction(e -> {
+                        try {
+                            approveSubmission(submission);
+                        } catch (Exception e1) {
+                        }
+                    });
 
                     Button rejectButton = new Button("Reject");
                     rejectButton.getStyleClass().addAll("button", "button-danger");
-                    rejectButton.setOnAction(e -> rejectSubmission(submission));
+                    rejectButton.setOnAction(e -> {
+                        try {
+                            rejectSubmission(submission);
+                        } catch (Exception e1) {
+                        }
+                    });
 
                     buttonsBox.getChildren().addAll(viewButton, approveButton, rejectButton);
                 } else {

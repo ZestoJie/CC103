@@ -1,12 +1,14 @@
 package com.cc103sys.cc103.Controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -15,7 +17,6 @@ import com.cc103sys.cc103.Utils.Session;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -32,12 +33,9 @@ public class SettingsController {
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
-    @FXML private CheckBox enableMusicToggle;
-    @FXML private CheckBox enableSFXToggle;
     @FXML private Button editFullNameButton;
     @FXML private Button editUsernameButton;
     @FXML private Button editEmailButton;
-    @FXML private Button changePasswordButton;
     @FXML private Button uploadPictureButton;
 
     private Integer currentUserId;
@@ -59,8 +57,8 @@ public class SettingsController {
             
             NavbarController.getInstance().setActive("settings");
             LOGGER.info("Settings initialized successfully");
-        } catch (Exception e) {
-            LOGGER.severe("Error initializing settings: " + e.getMessage());
+        } catch (IOException e) {
+            LOGGER.severe(String.format("Error initializing settings: %s", e.getMessage()));
             showAlert("Error", "Failed to initialize settings", e.getMessage());
         }
     }
@@ -98,7 +96,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Error loading user settings: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error loading user settings: {0}", e.getMessage());
         }
     }
 
@@ -113,7 +111,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warning("Error loading profile picture: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Error loading profile picture: {0}", e.getMessage());
             loadDefaultProfilePicture();
         }
     }
@@ -126,7 +124,7 @@ public class SettingsController {
                 profilePictureImageView.setStyle("-fx-border-radius: 50; -fx-background-radius: 50; -fx-border-color: #ddd; -fx-border-width: 2;");
             }
         } catch (Exception e) {
-            LOGGER.warning("Error loading default profile picture: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Error loading default profile picture: {0}", e.getMessage());
         }
     }
 
@@ -143,6 +141,7 @@ public class SettingsController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleEditFullName() {
         if (!isEditingFullName) {
             if (fullNameField != null) {
@@ -176,6 +175,7 @@ public class SettingsController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleEditUsername() {
         if (!isEditingUsername) {
             if (usernameField != null) {
@@ -217,6 +217,7 @@ public class SettingsController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleEditEmail() {
         if (!isEditingEmail) {
             if (emailField != null) {
@@ -250,6 +251,7 @@ public class SettingsController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleChangePassword() {
         try {
             javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
@@ -338,6 +340,7 @@ public class SettingsController {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleUploadPicture() {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -383,7 +386,7 @@ public class SettingsController {
                     showAlert("Error", "Failed to Update Picture", e.getMessage());
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             showAlert("Error", "Error Selecting File", e.getMessage());
         }
     }
@@ -400,7 +403,7 @@ public class SettingsController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.severe("Error getting user ID: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error getting user ID: {0}", e.getMessage());
         }
         return null;
     }

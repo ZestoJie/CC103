@@ -1,13 +1,12 @@
 package com.cc103sys.cc103.Controllers;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -38,6 +37,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+@SuppressWarnings("unused")
 public class TaskController implements TimerService.TimerListener {
     private static final Logger LOGGER = Logger.getLogger(TaskController.class.getName());
     private static final int BASE_TASK_POINTS = 10;
@@ -45,6 +45,7 @@ public class TaskController implements TimerService.TimerListener {
     private static final int REFRESH_INTERVAL_SECONDS = 5;
 
     private TimerService timerService;
+    @SuppressWarnings("unused")
     private Task timerTask;
 
     @FXML
@@ -120,7 +121,7 @@ public class TaskController implements TimerService.TimerListener {
     }
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         timerService = TimerService.getInstance();
         timerService.removeTimerListener(this);
         timerService.addTimerListener(this);
@@ -188,13 +189,19 @@ public class TaskController implements TimerService.TimerListener {
         
         refreshTimeline = new Timeline(
             new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> {
-                loadAllClassTasks();
-                loadFilteredTasks();
+                try {
+                    loadAllClassTasks();
+                } catch (Exception e1) {
+                }
+                try {
+                    loadFilteredTasks();
+                } catch (Exception e1) {
+                }
             })
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
-        LOGGER.info("Auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
+        LOGGER.info(() -> "Auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
     }
 
     private void stopAutoRefresh() {
@@ -423,13 +430,14 @@ public class TaskController implements TimerService.TimerListener {
         return Session.getPoints();
     }
 
-    private void refreshNavbarUserInfo() {
+    private void refreshNavbarUserInfo() throws Exception {
         NavbarController navbar = NavbarController.getInstance();
         if (navbar != null) {
             navbar.loadUserInfo();
         }
     }
 
+    @SuppressWarnings("unused")
     private int calculateTaskCompletionPoints(LocalDate dueDate) {
         if (dueDate == null) {
             return BASE_TASK_POINTS;
@@ -441,7 +449,7 @@ public class TaskController implements TimerService.TimerListener {
         return BASE_TASK_POINTS + (int) Math.max(0, daysBefore) * 2;
     }
 
-    private void reloadTaskLists() {
+    private void reloadTaskLists() throws Exception {
         loadAllClassTasks();
         loadFilteredTasks();
     }
@@ -464,7 +472,12 @@ public class TaskController implements TimerService.TimerListener {
 
             if (classFilterComboBox != null) {
                 classFilterComboBox.setItems(userClasses);
-                classFilterComboBox.setOnAction(e -> loadFilteredTasks());
+                classFilterComboBox.setOnAction(e -> {
+                    try {
+                        loadFilteredTasks();
+                    } catch (Exception e1) {
+                    }
+                });
                 if (!userClasses.isEmpty()) {
                     classFilterComboBox.getSelectionModel().selectFirst();
                 }
@@ -476,17 +489,18 @@ public class TaskController implements TimerService.TimerListener {
         }
     }
 
-    private void loadAllClassTasks() {
+    @SuppressWarnings("unused")
+    private void loadAllClassTasks() throws Exception {
         allTasks.clear();
         
         try {
             Integer userId = getCurrentUserId();
             if (userId == null) {
-                LOGGER.warning("Could not determine current user ID for user: " + Session.getUsername());
+                LOGGER.warning(() -> "Could not determine current user ID for user: " + Session.getUsername());
                 return;
             }
             
-            LOGGER.info("Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
+            LOGGER.info(() -> "Loading all tasks for user ID: " + userId + " (" + Session.getUsername() + ")");
             
             String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.description, t.class_id, t.class_task_id, COALESCE(c.class_name, '') as class_name "
                        + "FROM tasks t "
@@ -497,18 +511,8 @@ public class TaskController implements TimerService.TimerListener {
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
-                if (userId != null) {
-                    stmt.setInt(1, userId);
-                } else {
-                    stmt.setNull(1, Types.INTEGER);
-                }
+               
                 stmt.setString(2, Session.getUsername());
-                if (userId != null) {
-                    stmt.setInt(3, userId);
-                } else {
-                    stmt.setNull(3, Types.INTEGER);
-                }
-                LOGGER.info(() -> "Executing SQL: " + sql + " [userId=" + (userId != null ? userId : "NULL") + ", username=" + Session.getUsername() + "]");
                 try (ResultSet rs = stmt.executeQuery()) {
                     int count = 0;
                     while (rs.next()) {
@@ -528,15 +532,14 @@ public class TaskController implements TimerService.TimerListener {
                             Session.getUsername()
                         );
                         allTasks.add(task);
-                        LOGGER.info("Added task: " + rs.getString("task_name") + " (ID: " + rs.getInt("id") + ", ClassID: " + classId + ")");
+                        LOGGER.log(Level.INFO, "Added task: {0} (ID: {1}, ClassID: {2})", new Object[]{rs.getString("task_name"), rs.getInt("id"), classId});
                         count++;
                     }
-                    LOGGER.info("Total tasks loaded: " + count);
+                    LOGGER.info(String.format("Total tasks loaded: %d", count));
                 }
             }
-        } catch (Exception e) {
-            LOGGER.severe("Failed to load tasks: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOGGER.severe(() -> "Failed to load tasks: " + e.getMessage());
         }
     }
 
@@ -545,7 +548,8 @@ public class TaskController implements TimerService.TimerListener {
         return String.format("%s - %s%s (%s)", task.getTaskName(), task.getStatus(), classSuffix, task.getDate());
     }
 
-    private void loadFilteredTasks() {
+    @SuppressWarnings("unused")
+    private void loadFilteredTasks() throws Exception {
         filteredTasks.clear();
         Classes selected = classFilterComboBox == null ? null : classFilterComboBox.getValue();
         if (selected == null) {
@@ -567,18 +571,8 @@ public class TaskController implements TimerService.TimerListener {
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
-                if (userId != null) {
-                    stmt.setInt(1, userId);
-                } else {
-                    stmt.setNull(1, Types.INTEGER);
-                }
                 stmt.setString(2, Session.getUsername());
                 stmt.setInt(3, selected.getId());
-                if (userId != null) {
-                    stmt.setInt(4, userId);
-                } else {
-                    stmt.setNull(4, Types.INTEGER);
-                }
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         filteredTasks.add(new Task(
@@ -596,8 +590,8 @@ public class TaskController implements TimerService.TimerListener {
                     }
                 }
             }
-            LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + (selected == null ? "none" : selected.getClassName()));
-        } catch (Exception e) {
+            LOGGER.info(() -> "Loaded " + filteredTasks.size() + " filtered tasks for class " + selected.getClassName());
+        } catch (SQLException e) {
             LOGGER.severe(() -> "Failed to load filtered tasks: " + e.getMessage());
         }
     }
@@ -714,7 +708,7 @@ public class TaskController implements TimerService.TimerListener {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warning("Failed to get current user ID: " + e.getMessage());
+            LOGGER.warning(() -> "Failed to get current user ID: " + e.getMessage());
         }
         return null;
     }
@@ -796,9 +790,9 @@ public class TaskController implements TimerService.TimerListener {
                 stmt.setString(3, Session.getUsername());
                 stmt.executeUpdate();
             }
-            LOGGER.info("Task notes saved for task: " + selected.getTaskName());
+            LOGGER.log(Level.INFO, "Task notes saved for task: {0}", selected.getTaskName());
         } catch (Exception e) {
-            LOGGER.severe("Failed to save task notes: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to save task notes: {0}", e.getMessage());
         }
     }
 
@@ -829,7 +823,7 @@ public class TaskController implements TimerService.TimerListener {
         if (selected == null) return;
 
         completeTask(selected);
-        LOGGER.info("Task submitted for approval: " + selected.getTaskName());
+        LOGGER.log(Level.INFO, "Task submitted for approval: {0}", selected.getTaskName());
     }
 
     @FXML
@@ -841,13 +835,14 @@ public class TaskController implements TimerService.TimerListener {
         if (selected == null) return;
 
         undoTaskCompletion(selected);
-        LOGGER.info("Task un-submitted: " + selected.getTaskName());
+        LOGGER.log(Level.INFO, "Task un-submitted: {0}", selected.getTaskName());
     }
 
     private void approveTask(Task task) {
         updateTaskStatus(task, "Done");
     }
 
+    @SuppressWarnings("unused")
     private void loadPendingApprovals() {
         if (pendingApprovalsList == null) return;
         
@@ -865,11 +860,6 @@ public class TaskController implements TimerService.TimerListener {
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (userId != null) {
-                stmt.setInt(1, userId);
-            } else {
-                stmt.setNull(1, Types.INTEGER);
-            }
             stmt.setString(2, Session.getUsername());
             
             try (ResultSet rs = stmt.executeQuery()) {
@@ -894,10 +884,12 @@ public class TaskController implements TimerService.TimerListener {
         pendingApprovalsList.setCellFactory(param -> createTaskListCell());
     }
 
+    @Override
     public void onTimerUpdated(int secondsRemaining, boolean running, boolean paused) {
     }
 
-    public void onTimerCompleted() {
+    @Override
+    public void onTimerCompleted() throws Exception {
         LOGGER.info("Timer completed for task");
         loadAllClassTasks();
         loadFilteredTasks();

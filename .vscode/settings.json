@@ -1,0 +1,11 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.debug.settings.onBuildFailureProceed": true,
+    "css.lint.vendorPrefix": "ignore",
+    "css.lint.unknownProperties": "ignore",
+    "scss.lint.vendorPrefix": "ignore",
+    "scss.lint.unknownProperties": "ignore",
+    "css.validate": false,
+    "scss.validate": false,
+    "less.validate": false
+}

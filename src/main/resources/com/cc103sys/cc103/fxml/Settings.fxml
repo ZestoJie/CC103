@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.SettingsController" style="-fx-background-color: #f8fafc;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+    <children>
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER"/>
+        
+        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fafc;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <children>
+                <Label text="Settings" styleClass="heading-1" />
+                
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-padding: 0;">
+                    <content>
+                        <VBox spacing="20">
+                            
+                            <VBox spacing="12" styleClass="card">
+                                <children>
+                                    <Label text="Account" styleClass="heading-3" />
+                                    
+                                    
+                                    <HBox spacing="20" alignment="TOP_LEFT">
+                                        <children>
+                                            <VBox alignment="CENTER" spacing="10">
+                                                <ImageView fx:id="profilePictureImageView" fitHeight="100" fitWidth="100" style="-fx-border-radius: 50; -fx-background-radius: 50;" />
+                                            </VBox>
+                                            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                                <children>
+                                                    <Button fx:id="uploadPictureButton" text="Upload Picture" onAction="#handleUploadPicture" />
+                                                    <Label text="Accepted formats: JPG, PNG. Max size: 5MB" styleClass="subtitle" wrapText="true" />
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                    
+                                    <Separator />
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Full Name" styleClass="caption" prefWidth="150" />
+                                            <TextField fx:id="fullNameField" HBox.hgrow="ALWAYS" />
+                                            <Button fx:id="editFullNameButton" text="Edit" onAction="#handleEditFullName" styleClass="button-secondary" />
+                                        </children>
+                                    </HBox>
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Username" styleClass="caption" prefWidth="150" />
+                                            <TextField fx:id="usernameField" HBox.hgrow="ALWAYS" />
+                                            <Button fx:id="editUsernameButton" text="Edit" onAction="#handleEditUsername" styleClass="button-secondary" />
+                                        </children>
+                                    </HBox>
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Email Address" styleClass="caption" prefWidth="150" />
+                                            <TextField fx:id="emailField" HBox.hgrow="ALWAYS" />
+                                            <Button fx:id="editEmailButton" text="Edit" onAction="#handleEditEmail" styleClass="button-secondary" />
+                                        </children>
+                                    </HBox>
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Password" styleClass="caption" prefWidth="150" />
+                                            <PasswordField fx:id="passwordField" HBox.hgrow="ALWAYS" promptText="●●●●●●●●" editable="false" />
+                                            <Button fx:id="changePasswordButton" text="Change" onAction="#handleChangePassword" styleClass="button-secondary" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                            
+                            
+                            <VBox spacing="12" styleClass="card">
+                                <children>
+                                    <Label text="Sounds" styleClass="heading-3" />
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Enable Music" styleClass="body" HBox.hgrow="ALWAYS" />
+                                            <CheckBox fx:id="enableMusicToggle" />
+                                        </children>
+                                    </HBox>
+                                    
+                                    
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Enable SFX" styleClass="body" HBox.hgrow="ALWAYS" />
+                                            <CheckBox fx:id="enableSFXToggle" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

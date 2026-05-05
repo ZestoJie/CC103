@@ -1,5 +1,6 @@
 package com.cc103sys.cc103.Controllers;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -183,7 +184,8 @@ public class TaskDetailController {
     }
 
     private void loadSubmissionData() {
-        String sql = "SELECT id FROM task_submissions WHERE class_task_id = ? AND user_id = ?";
+        String sql = "SELECT id FROM task_submissions WHERE class_task_id = ? AND user_id = ? "
+                   + "ORDER BY submitted_at DESC LIMIT 1";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, currentTaskId);
@@ -213,17 +215,41 @@ public class TaskDetailController {
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     currentSubmissionId = rs.getInt(1);
-                    loadAttachments();
-                    updateSubmissionStatus();
                 }
             }
+
+            if (currentSubmissionId == null) {
+                currentSubmissionId = findLatestSubmissionId(conn);
+            }
+            loadAttachments();
+            updateSubmissionStatus();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to create submission: {0}", e.getMessage());
         }
     }
 
+    private Integer findLatestSubmissionId(Connection conn) {
+        String sql = "SELECT id FROM task_submissions WHERE class_task_id = ? AND user_id = ? ORDER BY submitted_at DESC LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, currentTaskId);
+            stmt.setInt(2, currentUserId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to find fallback submission ID: {0}", e.getMessage());
+        }
+        return null;
+    }
+
     private void loadAttachments() {
         attachments.clear();
+        if (currentSubmissionId == null) {
+            LOGGER.info("No submission record exists yet for current user; attachment list will remain empty.");
+            return;
+        }
         String sql = "SELECT id, submission_id, file_name, file_path, uploaded_at FROM task_attachments WHERE submission_id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -339,6 +365,27 @@ public class TaskDetailController {
         attachmentsListView.setCellFactory(lv -> new AttachmentListCell());
     }
 
+    private void openAttachment(TaskAttachment attachment) {
+        if (attachment == null) {
+            return;
+        }
+        try {
+            File file = new File(attachment.getFilePath());
+            if (!file.exists() || !file.isFile()) {
+                UiDialogs.error(window(), "File not found", "The selected file is no longer available.");
+                return;
+            }
+            if (!Desktop.isDesktopSupported()) {
+                UiDialogs.error(window(), "Cannot open file", "Your system does not support opening files from the app.");
+                return;
+            }
+            Desktop.getDesktop().open(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to open attachment: {0}", e.getMessage());
+            UiDialogs.error(window(), "Unable to open file", e.getMessage());
+        }
+    }
+
     @FXML
     @SuppressWarnings("unused")
     private void handleUploadFile() {
@@ -356,6 +403,10 @@ public class TaskDetailController {
             File selectedFile = fileChooser.showOpenDialog(stage);
 
             if (selectedFile != null) {
+                if (currentSubmissionId == null) {
+                    createNewSubmission();
+                }
+
                 if (selectedFile.length() > 20 * 1024 * 1024) {
                     UiDialogs.error(window(), "File too large", "File size must not exceed 20MB.");
                     return;
@@ -382,6 +433,14 @@ public class TaskDetailController {
     }
 
     private void saveAttachmentToDatabase(String filePath, String fileName) {
+        if (currentSubmissionId == null) {
+            createNewSubmission();
+            if (currentSubmissionId == null) {
+                LOGGER.severe("Unable to save attachment: submission record could not be created.");
+                UiDialogs.error(window(), "Upload failed", "Could not establish a submission record for your file.");
+                return;
+            }
+        }
         String sql = "INSERT INTO task_attachments (submission_id, file_name, file_path) VALUES (?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -505,6 +564,10 @@ public class TaskDetailController {
                 Label fileLabel = new Label(item.getFileName());
                 fileLabel.setStyle("-fx-font-size: 12;");
                 
+                Button openBtn = new Button("Open");
+                openBtn.getStyleClass().addAll("button", "button-primary");
+                openBtn.setOnAction(e -> openAttachment(item));
+
                 Button removeBtn = new Button("Remove");
                 removeBtn.getStyleClass().addAll("button", "button-danger");
                 removeBtn.setOnAction(e -> {
@@ -515,8 +578,14 @@ public class TaskDetailController {
                     }
                 });
 
+                hbox.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        openAttachment(item);
+                    }
+                });
+
                 HBox.setHgrow(fileLabel, Priority.ALWAYS);
-                hbox.getChildren().addAll(fileLabel, removeBtn);
+                hbox.getChildren().addAll(fileLabel, openBtn, removeBtn);
                 setGraphic(hbox);
             }
         }

@@ -67,8 +67,17 @@ public class DashboardController implements TimerService.TimerListener {
     @FXML private Label completedTasksLabel;
     @FXML private Label pendingTasksLabel;
     @FXML private VBox approvalsSection;
+    @FXML private VBox leaderboardCard;
+    @FXML private Label leaderboardCardTitle;
+    @FXML private Label leaderboardCardSubtitle;
     @FXML private ListView<Task> pendingApprovalsListView;
     @FXML private Label approvalsCountLabel;
+    @FXML private VBox approvalsCard;
+    @FXML private VBox quickStatsSection;
+    @FXML private VBox timerSection;
+    @FXML private VBox myTasksSection;
+    @FXML private Label tasksSectionLabel;
+    @FXML private Label tasksSectionSubtitle;
 
     private Timeline refreshTimeline;
     private boolean disposed;
@@ -172,20 +181,23 @@ public class DashboardController implements TimerService.TimerListener {
     private void startAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
         
         refreshTimeline = new Timeline(
             new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> {
                 try {
                     loadTasks();
-                } catch (Exception e1) {
-                }
-                if (Session.isHost()) {
-                    loadPendingApprovals();
+                    if (Session.isHost()) {
+                        loadPendingApprovals();
+                    }
+                } catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, "Error during dashboard refresh", ex);
                 }
             })
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.setOnFinished(e -> refreshTimeline = null);
         refreshTimeline.play();
         LOGGER.log(Level.INFO, "Dashboard auto-refresh timeline started (interval: {0} seconds)", REFRESH_INTERVAL_SECONDS);
     }
@@ -193,6 +205,7 @@ public class DashboardController implements TimerService.TimerListener {
     private void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
             LOGGER.info("Dashboard auto-refresh timeline stopped");
         }
     }
@@ -201,9 +214,64 @@ public class DashboardController implements TimerService.TimerListener {
         boolean isHost = Session.isHost();
         if (taskField != null) taskField.setVisible(isHost);
         if (taskDate != null) taskDate.setVisible(isHost);
+        
+        // For hosts: replace "My Tasks" with "Pending Approvals" as the main view
+        if (myTasksSection != null) {
+            myTasksSection.setVisible(!isHost);
+            myTasksSection.setManaged(!isHost);
+        }
+        
         if (approvalsSection != null) {
             approvalsSection.setVisible(isHost);
             approvalsSection.setManaged(isHost);
+        }
+        
+        if (leaderboardCard != null) {
+            leaderboardCard.setVisible(true);
+            leaderboardCard.setManaged(true);
+        }
+        if (leaderboardCardTitle != null) {
+            leaderboardCardTitle.setText(isHost ? "Pending Approvals" : "Mini Leaderboard");
+        }
+        if (leaderboardCardSubtitle != null) {
+            leaderboardCardSubtitle.setText(isHost ? "Review tasks submitted by participants" : "Preview top learners from your classes");
+        }
+        if (classSelector != null) {
+            classSelector.setVisible(!isHost);
+            classSelector.setManaged(!isHost);
+        }
+        if (leaderboardPreview != null) {
+            leaderboardPreview.setVisible(true);
+            leaderboardPreview.setManaged(true);
+        }
+        if (approvalsCard != null) {
+            approvalsCard.setVisible(isHost);
+            approvalsCard.setManaged(isHost);
+        }
+        if (pendingApprovalsListView != null) {
+            pendingApprovalsListView.setVisible(true);
+            pendingApprovalsListView.setManaged(true);
+        }
+        if (approvalsCountLabel != null) {
+            approvalsCountLabel.setVisible(isHost);
+            approvalsCountLabel.setManaged(isHost);
+        }
+        if (quickStatsSection != null) {
+            quickStatsSection.setVisible(!isHost);
+            quickStatsSection.setManaged(!isHost);
+        }
+        if (timerSection != null) {
+            timerSection.setVisible(!isHost);
+            timerSection.setManaged(!isHost);
+        }
+        
+        // Update labels for clarity
+        if (isHost && tasksSectionLabel != null) {
+            tasksSectionLabel.setText("Pending Approvals");
+        }
+        if (isHost && tasksSectionSubtitle != null) {
+            String subtitle = "Review tasks submitted by participants";
+            tasksSectionSubtitle.setText(subtitle);
         }
     }
     

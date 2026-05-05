@@ -375,17 +375,17 @@
     -fx-padding: 4;
 }
 .progress-bar > .bar {
-    -fx-background-color: linear-gradient(90deg, #0284c7, #0369a1);
+    -fx-background-color: #0284c7;
     -fx-background-radius: 8;
 }
 .progress-bar.success > .bar {
-    -fx-background-color: linear-gradient(90deg, #16a34a, #15803d);
+    -fx-background-color: #16a34a;
 }
 .progress-bar.warning > .bar {
-    -fx-background-color: linear-gradient(90deg, #ca8a04, #b45309);
+    -fx-background-color: #ca8a04;
 }
 .progress-bar.danger > .bar {
-    -fx-background-color: linear-gradient(90deg, #dc2626, #b91c1c);
+    -fx-background-color: #dc2626;
 }
 .tab-pane {
     -fx-background-color: transparent;

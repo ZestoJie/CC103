@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class TaskAttachment {
 
-    private int id;
-    private int submissionId;
-    private String fileName;
-    private String filePath;
-    private LocalDateTime uploadedAt;
+    private final int id;
+    private final int submissionId;
+    private final String fileName;
+    private final String filePath;
+    private final LocalDateTime uploadedAt;
 
     public TaskAttachment(int id, int submissionId, String fileName, String filePath, LocalDateTime uploadedAt) {
         this.id = id;

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
@@ -28,7 +29,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ClassDetailController {
 
@@ -60,8 +69,12 @@ public class ClassDetailController {
     private Button editTaskButton;
     @FXML@SuppressWarnings("unused")
     private Button deleteTaskButton;
+    @FXML private TextField attachmentField;
+    @FXML private Button uploadAttachmentButton;
+    
     private int currentClassId = -1;
     private ClassTask editingTask = null;
+    private File selectedAttachmentFile = null;
     private final ObservableList<ClassTask> classTasks = FXCollections.observableArrayList();
     private boolean isOwner = false;
     private Timeline refreshTimeline;
@@ -125,15 +138,21 @@ public class ClassDetailController {
     private void startAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
         
         refreshTimeline = new Timeline(
             new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> {
-                loadClassTasks();
-                loadParticipants();
+                try {
+                    loadClassTasks();
+                    loadParticipants();
+                } catch (Exception ex) {
+                    LOGGER.log(java.util.logging.Level.WARNING, "Error during class detail refresh", ex);
+                }
             })
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.setOnFinished(e -> refreshTimeline = null);
         refreshTimeline.play();
         LOGGER.info(() -> "Class detail auto-refresh timeline started (interval: " + REFRESH_INTERVAL_SECONDS + " seconds)");
     }
@@ -141,6 +160,7 @@ public class ClassDetailController {
     private void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
             LOGGER.info("Class detail auto-refresh timeline stopped");
         }
     }
@@ -214,6 +234,14 @@ public class ClassDetailController {
         if (ownerTaskActionsRow != null) {
             ownerTaskActionsRow.setVisible(owner);
             ownerTaskActionsRow.setManaged(owner);
+        }
+        if (uploadAttachmentButton != null) {
+            uploadAttachmentButton.setVisible(owner);
+            uploadAttachmentButton.setManaged(owner);
+        }
+        if (attachmentField != null) {
+            attachmentField.setVisible(owner);
+            attachmentField.setManaged(owner);
         }
         if (submitTaskButton != null && owner) {
             submitTaskButton.setText(editingTask != null ? "Update Task" : "Add Task");
@@ -306,6 +334,34 @@ public class ClassDetailController {
 
     @FXML
     @SuppressWarnings("unused")
+    private void handleUploadAttachment() {
+        if (!isOwner) {
+            UiDialogs.warn(window(), "Not allowed", "Only the class host can upload attachments.");
+            return;
+        }
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Attachment");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("All Files", "*.*"),
+            new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
+            new FileChooser.ExtensionFilter("Word Documents", "*.docx", "*.doc"),
+            new FileChooser.ExtensionFilter("Text Files", "*.txt"),
+            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png", "*.gif")
+        );
+        
+        File selectedFile = fileChooser.showOpenDialog(window());
+        if (selectedFile != null) {
+            selectedAttachmentFile = selectedFile;
+            if (attachmentField != null) {
+                attachmentField.setText(selectedFile.getName());
+            }
+            LOGGER.info(() -> "Attachment selected: " + selectedFile.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
     private void handleEditTask() {
         if (!isOwner) {
             return;
@@ -364,6 +420,18 @@ public class ClassDetailController {
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int taskId = keys.getInt(1);
+                    // Handle attachment if selected
+                    if (selectedAttachmentFile != null && selectedAttachmentFile.exists()) {
+                        saveTaskAttachment(conn, taskId, selectedAttachmentFile);
+                    }
+                }
+                stmt.setInt(1, currentClassId);
+                stmt.setString(2, title);
+                stmt.setString(3, description.isEmpty() ? null : description);
+                stmt.setDate(4, Date.valueOf(dueDate));
+                stmt.setInt(5, ownerId);
                 assignTaskToClassMembers(conn, keys);
             }
 
@@ -426,12 +494,51 @@ public class ClassDetailController {
         taskTitleField.clear();
         taskDescriptionArea.clear();
         taskDueDatePicker.setValue(null);
+        if (attachmentField != null) {
+            attachmentField.clear();
+        }
         formTitleLabel.setText("Add New Task");
         submitTaskButton.setText("Add Task");
         cancelEditButton.setVisible(false);
         cancelEditButton.setManaged(false);
         editingTask = null;
+        selectedAttachmentFile = null;
         applyOwnerParticipantUi();
+    }
+
+    private void saveTaskAttachment(Connection conn, int taskId, File attachmentFile) {
+        try {
+            // Create attachments directory if it doesn't exist
+            Path attachmentDir = Paths.get("task_attachments");
+            if (!Files.exists(attachmentDir)) {
+                Files.createDirectory(attachmentDir);
+            }
+            
+            // Create unique filename with timestamp
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String fileName = timestamp + "_" + attachmentFile.getName();
+            Path targetPath = attachmentDir.resolve(fileName);
+            
+            // Copy file to attachments directory
+            Files.copy(attachmentFile.toPath(), targetPath);
+            
+            // Store attachment info in database
+            String sql = "INSERT INTO class_task_attachments (class_task_id, file_name, file_path, uploaded_at) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, taskId);
+                stmt.setString(2, attachmentFile.getName());
+                stmt.setString(3, targetPath.toString());
+                stmt.setString(4, LocalDateTime.now().toString());
+                stmt.executeUpdate();
+                LOGGER.info(() -> "Attachment saved: " + targetPath.toString());
+            }
+        } catch (IOException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Failed to save attachment", e);
+            UiDialogs.error(window(), "Upload failed", "Could not save attachment: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Failed to save attachment to database", e);
+            UiDialogs.error(window(), "Upload failed", "Could not save attachment to database: " + e.getMessage());
+        }
     }
 
     private void loadParticipants() {

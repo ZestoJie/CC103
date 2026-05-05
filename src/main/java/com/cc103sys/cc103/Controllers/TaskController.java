@@ -511,8 +511,9 @@ public class TaskController implements TimerService.TimerListener {
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
-               
+                stmt.setInt(1, userId);
                 stmt.setString(2, Session.getUsername());
+                stmt.setString(3, Session.getUsername());
                 try (ResultSet rs = stmt.executeQuery()) {
                     int count = 0;
                     while (rs.next()) {
@@ -571,8 +572,10 @@ public class TaskController implements TimerService.TimerListener {
 
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
                 stmt.setString(2, Session.getUsername());
                 stmt.setInt(3, selected.getId());
+                stmt.setString(4, Session.getUsername());
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         filteredTasks.add(new Task(

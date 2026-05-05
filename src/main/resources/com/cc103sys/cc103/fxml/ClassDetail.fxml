@@ -16,9 +16,11 @@
     <children>
         <fx:include source="navbar.fxml"/>
 
-        <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20;">
-            <children>
-                <Label fx:id="breadcrumbLabel" styleClass="breadcrumb" text="Dashboard › Classes" />
+        <ScrollPane fitToWidth="true" fitToHeight="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <children>
+                        <Label fx:id="breadcrumbLabel" styleClass="breadcrumb" text="Dashboard › Classes" />
 
                 <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-wrap-text: true;">
                     <children>
@@ -86,6 +88,14 @@
                                         <Label text="Due Date *" styleClass="caption" />
                                         <DatePicker fx:id="taskDueDatePicker" />
 
+                                        <Label text="Attachment (Optional)" styleClass="caption" />
+                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                            <children>
+                                                <TextField fx:id="attachmentField" promptText="No file selected" editable="false" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="uploadAttachmentButton" onAction="#handleUploadAttachment" text="Browse" styleClass="button-secondary" />
+                                            </children>
+                                        </HBox>
+
                                         <HBox spacing="10">
                                             <children>
                                                 <Button fx:id="submitTaskButton" onAction="#handleSubmitTask" text="Add Task" HBox.hgrow="ALWAYS" />
@@ -115,5 +125,7 @@
                 </HBox>
             </children>
         </VBox>
+            </content>
+        </ScrollPane>
     </children>
 </HBox>

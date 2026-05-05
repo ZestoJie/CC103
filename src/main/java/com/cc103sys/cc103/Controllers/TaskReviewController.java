@@ -3,6 +3,8 @@ package com.cc103sys.cc103.Controllers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Logger;
 
 import com.cc103sys.cc103.DB.DBUtil;
@@ -32,6 +34,8 @@ public class TaskReviewController {
 
     private static final Logger LOGGER = Logger.getLogger(TaskReviewController.class.getName());
     private static final int REFRESH_INTERVAL_SECONDS = 5;
+    private static final int BASE_TASK_POINTS = 10;
+    private static final int LATE_TASK_POINTS = 5;
 
     @FXML private Label breadcrumbLabel;
     @FXML private Label classNameLabel;
@@ -225,30 +229,51 @@ public class TaskReviewController {
             }
 
             if (userId != null) {
-                sql = "UPDATE users SET points = points + 50 WHERE id = ?";
+                int points = calculateClassTaskApprovalPoints();
+                sql = "UPDATE users SET points = points + ? WHERE id = ?";
                 try (Connection conn = DBUtil.getConnection();
                      PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setInt(1, userId);
+                    stmt.setInt(1, points);
+                    stmt.setInt(2, userId);
                     stmt.executeUpdate();
                 }
 
-                sql = "UPDATE tasks SET status = 'Done', approved_by = ?, approved_date = CURDATE() WHERE user_id = ? AND class_task_id = ?";
+                sql = "UPDATE tasks SET status = 'Done', points_awarded = ?, approved_by = ?, approved_date = CURDATE() WHERE user_id = ? AND class_task_id = ?";
                 try (Connection conn = DBUtil.getConnection();
                      PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setInt(1, currentUserId);
-                    stmt.setInt(2, userId);
-                    stmt.setInt(3, currentTaskId);
+                    stmt.setInt(1, points);
+                    stmt.setInt(2, currentUserId);
+                    stmt.setInt(3, userId);
+                    stmt.setInt(4, currentTaskId);
                     stmt.executeUpdate();
                 }
+
+                LOGGER.info(String.format("Approved submission from %s and awarded %d points", submission.username, points));
+                UiDialogs.info(window(), "Approved", "Submission approved and " + points + " points awarded.");
+            } else {
+                UiDialogs.info(window(), "Approved", "Submission approved.");
             }
 
             LOGGER.info(String.format("Submission from %s approved", submission.username));
             loadAllSubmissions();
-            UiDialogs.info(window(), "Approved", "Submission approved and 50 points awarded.");
         } catch (Exception e) {
             LOGGER.severe(String.format("Failed to approve submission: %s", e.getMessage()));
             UiDialogs.error(window(), "Approval failed", e.getMessage());
         }
+    }
+
+    private int calculateClassTaskApprovalPoints() {
+        if (currentTask == null || currentTask.getDueDate() == null) {
+            return BASE_TASK_POINTS;
+        }
+
+        long daysBeforeDeadline = ChronoUnit.DAYS.between(LocalDate.now(), currentTask.getDueDate());
+        if (daysBeforeDeadline < 0) {
+            return LATE_TASK_POINTS;
+        }
+
+        int multiplier = (int) Math.max(1, daysBeforeDeadline);
+        return BASE_TASK_POINTS * multiplier;
     }
 
     private void rejectSubmission(SubmissionRecord submission) {

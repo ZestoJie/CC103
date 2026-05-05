@@ -609,7 +609,7 @@ public class DashboardController implements TimerService.TimerListener {
             return;
         }
         
-        int points = calculateTaskCompletionPoints(task.getDate());
+        int points = calculateClassTaskApprovalPoints(task.getDate());
         String updateSql = "UPDATE tasks SET status = 'Done', completed_date = ?, points_awarded = ?, approved_by = ?, approved_date = ? WHERE id = ?";
         String updatePointsSql = "UPDATE users SET points = points + ? WHERE username = ?";
         
@@ -662,6 +662,20 @@ public class DashboardController implements TimerService.TimerListener {
         } catch (Exception e) {
             LOGGER.severe("Failed to reject task: " + e.getMessage());
         }
+    }
+
+    private int calculateClassTaskApprovalPoints(LocalDate taskDate) {
+        if (taskDate == null) {
+            return 10;
+        }
+
+        long daysBeforeDeadline = ChronoUnit.DAYS.between(LocalDate.now(), taskDate);
+        if (daysBeforeDeadline < 0) {
+            return 5;
+        }
+
+        int multiplier = (int) Math.max(1, daysBeforeDeadline);
+        return 10 * multiplier;
     }
     
     private class ApprovalListCell extends ListCell<Task> {

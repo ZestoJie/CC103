@@ -84,7 +84,7 @@ public class DashboardController implements TimerService.TimerListener {
     private boolean pomodoroRunning;
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private final ObservableList<Task> pendingApprovals = FXCollections.observableArrayList();
-    private static final int REFRESH_INTERVAL_SECONDS = 5;
+    private static final int REFRESH_INTERVAL_SECONDS = 30;
 
     private Window window() {
         return welcomeLabel != null && welcomeLabel.getScene() != null

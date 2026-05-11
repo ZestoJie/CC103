@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox style="-fx-background-color: #f8fafc;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cc103sys.cc103.Controllers.DashboardController">
+
+    <children>
+
+        <fx:include source="navbar.fxml" HBox.hgrow="NEVER" />
+
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: transparent; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="20" style="-fx-background-color: #f8fafc;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="20" left="20" right="20" top="20" />
+                    </padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <children>
+
+                    <Label fx:id="welcomeLabel" styleClass="heading-1" text="Welcome back, User!" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+                </children>
+            </HBox>
+
+            <HBox alignment="TOP_LEFT" spacing="20" VBox.vgrow="ALWAYS">
+
+                <VBox fx:id="myTasksSection" spacing="12" styleClass="card" VBox.vgrow="ALWAYS">
+
+                    <Label fx:id="tasksSectionLabel" styleClass="heading-3" text="My Tasks" />
+
+                    <Label fx:id="tasksSectionSubtitle" styleClass="subtitle" text="Tasks assigned to you" />
+
+                    <ListView fx:id="taskList" prefHeight="668.0" prefWidth="430.0" VBox.vgrow="ALWAYS" />
+
+                    <Label fx:id="noTaskLabel" styleClass="subtitle" text="No activities to accomplish" visible="false" />
+                </VBox>
+
+                <VBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+
+                    <VBox fx:id="leaderboardCard" spacing="12" styleClass="card" VBox.vgrow="ALWAYS">
+                        <HBox>
+                            <Label fx:id="leaderboardCardTitle" styleClass="heading-3" text="Dashboard Overview" />
+
+                            <Region HBox.hgrow="ALWAYS" />
+
+                            <Label fx:id="approvalsCountLabel" managed="false" styleClass="caption" text="Pending: 0" visible="false" />
+
+                            <ComboBox fx:id="classSelector" promptText="Class" />
+                        </HBox>
+
+                        <Label fx:id="leaderboardCardSubtitle" styleClass="subtitle" text="See top performers and pending approvals for your selected class" />
+
+                        <HBox spacing="20" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <children>
+                                <VBox spacing="12" styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="heading-3" text="Leaderboard" />
+                                        <ListView fx:id="leaderboardPreview" prefHeight="292.0" prefWidth="347.0" VBox.vgrow="ALWAYS" />
+                                    </children>
+                                </VBox>
+                                <VBox fx:id="approvalsCard" managed="false" spacing="12" styleClass="card" visible="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="heading-3" text="Pending Approvals" />
+                                        <ListView fx:id="pendingApprovalsListView" VBox.vgrow="ALWAYS" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </VBox>
+
+                    <VBox fx:id="timerSection" spacing="12" styleClass="card" VBox.vgrow="ALWAYS">
+
+                        <Label styleClass="heading-3" text="Timer Panel" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <children>
+                                <Label styleClass="caption" text="Mode:" />
+                                <RadioButton fx:id="studyModeRadio" onAction="#handleModeChange" selected="true" text="Study">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="timerModeGroup" />
+                                 </toggleGroup></RadioButton>
+                                <RadioButton fx:id="breakModeRadio" onAction="#handleModeChange" text="Break" toggleGroup="$timerModeGroup" />
+                            </children>
+                        </HBox>
+
+                        <TextField fx:id="timerSubjectField" promptText="Subject" />
+
+                        <HBox alignment="CENTER" style="-fx-background-color: #f3f4f6; -fx-padding: 20; -fx-background-radius: 12;">
+                            <children>
+                                <Label fx:id="timerLabel" style="-fx-font-size: 32px; -fx-font-weight: bold;" text="00:00" />
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <children>
+                                <ComboBox fx:id="timerPreset" promptText="Select Duration" HBox.hgrow="ALWAYS" />
+                                <Button fx:id="timerStartButton" onAction="#handleStartTimer" text="Start" />
+                                <Button fx:id="timerPauseButton" onAction="#handlePauseTimer" text="Pause" />
+                            </children>
+                        </HBox>
+                    </VBox>
+
+                    <VBox fx:id="quickStatsSection" spacing="12" styleClass="card" VBox.vgrow="ALWAYS">
+
+                        <Label styleClass="heading-3" text="Quick Stats" />
+
+                        <Label fx:id="totalTasksLabel" styleClass="subtitle" text="Total Tasks: 0" />
+
+                        <Label fx:id="completedTasksLabel" styleClass="subtitle" text="Completed Tasks: 0" />
+
+                        <Label fx:id="pendingTasksLabel" styleClass="subtitle" text="Pending Tasks: 0" />
+                    </VBox>
+
+                </VBox>
+
+            </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+
+    </children>
+</HBox>

@@ -24,7 +24,11 @@
                 </image>
             </ImageView>
 
-            <Label style="-fx-font-size: 22px;                           -fx-font-weight: bold;                           -fx-text-fill: #1f2d3a;                           -fx-font-family: 'Segoe UI Semibold';" text="KyusiyuVenture" />
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Label style="-fx-font-size: 22px;                           -fx-font-weight: bold;                           -fx-text-fill: #1f2d3a;                           -fx-font-family: 'Segoe UI Semibold';" text="KyusiyuVenture" />
+                </children>
+            </HBox>
 
             <TextField fx:id="usernameField" promptText="Username" />
 
@@ -41,10 +45,12 @@
 
             <Button onAction="#handleLogin" text="START QUEST" />
 
+            <Button onAction="#closeApp" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold;" text="CLOSE APPLICATION" />
+
             <HBox alignment="CENTER" spacing="3.0">
                 <children>
                     <Label text="New Student?" />
-                    <Label onMouseClicked="#goRegister" style="-fx-text-fill: #3b82f6;                                   -fx-font-weight: bold;" text="Register Now" />
+                    <Label onMouseClicked="#goRegister" style="-fx-text-fill: #3b82f6;-fx-font-weight: bold;" text="Register Now" />
                 </children>
             </HBox>
 

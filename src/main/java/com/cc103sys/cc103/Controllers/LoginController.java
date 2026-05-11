@@ -10,6 +10,7 @@ import com.cc103sys.cc103.Utils.CredentialsManager;
 import com.cc103sys.cc103.Utils.Navigator;
 import com.cc103sys.cc103.Utils.Session;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -83,6 +84,12 @@ public class LoginController {
         } catch (Exception e) {
             LOGGER.severe(() -> "Navigation error: " + e.getMessage());
         }
+    }
+
+    @FXML
+    @SuppressWarnings("unused")
+    private void closeApp() {
+        Platform.exit();
     }
 
     private boolean validateLoginInput(String username, String password) {

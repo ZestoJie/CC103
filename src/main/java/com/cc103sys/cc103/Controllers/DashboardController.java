@@ -639,7 +639,7 @@ public class DashboardController implements TimerService.TimerListener {
         Integer currentUserId = getCurrentUserId();
         if (currentUserId == null) return;
 
-        String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, t.username, c.class_name " +
+        String sql = "SELECT t.id, t.task_name, t.task_date, t.status, t.class_id, t.class_task_id, t.username, c.class_name " +
                      "FROM tasks t " +
                      "LEFT JOIN classes c ON t.class_id = c.id " +
                      "WHERE t.status = 'For Approval' " +
@@ -651,12 +651,15 @@ public class DashboardController implements TimerService.TimerListener {
             stmt.setInt(1, currentUserId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    Integer classId = rs.getObject("class_id", Integer.class);
+                    Integer classTaskId = rs.getObject("class_task_id", Integer.class);
                     pendingApprovals.add(new Task(
                         rs.getInt("id"),
                         rs.getString("task_name"),
                         rs.getDate("task_date").toLocalDate(),
                         rs.getString("status"),
-                        rs.getInt("class_id"),
+                        classId,
+                        classTaskId,
                         rs.getString("class_name"),
                         false,
                         rs.getString("username")
@@ -764,18 +767,21 @@ public class DashboardController implements TimerService.TimerListener {
                 String userLabel = task.getUsername() != null ? " by " + task.getUsername() : "";
                 String taskText = classLabel + task.getTaskName() + userLabel + " (" + task.getDate() + ")";
                 
+                Button viewBtn = new Button("View Task");
                 Button approveBtn = new Button("Approve");
                 Button rejectBtn = new Button("Reject");
                 
+                viewBtn.getStyleClass().addAll("button", "button-secondary");
                 approveBtn.getStyleClass().addAll("button", "button-success");
                 rejectBtn.getStyleClass().addAll("button", "button-danger");
                 
                 final Task approvalTask = task;
+                viewBtn.setOnAction(e -> Navigator.navigateToTaskReview(approvalTask.getClassId(), approvalTask.getClassTaskId()));
                 approveBtn.setOnAction(e -> approveTask(approvalTask));
                 rejectBtn.setOnAction(e -> rejectTask(approvalTask));
                 
                 HBox buttonBox = new HBox(5);
-                buttonBox.getChildren().addAll(approveBtn, rejectBtn);
+                buttonBox.getChildren().addAll(viewBtn, approveBtn, rejectBtn);
                 
                 VBox cellBox = new VBox(3);
                 cellBox.getChildren().addAll(

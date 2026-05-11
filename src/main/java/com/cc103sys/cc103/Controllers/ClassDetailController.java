@@ -577,8 +577,6 @@ public class ClassDetailController {
         return null;
     }
 
-
-
     private class TaskListCell extends ListCell<ClassTask> {
         @Override
         protected void updateItem(ClassTask task, boolean empty) {

@@ -45,8 +45,6 @@
 
             <Button onAction="#handleLogin" text="START QUEST" />
 
-            <Button onAction="#closeApp" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold;" text="CLOSE APPLICATION" />
-
             <HBox alignment="CENTER" spacing="3.0">
                 <children>
                     <Label text="New Student?" />
